@@ -370,7 +370,7 @@ class UnemployedResidentsByDistrict(Base):
     district = relationship('District')
 
 
-class UnemployedResidentsByDistrictsCategorized(Base):
+class UnemployedCategorizedResidentsByDistrict(Base):
     __tablename__ = 'unemployed_residents_by_districts_categorized'
     __table_args__ = (
         Index('unemployed_residents_by_districts_categorized_year_district_id_', 'year', 'district_id'),
