@@ -93,7 +93,15 @@ async def get_residents_education_support(session: AsyncSession = Depends(get_se
     rows = await service.get_residents_education_support(session)
     schema = schemas.ChildEducationSupport
 
-    return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
+    return [schema(year=r.year,
+        educational_assistance=r.educational_assistance,
+        parenting_counselor=r.parenting_counselor,
+        pedagogical_family_assistance=r.pedagogical_family_assistance,
+        child_day_care_facility=r.child_day_care_facility,
+        full_time_care=r.full_time_care,
+        residential_education=r.residential_education,
+        integration_assistance=r.integration_assistance,
+        additional_support=r.additional_support) for r in rows]
 
 
 @router.get('/{district_id}/residents', response_model=list[schemas.ResidentsByDistrict])

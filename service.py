@@ -46,9 +46,9 @@ async def get_residents_debt_counseling(session: AsyncSession):
     return result.scalars().all()
 
 
-async def get_residents_education_support_by_district(session: AsyncSession, district_id: int):
+async def get_residents_education_support(session: AsyncSession):
     model = models.ChildEducationSupport
-    result = await session.execute(select(model).filter(model.district_id==district_id))
+    result = await session.execute(select(model))
 
     return result.scalars().all()
 
