@@ -43,30 +43,6 @@ class District(Base):
     geometry = Column(NullType)
 
 
-t_geography_columns = Table(
-    'geography_columns', metadata,
-    Column('f_table_catalog', String),
-    Column('f_table_schema', String),
-    Column('f_table_name', String),
-    Column('f_geography_column', String),
-    Column('coord_dimension', Integer),
-    Column('srid', Integer),
-    Column('type', Text)
-)
-
-
-t_geometry_columns = Table(
-    'geometry_columns', metadata,
-    Column('f_table_catalog', String(256)),
-    Column('f_table_schema', String),
-    Column('f_table_name', String),
-    Column('f_geometry_column', String),
-    Column('coord_dimension', Integer),
-    Column('srid', Integer),
-    Column('type', String(30))
-)
-
-
 class HouseholdType(Base):
     __tablename__ = 'household_type'
 
@@ -74,7 +50,7 @@ class HouseholdType(Base):
     label = Column(String)
 
 
-class NonGermanNationalsResidenceStatu(Base):
+class NonGermanNationalsResidenceStatus(Base):
     __tablename__ = 'non_german_nationals_residence_status'
 
     id = Column(Integer, primary_key=True)
