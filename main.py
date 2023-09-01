@@ -158,7 +158,7 @@ async def get_residents_basicbenefits_by_district(district_id: int, session: Asy
 @router.get('/{district_id}/residents/ageunder18', response_model=list[schemas.ChildrenAgeUnder18ByDistrict])
 async def get_residents_ageunder18_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_ageunder18_by_district(session, district_id)
-    schema = schemas.BasicBenefitsIncomeByDistrict
+    schema = schemas.ChildrenAgeUnder18ByDistrict
 
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
 
