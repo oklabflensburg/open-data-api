@@ -208,7 +208,7 @@ class ChildrenAgeUnder18ByDistrict(Base):
     district = relationship('District')
 
 
-class DebtCounselingResident(Base):
+class DebtCounselingOfResidents(Base):
     __tablename__ = 'debt_counseling_residents'
     __table_args__ = (
         Index('debt_counseling_residents_year_household_type_id_idx', 'year', 'household_type_id'),

@@ -41,7 +41,7 @@ async def get_district(district_id: int, session: AsyncSession = Depends(get_ses
 
 @router.get('/districts/', response_model=list[schemas.District])
 async def get_districts(session: AsyncSession = Depends(get_session)):
-    rows = await service.get_districts(session, district_id)
+    rows = await service.get_districts(session)
     schema = schemas.District
 
     return [schema(district_id=r.id, district_name=r.name) for r in rows]
@@ -83,9 +83,9 @@ async def get_residents_non_germans(session: AsyncSession = Depends(get_session)
 @router.get('/residents/debtcounseling', response_model=list[schemas.DebtCounselingOfResidents])
 async def get_residents_debt_counseling(session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_debt_counseling(session)
-    schema = schemas.DebtCounseling
+    schema = schemas.DebtCounselingOfResidents
 
-    return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
+    return [schema(year=r.year, household_type_id=r.household_type_id, residents=r.residents) for r in rows]
 
 
 @router.get('/residents/education/support', response_model=list[schemas.ChildEducationSupport])

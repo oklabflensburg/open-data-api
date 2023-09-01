@@ -39,9 +39,9 @@ async def get_residents_non_germans(session: AsyncSession):
     return result.scalars().all()
 
 
-async def get_residents_debt_counseling_by_district(session: AsyncSession, district_id: int):
-    model = models.DebtCounseling
-    result = await session.execute(select(model).filter(model.district_id==district_id))
+async def get_residents_debt_counseling(session: AsyncSession):
+    model = models.DebtCounselingOfResidents
+    result = await session.execute(select(model))
 
     return result.scalars().all()
 
