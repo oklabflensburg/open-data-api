@@ -69,9 +69,9 @@ class AgeGroupsOfResidentsByDistrict(BaseModel):
     age_30_to_under_45: Optional[int]
     age_45_to_under_65: Optional[int]
     age_65_to_under_80: Optional[int]
-    age_80_and_older: Optional[int]
+    age_80_and_above: Optional[int]
     age_0_to_under_7: Optional[int]
-    age_60_and_older: Optional[int]
+    age_60_and_above: Optional[int]
 
 
 class AgeGroupsOfResidentsByDistrict(AgeGroupsOfResidentsByDistrict):
@@ -153,7 +153,6 @@ class UnemployedResidentsByDistricts(UnemployedResidentsByDistrict):
 class UnemployedCategorizedResidentsByDistrict(BaseModel):
     year: int
     district_id: int
-    total: Optional[int]
     unemployed_total: Optional[int]
     percentage_of_total: Optional[float]
     percentage_sgb_iii: Optional[float]

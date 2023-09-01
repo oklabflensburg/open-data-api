@@ -184,7 +184,16 @@ async def get_residents_agegroups_by_district(district_id: int, session: AsyncSe
     rows = await service.get_residents_agegroups_by_district(session, district_id)
     schema = schemas.AgeGroupsOfResidentsByDistrict
 
-    return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
+    return [schema(year=r.year,
+        district_id=r.district_id,
+        age_under_18=r.age_under_18,
+        age_18_to_under_30=r.age_18_to_under_30,
+        age_30_to_under_45=r.age_30_to_under_45,
+        age_45_to_under_65=r.age_45_to_under_65,
+        age_65_to_under_80=r.age_65_to_under_80,
+        age_80_and_above=r.age_80_and_older,
+        age_0_to_under_7=r.age_0_to_under_7,
+        age_60_and_above=r.age_60_and_older) for r in rows]
 
 
 @router.get('/{district_id}/residents/unemployed', response_model=list[schemas.UnemployedResidentsByDistrict])
@@ -200,7 +209,15 @@ async def get_residents_unemployed_by_categories_by_district(district_id: int, s
     rows = await service.get_residents_unemployed_categorized_by_district(session, district_id)
     schema = schemas.UnemployedCategorizedResidentsByDistrict
 
-    return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
+    return [schema(year=r.year,
+        district_id=r.district_id,
+        unemployed_total=r.unemployed_total,
+        percentage_of_total=r.percentage_of_total,
+        percentage_sgb_iii=r.percentage_sgb_iii,
+        percentage_sgb_ii=r.percentage_sgb_ii,
+        percentage_foreign_citizenship=r.percentage_foreign_citizenship,
+        percentage_female=r.percentage_female,
+        percentage_age_under_25=r.percentage_age_under_25) for r in rows]
 
 
 @router.get('/{district_id}/residents/beneficiaries', response_model=list[schemas.BeneficiariesByDistrict])
