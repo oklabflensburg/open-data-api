@@ -106,7 +106,7 @@ async def get_residents_education_support(session: AsyncSession = Depends(get_se
 
 @router.get('/{district_id}/residents', response_model=list[schemas.ResidentsByDistrict])
 async def get_residents_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
-    rows = await service.get_residents(session, district_id)
+    rows = await service.get_residents_by_district(session, district_id)
     schema = schemas.ResidentsByDistrict
 
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
@@ -117,7 +117,10 @@ async def get_residents_births_by_district(district_id: int, session: AsyncSessi
     rows = await service.get_residents_births_by_district(session, district_id)
     schema = schemas.BirthsByDistrict
 
-    return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
+    return [schema(year=r.year,
+        district_id=r.district_id,
+        births=r.births,
+        birth_rate=r.birth_rate) for r in rows]
 
 
 @router.get('/{district_id}/residents/employed', response_model=list[schemas.EmployedWithPensionInsuranceByDistrict])
@@ -125,7 +128,10 @@ async def get_residents_employed_by_district(district_id: int, session: AsyncSes
     rows = await service.get_residents_employed_by_district(session, district_id)
     schema = schemas.EmployedWithPensionInsuranceByDistrict
 
-    return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
+    return [schema(year=r.year,
+        district_id=r.district_id,
+        residents=r.residents,
+        employment_rate=r.employment_rate) for r in rows]
 
 
 @router.get('/{district_id}/residents/ageratio', response_model=list[schemas.AgeRatioByDistrict])
@@ -133,7 +139,7 @@ async def get_residents_ageratio_by_district(district_id: int, session: AsyncSes
     rows = await service.get_residents_ageratio_by_district(session, district_id)
     schema = schemas.AgeRatioByDistrict
 
-    return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
+    return [schema(year=r.year, district_id=r.district_id, quotient=r.quotient) for r in rows]
 
 
 @router.get('/{district_id}/residents/basicbenefits', response_model=list[schemas.BasicBenefitsIncomeByDistrict])
@@ -141,7 +147,12 @@ async def get_residents_basicbenefits_by_district(district_id: int, session: Asy
     rows = await service.get_residents_basicbenefits_by_district(session, district_id)
     schema = schemas.BasicBenefitsIncomeByDistrict
 
-    return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
+    return [schema(year=r.year,
+        district_id=r.district_id,
+        male=r.male,
+        female=r.female,
+        age_18_to_under_65=r.age_18_to_under_65,
+        age_65_and_above=r.age_65_and_above) for r in rows]
 
 
 @router.get('/{district_id}/residents/ageunder18', response_model=list[schemas.ChildrenAgeUnder18ByDistrict])
