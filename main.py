@@ -246,7 +246,7 @@ async def get_residents_beneficiaries_by_characteristics_by_districts(district_i
         unemployability=r.unemployability,
         employability=r.employability,
         percentage_females=r.percentage_females,
-        percentage_single_parents=r.percenatage_single_parents,
+        percentage_single_parents=r.percentage_single_parents,
         percentage_foreign_citizenship=r.percentage_foreign_citizenship) for r in rows]
 
 
