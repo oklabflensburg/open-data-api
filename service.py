@@ -104,7 +104,7 @@ async def get_residents_births_by_district(session: AsyncSession, district_id: i
 
 
 
-async def get_residents_employed_by_district(session: AsyncSession, district_id: int):
+async def get_residents_employed_by_districts(session: AsyncSession):
     model = models.EmployedWithPensionInsuranceByDistrict
     result = await session.execute(select(model))
 
@@ -209,8 +209,8 @@ async def get_residents_agegroups_by_district(session: AsyncSession, district_id
 
 
 
-async def get_residents_unemployed_by_districts(session: AsyncSession):
-    model = models.UnemployedResidentsByDistrict
+async def get_residents_beneficiaries_by_districts(session: AsyncSession):
+    model = models.BeneficiariesByDistrict
     result = await session.execute(select(model))
 
     return result.scalars().all()
@@ -239,8 +239,8 @@ async def get_residents_unemployed_categorized_by_district(session: AsyncSession
 
 
 
-async def get_residents_beneficiaries_by_districts(session: AsyncSession):
-    model = models.BeneficiariesByDistrict
+async def get_residents_beneficiaries_inactive_by_districts(session: AsyncSession):
+    model = models.InactiveBeneficiariesInHouseholdsByDistrict
     result = await session.execute(select(model))
 
     return result.scalars().all()
@@ -254,8 +254,8 @@ async def get_residents_beneficiaries_by_district(session: AsyncSession, distric
 
 
 
-async def get_residents_beneficiaries_inactive_by_districts(session: AsyncSession):
-    model = models.InactiveBeneficiariesInHouseholdsByDistrict
+async def get_residents_beneficiaries_characteristics_by_districts(session: AsyncSession):
+    model = models.BeneficiariesCharacteristicsByDistrict
     result = await session.execute(select(model))
 
     return result.scalars().all()
@@ -269,8 +269,8 @@ async def get_residents_beneficiaries_inactive_by_district(session: AsyncSession
 
 
 
-async def get_residents_beneficiaries_characteristics_by_districts(session: AsyncSession):
-    model = models.BeneficiariesCharacteristicsByDistrict
+async def get_residents_beneficiaries_age15tounder65_by_districts(session: AsyncSession):
+    model = models.BeneficiariesAge15ToUnder65ByDistrict
     result = await session.execute(select(model))
 
     return result.scalars().all()
@@ -284,15 +284,7 @@ async def get_residents_beneficiaries_characteristics_by_district(session: Async
 
 
 
-async def get_residents_beneficiaries_age15tounder65_by_districts(session: AsyncSession):
-    model = models.BeneficiariesAge15ToUnder65ByDistrict
-    result = await session.execute(select(model))
-
-    return result.scalars().all()
-
-
-
-async def get_residents_migration_background_by_district(session: AsyncSession):
+async def get_residents_migration_background_by_districts(session: AsyncSession):
     model = models.MigrationBackgroundByDistrict
     result = await session.execute(select(model))
 

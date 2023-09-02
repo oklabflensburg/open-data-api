@@ -265,6 +265,17 @@ async def get_residents_beneficiaries_age15tounder65_by_district(district_id: in
 
 
 
+@router.get('/districts/residents/migration/background', response_model=list[schemas.MigrationBackgroundByDistrict])
+async def get_residents_migration_background_by_districts(session: AsyncSession = Depends(get_session)):
+    rows = await service.get_residents_migration_background_by_districts(session)
+    schema = schemas.MigrationBackgroundByDistrict
+
+    return [schema(year=r.year,
+        district_id=r.district_id,
+        foreign_citizenship=r.foreign_citizenship,
+        german_citizenship=r.german_citizenship) for r in rows]
+
+
 @router.get('/{district_id}/residents/migration/background', response_model=list[schemas.MigrationBackgroundByDistrict])
 async def get_residents_migration_background_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_migration_background_by_district(session, district_id)
@@ -274,6 +285,7 @@ async def get_residents_migration_background_by_district(district_id: int, sessi
         district_id=r.district_id,
         foreign_citizenship=r.foreign_citizenship,
         german_citizenship=r.german_citizenship) for r in rows]
+
 
 
 @router.get('/districts/residents/housing/assistance', response_model=list[schemas.HousingAssistanceCasesByDistrict])
