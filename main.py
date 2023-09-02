@@ -9,7 +9,7 @@ import schemas
 import service
 
 
-app = FastAPI()
+app = FastAPI(title='Sozialatlas', summary='Some endpoints are not yet implemented')
 Base = declarative_base()
 router = APIRouter(prefix='/sozialatlas/v1')
 
@@ -39,7 +39,7 @@ async def get_district(district_id: int, session: AsyncSession = Depends(get_ses
         raise HTTPException(status_code=404, detail='Not found')
 
 
-@router.get('/districts/', response_model=list[schemas.District])
+@router.get('/districts/', response_model=list[schemas.District], tags=['districts'])
 async def get_districts(session: AsyncSession = Depends(get_session)):
     rows = await service.get_districts(session)
     schema = schemas.District
