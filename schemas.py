@@ -232,7 +232,7 @@ class BeneficiariesCharacteristicsByDistrict(BaseModel):
     unemployability: Optional[int]
     employability: Optional[int]
     percentage_females: Optional[float]
-    percenatage_single_parents: Optional[float]
+    percentage_single_parents: Optional[float]
     percentage_foreign_citizenship: Optional[float]
 
 

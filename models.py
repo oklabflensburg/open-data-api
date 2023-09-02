@@ -173,7 +173,7 @@ class BeneficiariesCharacteristicsByDistrict(Base):
     unemployability = Column(Integer)
     employability = Column(Integer)
     percentage_females = Column(Numeric)
-    percenatage_single_parents = Column(Numeric)
+    percentage_single_parents = Column(Numeric)
     percentage_foreign_citizenship = Column(Numeric)
 
     district = relationship('District')
