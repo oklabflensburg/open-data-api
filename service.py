@@ -42,7 +42,7 @@ async def get_residents_by_age_groups(session: AsyncSession):
     return result.scalars().all()
 
 
-async def get_residents_by_age_groups(session: AsyncSession, age_group_id: int):
+async def get_residents_by_age_group(session: AsyncSession, age_group_id: int):
     model = models.AgeGroupsOfResident
     result = await session.execute(select(model).filter(model.id==age_group_id))
 
@@ -171,9 +171,9 @@ async def get_residents_age18tounder65_by_districts(session: AsyncSession):
     return result.scalars().all()
 
 
-async def get_residents_age18tounder65_by_districts(session: AsyncSession):
+async def get_residents_age18tounder65_by_district(session: AsyncSession, district_id: int):
     model = models.ResidentsAge18ToUnder65ByDistrict
-    result = await session.execute(select(model))
+    result = await session.execute(select(model).filter(model.district_id==district_id))
 
     return result.scalars().all()
 
@@ -216,6 +216,14 @@ async def get_residents_beneficiaries_by_districts(session: AsyncSession):
     return result.scalars().all()
 
 
+
+async def get_residents_unemployed_by_districts(session: AsyncSession):
+    model = models.UnemployedResidentsByDistrict
+    result = await session.execute(select(model))
+
+    return result.scalars().all()
+
+
 async def get_residents_unemployed_by_district(session: AsyncSession, district_id: int):
     model = models.UnemployedResidentsByDistrict
     result = await session.execute(select(model).filter(model.district_id==district_id))
@@ -224,14 +232,14 @@ async def get_residents_unemployed_by_district(session: AsyncSession, district_i
 
 
 
-async def get_residents_unemployed_categorized_by_districts(session: AsyncSession):
+async def get_residents_unemployed_by_categories_by_districts(session: AsyncSession):
     model = models.UnemployedCategorizedResidentsByDistrict
     result = await session.execute(select(model))
 
     return result.scalars().all()
 
 
-async def get_residents_unemployed_categorized_by_district(session: AsyncSession, district_id: int):
+async def get_residents_unemployed_by_categories_by_district(session: AsyncSession, district_id: int):
     model = models.UnemployedCategorizedResidentsByDistrict
     result = await session.execute(select(model).filter(model.district_id==district_id))
 

@@ -318,7 +318,7 @@ async def get_residents_unemployed_by_district(district_id: int, session: AsyncS
 
 @router.get('/districts/residents/unemployed/categorized', response_model=list[schemas.UnemployedCategorizedResidentsByDistrict])
 async def get_residents_unemployed_by_categories_by_districts(session: AsyncSession = Depends(get_session)):
-    rows = await service.get_residents_unemployed_categorized_by_districts(session)
+    rows = await service.get_residents_unemployed_by_categories_by_districts(session)
     schema = schemas.UnemployedCategorizedResidentsByDistrict
 
     return [schema(year=r.year,
@@ -334,7 +334,7 @@ async def get_residents_unemployed_by_categories_by_districts(session: AsyncSess
 
 @router.get('/{district_id}/residents/unemployed/categorized', response_model=list[schemas.UnemployedCategorizedResidentsByDistrict])
 async def get_residents_unemployed_by_categories_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
-    rows = await service.get_residents_unemployed_categorized_by_district(session, district_id)
+    rows = await service.get_residents_unemployed_by_categories_by_district(session, district_id)
     schema = schemas.UnemployedCategorizedResidentsByDistrict
 
     return [schema(year=r.year,
