@@ -384,7 +384,7 @@ async def get_residents_beneficiaries_inactive_by_district(district_id: int, ses
 
 
 @router.get('/districts/residents/beneficiaries/characteristics', response_model=list[schemas.BeneficiariesCharacteristicsByDistrict])
-async def get_residents_beneficiaries_by_characteristics_by_districts(district_id: int, session: AsyncSession = Depends(get_session)):
+async def get_residents_beneficiaries_by_characteristics_by_districts(session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_beneficiaries_characteristics_by_districts(session)
     schema = schemas.BeneficiariesCharacteristicsByDistrict
 
@@ -395,6 +395,35 @@ async def get_residents_beneficiaries_by_characteristics_by_districts(district_i
         percentage_females=r.percentage_females,
         percentage_single_parents=r.percentage_single_parents,
         percentage_foreign_citizenship=r.percentage_foreign_citizenship) for r in rows]
+
+
+@router.get('/{district_id}/residents/beneficiaries/characteristics', response_model=list[schemas.BeneficiariesCharacteristicsByDistrict])
+async def get_residents_beneficiaries_by_characteristics_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
+    rows = await service.get_residents_beneficiaries_characteristics_by_district(session, district_id)
+    schema = schemas.BeneficiariesCharacteristicsByDistrict
+
+    return [schema(year=r.year,
+        district_id=r.district_id,
+        unemployability=r.unemployability,
+        employability=r.employability,
+        percentage_females=r.percentage_females,
+        percentage_single_parents=r.percentage_single_parents,
+        percentage_foreign_citizenship=r.percentage_foreign_citizenship) for r in rows]
+
+
+
+@router.get('/districts/residents/beneficiaries/age15tounder65', response_model=list[schemas.BeneficiariesAge15ToUnder65ByDistrict])
+async def get_residents_beneficiaries_age15tounder65_by_districts(session: AsyncSession = Depends(get_session)):
+    rows = await service.get_residents_beneficiaries_age15tounder65_by_districts(session)
+    schema = schemas.BeneficiariesAge15ToUnder65ByDistrict
+
+    return [schema(year=r.year,
+        district_id=r.district_id,
+        percentage_of_total_residents=r.percentage_of_total_residents,
+        employable_with_benefits=r.employable_with_benefits,
+        unemployment_benefits=r.unemployment_benefits,
+        basic_income=r.basic_income,
+        assisting_benefits=r.assisting_benefits) for r in rows]
 
 
 @router.get('/{district_id}/residents/beneficiaries/age15tounder65', response_model=list[schemas.BeneficiariesAge15ToUnder65ByDistrict])

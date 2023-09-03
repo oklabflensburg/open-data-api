@@ -284,6 +284,14 @@ async def get_residents_beneficiaries_age15tounder65_by_districts(session: Async
     return result.scalars().all()
 
 
+async def get_residents_beneficiaries_age15tounder65_by_district(session: AsyncSession, district_id: int):
+    model = models.BeneficiariesAge15ToUnder65ByDistrict
+    result = await session.execute(select(model).filter(model.district_id==district_id))
+
+    return result.scalars().all()
+
+
+
 async def get_residents_beneficiaries_characteristics_by_district(session: AsyncSession, district_id: int):
     model = models.BeneficiariesCharacteristicsByDistrict
     result = await session.execute(select(model).filter(model.district_id==district_id))
