@@ -28,6 +28,14 @@ async def get_session() -> AsyncSession:
 
 
 
+@router.get('/districts/', response_model=list[schemas.District], tags=['districts'])
+async def get_districts(session: AsyncSession = Depends(get_session)):
+    rows = await service.get_districts(session)
+    schema = schemas.District
+
+    return [schema(district_id=r.id, district_name=r.name) for r in rows]
+
+
 @router.get('/{district_id}', response_model=list[schemas.District])
 async def get_district(district_id: int, session: AsyncSession = Depends(get_session)):
     row = await service.get_district(session, district_id)
@@ -38,13 +46,6 @@ async def get_district(district_id: int, session: AsyncSession = Depends(get_ses
     except AttributeError as e:
         raise HTTPException(status_code=404, detail='Not found')
 
-
-@router.get('/districts/', response_model=list[schemas.District], tags=['districts'])
-async def get_districts(session: AsyncSession = Depends(get_session)):
-    rows = await service.get_districts(session)
-    schema = schemas.District
-
-    return [schema(district_id=r.id, district_name=r.name) for r in rows]
 
 
 @router.get('/household/types', response_model=list[schemas.HouseholdType])
@@ -104,12 +105,33 @@ async def get_residents_education_support(session: AsyncSession = Depends(get_se
         additional_support=r.additional_support) for r in rows]
 
 
+
+@router.get('/districts/residents', response_model=list[schemas.ResidentsByDistrict])
+async def get_residents_by_districts(session: AsyncSession = Depends(get_session)):
+    rows = await service.get_residents_by_districts(session)
+    schema = schemas.ResidentsByDistrict
+
+    return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
+
+
 @router.get('/{district_id}/residents', response_model=list[schemas.ResidentsByDistrict])
 async def get_residents_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_by_district(session, district_id)
     schema = schemas.ResidentsByDistrict
 
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
+
+
+
+@router.get('/districts/residents/births', response_model=list[schemas.BirthsByDistrict])
+async def get_residents_births_by_districts(session: AsyncSession = Depends(get_session)):
+    rows = await service.get_residents_births_by_districts(session)
+    schema = schemas.BirthsByDistrict
+
+    return [schema(year=r.year,
+        district_id=r.district_id,
+        births=r.births,
+        birth_rate=r.birth_rate) for r in rows]
 
 
 @router.get('/{district_id}/residents/births', response_model=list[schemas.BirthsByDistrict])
@@ -123,6 +145,18 @@ async def get_residents_births_by_district(district_id: int, session: AsyncSessi
         birth_rate=r.birth_rate) for r in rows]
 
 
+
+@router.get('/districts/residents/employed', response_model=list[schemas.EmployedWithPensionInsuranceByDistrict])
+async def get_residents_employed_by_districts(session: AsyncSession = Depends(get_session)):
+    rows = await service.get_residents_employed_by_districts(session)
+    schema = schemas.EmployedWithPensionInsuranceByDistrict
+
+    return [schema(year=r.year,
+        district_id=r.district_id,
+        residents=r.residents,
+        employment_rate=r.employment_rate) for r in rows]
+
+
 @router.get('/{district_id}/residents/employed', response_model=list[schemas.EmployedWithPensionInsuranceByDistrict])
 async def get_residents_employed_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_employed_by_district(session, district_id)
@@ -134,12 +168,35 @@ async def get_residents_employed_by_district(district_id: int, session: AsyncSes
         employment_rate=r.employment_rate) for r in rows]
 
 
+
+@router.get('/districts/residents/ageratio', response_model=list[schemas.AgeRatioByDistrict])
+async def get_residents_ageratio_by_districts(session: AsyncSession = Depends(get_session)):
+    rows = await service.get_residents_ageratio_by_districts(session)
+    schema = schemas.AgeRatioByDistrict
+
+    return [schema(year=r.year, district_id=r.district_id, quotient=r.quotient) for r in rows]
+
+
 @router.get('/{district_id}/residents/ageratio', response_model=list[schemas.AgeRatioByDistrict])
 async def get_residents_ageratio_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_ageratio_by_district(session, district_id)
     schema = schemas.AgeRatioByDistrict
 
     return [schema(year=r.year, district_id=r.district_id, quotient=r.quotient) for r in rows]
+
+
+
+@router.get('/districts/residents/basicbenefits', response_model=list[schemas.BasicBenefitsIncomeByDistrict])
+async def get_residents_basicbenefits_by_districts(session: AsyncSession = Depends(get_session)):
+    rows = await service.get_residents_basicbenefits_by_districts(session)
+    schema = schemas.BasicBenefitsIncomeByDistrict
+
+    return [schema(year=r.year,
+        district_id=r.district_id,
+        male=r.male,
+        female=r.female,
+        age_18_to_under_65=r.age_18_to_under_65,
+        age_65_and_above=r.age_65_and_above) for r in rows]
 
 
 @router.get('/{district_id}/residents/basicbenefits', response_model=list[schemas.BasicBenefitsIncomeByDistrict])
@@ -155,10 +212,28 @@ async def get_residents_basicbenefits_by_district(district_id: int, session: Asy
         age_65_and_above=r.age_65_and_above) for r in rows]
 
 
+
+@router.get('/districts/residents/ageunder18', response_model=list[schemas.ChildrenAgeUnder18ByDistrict])
+async def get_residents_ageunder18_by_districts(session: AsyncSession = Depends(get_session)):
+    rows = await service.get_residents_ageunder18_by_districts(session)
+    schema = schemas.ChildrenAgeUnder18ByDistrict
+
+    return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
+
+
 @router.get('/{district_id}/residents/ageunder18', response_model=list[schemas.ChildrenAgeUnder18ByDistrict])
 async def get_residents_ageunder18_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_ageunder18_by_district(session, district_id)
     schema = schemas.ChildrenAgeUnder18ByDistrict
+
+    return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
+
+
+
+@router.get('/districts/residents/age18tounder65', response_model=list[schemas.ResidentsAge18ToUnder65ByDistrict])
+async def get_residents_age18tounder65_by_districts(session: AsyncSession = Depends(get_session)):
+    rows = await service.get_residents_age18tounder65_by_districts(session)
+    schema = schemas.ResidentsAge18ToUnder65ByDistrict
 
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
 
@@ -171,12 +246,39 @@ async def get_residents_age18tounder65_by_district(district_id: int, session: As
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
 
 
+
+@router.get('/districts/residents/age65andabove', response_model=list[schemas.ResidentsAge65AndAboveByDistrict])
+async def get_residents_age65andabove_by_districts(session: AsyncSession = Depends(get_session)):
+    rows = await service.get_residents_age65andabove_by_districts(session)
+    schema = schemas.ResidentsAge65AndAboveByDistrict
+
+    return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
+
+
 @router.get('/{district_id}/residents/age65andabove', response_model=list[schemas.ResidentsAge65AndAboveByDistrict])
 async def get_residents_age65andabove_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_age65andabove_by_district(session, district_id)
     schema = schemas.ResidentsAge65AndAboveByDistrict
 
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
+
+
+
+@router.get('/districts/residents/agegroups', response_model=list[schemas.AgeGroupsOfResidentsByDistrict])
+async def get_residents_agegroups_by_districts(session: AsyncSession = Depends(get_session)):
+    rows = await service.get_residents_agegroups_by_districts(session)
+    schema = schemas.AgeGroupsOfResidentsByDistrict
+
+    return [schema(year=r.year,
+        district_id=r.district_id,
+        age_under_18=r.age_under_18,
+        age_18_to_under_30=r.age_18_to_under_30,
+        age_30_to_under_45=r.age_30_to_under_45,
+        age_45_to_under_65=r.age_45_to_under_65,
+        age_65_to_under_80=r.age_65_to_under_80,
+        age_80_and_above=r.age_80_and_older,
+        age_0_to_under_7=r.age_0_to_under_7,
+        age_60_and_above=r.age_60_and_older) for r in rows]
 
 
 @router.get('/{district_id}/residents/agegroups', response_model=list[schemas.AgeGroupsOfResidentsByDistrict])
@@ -196,12 +298,38 @@ async def get_residents_agegroups_by_district(district_id: int, session: AsyncSe
         age_60_and_above=r.age_60_and_older) for r in rows]
 
 
+
+@router.get('/districts/residents/unemployed', response_model=list[schemas.UnemployedResidentsByDistrict])
+async def get_residents_unemployed_by_districts(session: AsyncSession = Depends(get_session)):
+    rows = await service.get_residents_unemployed_by_districts(session)
+    schema = schemas.UnemployedResidentsByDistrict
+
+    return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
+
+
 @router.get('/{district_id}/residents/unemployed', response_model=list[schemas.UnemployedResidentsByDistrict])
 async def get_residents_unemployed_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_unemployed_by_district(session, district_id)
     schema = schemas.UnemployedResidentsByDistrict
 
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
+
+
+
+@router.get('/districts/residents/unemployed/categorized', response_model=list[schemas.UnemployedCategorizedResidentsByDistrict])
+async def get_residents_unemployed_by_categories_by_districts(session: AsyncSession = Depends(get_session)):
+    rows = await service.get_residents_unemployed_categorized_by_districts(session)
+    schema = schemas.UnemployedCategorizedResidentsByDistrict
+
+    return [schema(year=r.year,
+        district_id=r.district_id,
+        unemployed_total=r.unemployed_total,
+        percentage_of_total=r.percentage_of_total,
+        percentage_sgb_iii=r.percentage_sgb_iii,
+        percentage_sgb_ii=r.percentage_sgb_ii,
+        percentage_foreign_citizenship=r.percentage_foreign_citizenship,
+        percentage_female=r.percentage_female,
+        percentage_age_under_25=r.percentage_age_under_25) for r in rows]
 
 
 @router.get('/{district_id}/residents/unemployed/categorized', response_model=list[schemas.UnemployedCategorizedResidentsByDistrict])
@@ -220,10 +348,28 @@ async def get_residents_unemployed_by_categories_by_district(district_id: int, s
         percentage_age_under_25=r.percentage_age_under_25) for r in rows]
 
 
+
+@router.get('/districts/residents/beneficiaries', response_model=list[schemas.BeneficiariesByDistrict])
+async def get_residents_beneficiaries_by_districts(session: AsyncSession = Depends(get_session)):
+    rows = await service.get_residents_beneficiaries_by_districts(session)
+    schema = schemas.BeneficiariesByDistrict
+
+    return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
+
+
 @router.get('/{district_id}/residents/beneficiaries', response_model=list[schemas.BeneficiariesByDistrict])
 async def get_residents_beneficiaries_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_beneficiaries_by_district(session, district_id)
     schema = schemas.BeneficiariesByDistrict
+
+    return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
+
+
+
+@router.get('/districts/residents/beneficiaries/inactive', response_model=list[schemas.InactiveBeneficiariesInHouseholdsByDistrict])
+async def get_residents_beneficiaries_inactive_by_districts(session: AsyncSession = Depends(get_session)):
+    rows = await service.get_residents_beneficiaries_inactive_by_districts(session)
+    schema = schemas.InactiveBeneficiariesInHouseholdsByDistrict
 
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
 
@@ -234,6 +380,7 @@ async def get_residents_beneficiaries_inactive_by_district(district_id: int, ses
     schema = schemas.InactiveBeneficiariesInHouseholdsByDistrict
 
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
+
 
 
 @router.get('/districts/residents/beneficiaries/characteristics', response_model=list[schemas.BeneficiariesCharacteristicsByDistrict])
