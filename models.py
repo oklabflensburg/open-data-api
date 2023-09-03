@@ -137,7 +137,6 @@ class BeneficiariesAge15ToUnder65ByDistrict(Base):
     id = Column(Integer, primary_key=True)
     year = Column(Integer)
     district_id = Column(ForeignKey('districts.id'))
-    total = Column(Integer)
     percentage_of_total_residents = Column(Numeric)
     employable_with_benefits = Column(Integer)
     unemployment_benefits = Column(Integer)

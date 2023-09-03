@@ -152,7 +152,7 @@ class UnemployedResidentsByDistricts(UnemployedResidentsByDistrict):
 
 class UnemployedCategorizedResidentsByDistrict(BaseModel):
     year: int
-    district_id: int
+    district_id: Optional[int]
     unemployed_total: Optional[int]
     percentage_of_total: Optional[float]
     percentage_sgb_iii: Optional[float]
@@ -204,7 +204,7 @@ class HouseholdsAtRiskOfHomelessnessByDistricts(HouseholdsAtRiskOfHomelessnessBy
 
 class BeneficiariesAge15ToUnder65ByDistrict(BaseModel):
     year: int
-    district_id: int
+    district_id: Optional[int]
     percentage_of_total_residents: Optional[float]
     employable_with_benefits: Optional[int]
     unemployment_benefits: Optional[int]
