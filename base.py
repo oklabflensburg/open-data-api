@@ -2,9 +2,25 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import sessionmaker
+from functools import lru_cache
+
+import config
 
 
-DATABASE_URL = "postgresql+asyncpg://postgres:postgres@127.0.0.1:5433/postgres"
+
+@lru_cache()
+def get_settings():
+    return config.Settings()
+
+
+host = get_settings().host
+username = get_settings().username
+password = get_settings().password
+database = get_settings().database
+port = get_settings().port
+
+
+DATABASE_URL = f'postgresql+asyncpg://{username}:{password}@{host}:{port}/{database}'
 
 
 Base = declarative_base()
