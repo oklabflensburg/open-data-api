@@ -1,4 +1,6 @@
 from fastapi import Depends, FastAPI, APIRouter, HTTPException
+from fastapi.openapi.utils import get_openapi
+from fastapi.openapi.docs import get_swagger_ui_html
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session
@@ -9,7 +11,7 @@ import schemas
 import service
 
 
-app = FastAPI(title='Sozialatlas', summary='Some endpoints are not yet implemented')
+app = FastAPI(docs_url=None, redoc_url=None)
 Base = declarative_base()
 router = APIRouter(prefix='/sozialatlas/v1')
 
@@ -26,6 +28,14 @@ async def get_session() -> AsyncSession:
     async with base.async_session() as session:
         yield session
 
+
+@app.get('/', include_in_schema=False)
+async def swagger_ui_html():
+    return get_swagger_ui_html(
+        openapi_url='/openapi.json',
+        title='FastAPI',
+        swagger_favicon_url='/static/favicon.ico'
+    )
 
 
 @router.get('/districts/', response_model=list[schemas.District], tags=['districts'])
@@ -538,4 +548,25 @@ async def get_residents_risk_homelessness_by_district(district_id: int, session:
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
 
 
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+
+    openapi_schema = get_openapi(
+        title='Opendata API',
+        version='1.15.2',
+        summary='Some endpoints are not yet implemented',
+        description='tbd.',
+        routes=app.routes,
+    )
+
+    openapi_schema['info']['x-logo'] = {
+        'url': '/static/oklabflensburg_logo_quadrat.jpg'
+    }
+
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
+
+
+app.openapi = custom_openapi
 app.include_router(router)
