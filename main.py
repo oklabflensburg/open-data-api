@@ -1,6 +1,7 @@
 from fastapi import Depends, FastAPI, APIRouter, HTTPException
-from fastapi.openapi.utils import get_openapi
+from fastapi.staticfiles import StaticFiles
 from fastapi.openapi.docs import get_swagger_ui_html
+from fastapi.openapi.utils import get_openapi
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session
@@ -14,6 +15,7 @@ import service
 app = FastAPI(docs_url=None, redoc_url=None)
 Base = declarative_base()
 router = APIRouter(prefix='/sozialatlas/v1')
+app.mount('/static', StaticFiles(directory='static'), name='static')
 
 
 @app.on_event('startup')
@@ -557,14 +559,11 @@ def custom_openapi():
         version='1.15.2',
         summary='Some endpoints are not yet implemented',
         description='tbd.',
-        routes=app.routes,
+        routes=app.routes
     )
 
-    openapi_schema['info']['x-logo'] = {
-        'url': '/static/oklabflensburg_logo_quadrat.jpg'
-    }
-
     app.openapi_schema = openapi_schema
+
     return app.openapi_schema
 
 
