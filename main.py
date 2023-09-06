@@ -1,7 +1,7 @@
-from fastapi import Depends, FastAPI, APIRouter, HTTPException
-from fastapi.staticfiles import StaticFiles
+from fastapi import Request, Depends, FastAPI, APIRouter, HTTPException
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.openapi.docs import get_swagger_ui_html
-from fastapi.openapi.utils import get_openapi
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session
@@ -12,7 +12,7 @@ import schemas
 import service
 
 
-app = FastAPI(docs_url=None, redoc_url=None)
+app = FastAPI(docs_url=None, redoc_url=None, version='1.15.2', title='Opendata API', summary='Some endpoints are not yet implemented')
 Base = declarative_base()
 router = APIRouter(prefix='/sozialatlas/v1')
 app.mount('/static', StaticFiles(directory='static'), name='static')
@@ -31,11 +31,17 @@ async def get_session() -> AsyncSession:
         yield session
 
 
+
 @app.get('/', include_in_schema=False)
-async def swagger_ui_html():
+def home_redirect():
+    return RedirectResponse('/docs')
+
+
+@app.get('/docs', include_in_schema=False)
+async def swagger_ui_html(req: Request) -> HTMLResponse:
     return get_swagger_ui_html(
+        title=app.title,
         openapi_url='/openapi.json',
-        title='FastAPI',
         swagger_favicon_url='/static/favicon.ico'
     )
 
@@ -550,22 +556,4 @@ async def get_residents_risk_homelessness_by_district(district_id: int, session:
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
 
 
-def custom_openapi():
-    if app.openapi_schema:
-        return app.openapi_schema
-
-    openapi_schema = get_openapi(
-        title='Opendata API',
-        version='1.15.2',
-        summary='Some endpoints are not yet implemented',
-        description='tbd.',
-        routes=app.routes
-    )
-
-    app.openapi_schema = openapi_schema
-
-    return app.openapi_schema
-
-
-app.openapi = custom_openapi
 app.include_router(router)
