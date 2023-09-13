@@ -19,6 +19,7 @@ class DistrictDetails(BaseModel):
     percentage_female: Optional[float]
     percentage_age_under_25: Optional[float]
     housing_benefit: int
+    notices_of_rent_arrears: Optional[int]
     termination_rent_arrears: Optional[int]
     termination_for_conduct: Optional[int]
     action_for_eviction: Optional[int]
