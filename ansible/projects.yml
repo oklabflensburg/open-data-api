@@ -1,0 +1,81 @@
+---
+- hosts: all
+  remote_user: "{{ ansible_user }}"
+
+  vars_files:
+    - vars.yml
+
+  tasks:
+    - name: Create a directory if it does not exist
+      ansible.builtin.file:
+        path: /opt/git
+        state: directory
+        mode: "0755"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+
+    - name: Clone listed project repositories
+      ansible.builtin.git:
+        repo: "https://github.com/oklabflensburg/{{ item }}.git"
+        dest: "/opt/git/{{ item }}"
+      with_items:
+        - open-accident-map
+        - open-local-elections-map
+        - open-monuments-map
+        - open-playgrounds-map
+        - open-recycling-map
+        - open-sensor-map
+        - open-social-map
+        - open-surface-map
+
+    - name: Copy enviroment files to repo from template
+      template: 
+        src: env.j2 
+        dest: "/opt/git/{{ item }}/.env"
+      with_items:
+        - open-accident-map
+        - open-local-elections-map
+        - open-monuments-map
+        - open-playgrounds-map
+        - open-recycling-map
+        - open-sensor-map
+        - open-social-map
+        - open-surface-map
+
+    - name: Set python virualenv
+      command:
+        cmd: "virtualenv /opt/git/{{ item }}/venv -p python3"
+        creates: "/opt/git/{{ item }}/venv"
+      with_items:
+        - open-accident-map
+        - open-local-elections-map
+        - open-monuments-map
+        - open-recycling-map
+        - open-sensor-map
+        - open-social-map
+        - open-trees-map
+
+    - name: Install python requirements
+      ansible.builtin.pip:
+        requirements: "/opt/git/{{ item }}/requirements.txt"
+        virtualenv: "/opt/git/{{ item }}/venv"
+        virtualenv_python: python3
+      with_items:
+        - open-accident-map
+        - open-local-elections-map
+        - open-monuments-map
+        - open-recycling-map
+        - open-sensor-map
+        - open-social-map
+        - open-trees-map
+
+    - name: Run a script using an executable in a system path
+      ansible.builtin.shell:
+        cmd: |
+          "source venv/bin/activate"
+          "python {{ item }}"
+          "deactivate"
+        chdir: /opt/git/open-monuments-map
+      with_items:
+        - "insert_boundaries.py data/monument_boundaries.geojson"
+        - "insert_monuments.py data/stadt-flensburg-denkmalschutz.geojson"

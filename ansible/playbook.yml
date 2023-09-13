@@ -115,22 +115,6 @@
       become: true
       become_user: postgres
 
-    - name: Git checkout
-      ansible.builtin.git:
-        repo: "https://github.com/oklabflensburg/{{ item }}.git"
-        dest: "/opt/git/{{ item }}"
-      with_items:
-        - open-accident-map
-        - open-data-api
-        - open-local-elections-map
-        - open-monuments-map
-        - open-playgrounds-map
-        - open-recycling-map
-        - open-sensor-map
-        - open-social-map
-        - open-surface-map
-        - open-trees-map
-
   handlers:
     - name: restart postgres
       service: name=postgresql state=restarted
