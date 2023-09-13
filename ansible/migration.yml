@@ -23,4 +23,4 @@
         chdir: /opt/git/open-social-map
         executable: /opt/git/open-social-map/venv/bin/python
       with_items:
-        - "insert_geography.py /opt/git/open-social-map/data/flensburg_stadtteile.geojson"
+        - "insert_districts.py /opt/git/open-social-map/data/flensburg_stadtteile.geojson"
