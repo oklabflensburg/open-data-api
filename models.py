@@ -2,9 +2,29 @@ from sqlalchemy import CheckConstraint, Column, ForeignKey, Index, Integer, Nume
 from sqlalchemy.sql.sqltypes import NullType
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
+from geoalchemy2 import Geometry
+
 
 Base = declarative_base()
 metadata = Base.metadata
+
+
+
+class Monument(Base):
+    __tablename__ = 'monuments'
+
+    id = Column(Integer, primary_key=True)
+    object_id = Column(String)
+    address = Column(String)
+    image_url = Column(String)
+    designation = Column(String)
+    description = Column(String)
+    administrative = Column(String)
+    monument_type = Column(String)
+    postal_code = Column(String)
+    place_name = Column(String)
+    geometry = Column(Geometry)
+
 
 
 class AgeGroupsOfResident(Base):
@@ -40,7 +60,8 @@ class District(Base):
 
     id = Column(Integer, primary_key=True, unique=True)
     name = Column(String)
-    geometry = Column(NullType)
+    geometry = Column(Geometry)
+
 
 
 class HouseholdType(Base):

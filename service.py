@@ -5,18 +5,26 @@ import models
 
 
 
-async def get_districts(session: AsyncSession):
-    model = models.District
+async def get_monuments(session: AsyncSession):
+    model = models.Monument
     result = await session.execute(select(model))
 
     return result.scalars().all()
 
 
+
+async def get_districts(session: AsyncSession):
+    model = models.District
+    result = await session.execute(select(model.id, model.name))
+
+    return result.all()
+
+
 async def get_district(session: AsyncSession, district_id: int):
     model = models.District
-    result = await session.execute(select(model).filter(model.id==district_id))
+    result = await session.execute(select(model.id, model.name).filter(model.id==district_id))
     
-    return result.scalars().first()
+    return result.first()
 
 
 

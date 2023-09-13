@@ -1,7 +1,8 @@
 from fastapi import Request, Depends, FastAPI, APIRouter, HTTPException
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.staticfiles import StaticFiles
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session
@@ -44,6 +45,18 @@ async def swagger_ui_html(req: Request) -> HTMLResponse:
         openapi_url='/openapi.json',
         swagger_favicon_url='/static/favicon.ico'
     )
+
+
+
+
+@router.get('/monuments', response_model=list[schemas.District], tags=['monuments'])
+async def get_districts(session: AsyncSession = Depends(get_session)):
+    rows = await service.get_monuments(session)
+    schema = schemas.District
+    monuments = jsonable_encoder(rows)
+
+    return JSONResponse(content=monuments)
+
 
 
 @router.get('/districts/', response_model=list[schemas.District], tags=['districts'])
