@@ -1,0 +1,136 @@
+---
+- hosts: all
+  become: yes
+
+  vars_files:
+    - vars.yml
+
+  pre_tasks:
+    - name: Handle system setup defaults
+      block:
+        - name: Install system packages
+          ansible.builtin.apt: "name={{ item }} state=present"
+          with_items:
+            - acl
+            - git
+            - gnupg2
+            - virtualenv
+            - python3
+            - python3-pip
+
+        - name: Add postgresql signing key to keyring file
+          ansible.builtin.get_url:
+            url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+            dest: /etc/apt/keyrings/postgresql.asc
+            mode: '0644'
+            force: true
+
+        - name: Add postgresql apt source
+          ansible.builtin.apt_repository:
+            repo: "deb [arch=amd64, signed-by=/etc/apt/keyrings/postgresql.asc] http://apt.postgresql.org/pub/repos/apt/ {{ ansible_distribution_release }}-pgdg main"
+            state: present
+
+        - name: Install database packages
+          ansible.builtin.apt: "name={{ item }} state=present update_cache=yes"
+          with_items:
+            - postgresql-15
+            - postgresql-15-postgis-3
+            - postgresql-client-15
+
+        - name: Make sure psycopg2 is installed
+          ansible.builtin.pip:
+            name: psycopg2-binary
+            state: present
+
+  tasks:
+    - name: Find out if PostgreSQL is initialized
+      ansible.builtin.stat:
+        path: /etc/postgresql/15/main/pg_hba.conf
+      register: postgres_data
+
+    - name: Start and enable services
+      service: "name={{ item }} state=started enabled=yes"
+      with_items:
+        - postgresql
+      when: not postgres_data.stat.exists
+
+    - name: Create app database
+      postgresql_db:
+        state: present
+        name: "{{ db_name }}"
+      become: yes
+      become_user: postgres
+
+    - name: Create db user
+      postgresql_user:
+        state: present
+        name: "{{ db_user }}"
+        password: "{{ db_password }}"
+      become: yes
+      become_user: postgres
+
+    - name: Grant db user access to app db
+      postgresql_privs:
+        type: database
+        database: "{{ db_name }}"
+        roles: "{{ db_user }}"
+        grant_option: no
+        privs: all
+      become: yes
+      become_user: postgres
+
+    - name: Allow md5 connection for the db user
+      postgresql_pg_hba:
+        dest: "/etc/postgresql/15/main/pg_hba.conf"
+        contype: host
+        databases: all
+        method: md5
+        users: "{{ db_user }}"
+        create: true
+      become: yes
+      become_user: postgres
+      notify: restart postgres
+
+    - name: pull project sql files
+      ansible.builtin.get_url:
+        url: "{{ item }}"
+        dest: "/tmp/"
+      with_items:
+        - https://raw.githubusercontent.com/oklabflensburg/open-social-map/main/data/cleanup_database_schema.sql
+        - https://raw.githubusercontent.com/oklabflensburg/open-social-map/main/data/flensburg_sozialatlas_metadaten.sql
+        - https://raw.githubusercontent.com/oklabflensburg/open-monuments-map/main/data/flensburg_denkmalschutz.sql
+        - https://raw.githubusercontent.com/oklabflensburg/open-social-map/main/data/flensburg_sozialatlas.sql
+      become: yes
+      become_user: postgres
+
+    - name: Add data to postgresql database
+      community.postgresql.postgresql_script:
+        db: "{{ db_name }}"
+        path: "/tmp/{{ item }}"
+      with_items:
+        - cleanup_database_schema.sql
+        - flensburg_sozialatlas_metadaten.sql
+        - flensburg_denkmalschutz.sql
+        - flensburg_sozialatlas.sql
+      become: true
+      become_user: postgres
+
+    - name: Git checkout
+      ansible.builtin.git:
+        repo: "https://github.com/oklabflensburg/{{ item }}.git"
+        dest: "/opt/git/{{ item }}"
+      with_items:
+        - open-accident-map
+        - open-data-api
+        - open-local-elections-map
+        - open-monuments-map
+        - open-playgrounds-map
+        - open-recycling-map
+        - open-sensor-map
+        - open-social-map
+        - open-surface-map
+        - open-trees-map
+
+  handlers:
+    - name: restart postgres
+      service: name=postgresql state=restarted
