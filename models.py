@@ -23,7 +23,7 @@ class Monument(Base):
     monument_type = Column(String)
     postal_code = Column(String)
     place_name = Column(String)
-    geometry = Column(Geometry)
+    wkb_geometry = Column(Geometry)
 
 
 
@@ -60,7 +60,7 @@ class District(Base):
 
     id = Column(Integer, primary_key=True, unique=True)
     name = Column(String)
-    geometry = Column(Geometry)
+    wkb_geometry = Column(Geometry)
 
 
 
