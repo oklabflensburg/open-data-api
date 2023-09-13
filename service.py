@@ -1,4 +1,5 @@
 from sqlalchemy import select
+from sqlalchemy.sql import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 import models
@@ -10,6 +11,132 @@ async def get_monuments(session: AsyncSession):
     result = await session.execute(select(model))
 
     return result.scalars().all()
+
+
+
+async def get_district_details(session: AsyncSession, district_id: int):
+    sql = text('''
+        SELECT
+            d.name AS district_name,
+            rd.residents,
+            bd.births,
+            ard.quotient AS age_ratio,
+            cad.residents AS age_to_under_18,
+            ra1865d.residents AS age_18_to_under_65,
+            ra65ad.residents AS age_65_and_above,
+            epid.residents AS employed_residents,
+            ued.residents AS unemployed_residents,
+            uecd.percentage_sgb_iii,
+            uecd.percentage_sgb_ii,
+            uecd.percentage_foreign_citizenship,
+            uecd.percentage_female,
+            uecd.percentage_age_under_25,
+            hbd.residents AS housing_benefit,
+            hacd.notices_of_rent_arrears,
+            hacd.termination_rent_arrears,
+            hacd.termination_for_conduct,
+            hacd.action_for_eviction,
+            hacd.eviction_notice,
+            hacd.eviction_carried,
+            hrhd.residents AS risk_of_homelessness,
+            ba1565d.employable_with_benefits,
+            ba1565d.unemployment_benefits,
+            ba1565d.basic_income,
+            ba1565d.assisting_benefits,
+            bfd.residents AS beneficiaries_sgbii,
+            bcd.unemployability,
+            bcd.employability,
+            bcd.percentage_females,
+            bcd.percentage_single_parents,
+            bcd.percentage_foreign_citizenship,
+            iad.residents AS unemployed_beneficiaries,
+            bbid.male AS male_basic_beneficiaries,
+            bbid.female AS female_basic_beneficiaries,
+            bbid.age_18_to_under_65 AS age_18_to_under_65_basic_beneficiaries,
+            bbid.age_65_and_above AS age_65_and_above_basic_beneficiaries,
+            mbd.foreign_citizenship,
+            mbd.german_citizenship
+        FROM
+            districts AS d
+        JOIN
+            residents_by_districts AS rd
+            ON d.id = rd.district_id
+        JOIN
+            births_by_districts AS bd
+            ON d.id = bd.district_id
+            AND bd.year = rd.year
+        JOIN
+            age_ratio_by_districts AS ard
+            ON d.id = ard.district_id
+            AND ard.year = rd.year
+        JOIN
+            children_age_under_18_by_districts AS cad
+            ON d.id = cad.district_id
+            AND cad.year = rd.year
+        JOIN
+            residents_age_18_to_under_65_by_districts AS ra1865d
+            ON d.id = ra1865d.district_id
+            AND rd.year = ra1865d.year
+        JOIN
+            residents_age_65_and_above_by_districts AS ra65ad
+            ON d.id = ra65ad.district_id
+            AND ra65ad.year = rd.year
+        JOIN
+            migration_background_by_districts AS mbd
+            ON d.id = mbd.district_id
+            AND mbd.year = rd.year
+        JOIN
+            employed_with_pension_insurance_by_districts AS epid
+            ON d.id = epid.district_id
+            AND rd.year = epid.year
+        JOIN
+            unemployed_residents_by_districts AS ued
+            ON d.id = ued.district_id
+            AND rd.year = ued.year
+        JOIN
+            unemployed_residents_by_districts_categorized AS uecd
+            ON d.id = uecd.district_id
+            AND rd.year = uecd.year
+        JOIN
+            housing_benefit_by_districts AS hbd
+            ON d.id = hbd.district_id
+            AND rd.year = hbd.year
+        JOIN
+            housing_assistance_cases_by_districts AS hacd
+            ON d.id = hacd.district_id
+            AND rd.year = hacd.year
+        JOIN
+            households_at_risk_of_homelessness_by_districts AS hrhd
+            ON d.id = hrhd.district_id
+            AND rd.year = hrhd.year
+        JOIN
+            beneficiaries_age_15_to_under_65_by_districts AS ba1565d
+            ON d.id = ba1565d.district_id
+            AND rd.year = ba1565d.year
+        JOIN
+            beneficiaries_by_districts AS bfd
+            ON d.id = bfd.district_id
+            AND rd.year = bfd.year
+        JOIN
+            beneficiaries_characteristics_by_districts AS bcd
+            ON d.id = bcd.district_id
+            AND rd.year = bcd.year
+        JOIN
+            inactive_beneficiaries_in_households_by_districts AS iad
+            ON d.id = iad.district_id
+            AND rd.year = iad.year
+        JOIN
+            basic_benefits_income_by_districts AS bbid
+            ON d.id = bbid.district_id
+            AND rd.year = bbid.year
+        WHERE
+            rd.year = 2021
+            AND d.id = :district_id
+    ''')
+
+    result = await session.execute(sql, {'district_id': district_id})
+
+    return result.all()
 
 
 

@@ -2,6 +2,48 @@ from typing import Optional
 from pydantic import BaseModel
 
 
+
+class DistrictDetails(BaseModel):
+    district_name: str
+    residents: Optional[int]
+    births: int
+    age_ratio: int
+    age_to_under_18: int
+    age_18_to_under_65: int
+    age_65_and_above: int
+    employed_residents: int
+    unemployed_residents: int
+    percentage_sgb_iii: Optional[float]
+    percentage_sgb_ii: Optional[float]
+    percentage_foreign_citizenship: Optional[float]
+    percentage_female: Optional[float]
+    percentage_age_under_25: Optional[float]
+    housing_benefit: int
+    termination_rent_arrears: Optional[int]
+    termination_for_conduct: Optional[int]
+    action_for_eviction: Optional[int]
+    eviction_notice: Optional[int]
+    eviction_carried: Optional[int]
+    risk_of_homelessness: Optional[int]
+    employable_with_benefits: int
+    unemployment_benefits: int
+    basic_income: int
+    assisting_benefits: int
+    beneficiaries_sgbii: int
+    unemployability: int
+    employability: int
+    percentage_females: Optional[float]
+    percentage_single_parents: Optional[float]
+    percentage_foreign_citizenship: Optional[float]
+    unemployed_beneficiaries: int
+    male_basic_beneficiaries: int
+    female_basic_beneficiaries: int
+    age_18_to_under_65_basic_beneficiaries: int
+    age_65_and_above_basic_beneficiaries: int
+    foreign_citizenship: int
+    german_citizenship: int
+
+
 class District(BaseModel):
     district_id: int
     district_name: Optional[str]

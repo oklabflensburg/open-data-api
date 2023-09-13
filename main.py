@@ -48,7 +48,6 @@ async def swagger_ui_html(req: Request) -> HTMLResponse:
 
 
 
-
 @router.get('/monuments', response_model=list[schemas.District], tags=['monuments'])
 async def get_districts(session: AsyncSession = Depends(get_session)):
     rows = await service.get_monuments(session)
@@ -56,6 +55,41 @@ async def get_districts(session: AsyncSession = Depends(get_session)):
     monuments = jsonable_encoder(rows)
 
     return JSONResponse(content=monuments)
+
+
+
+@router.get('/{district_id}/deatail', response_model=list[schemas.DistrictDetails], tags=['details'])
+async def get_district_details(district_id: int, session: AsyncSession = Depends(get_session)):
+    rows = await service.get_district_details(session, district_id)
+    schema = schemas.DistrictDetails
+
+    return [schema(district_name=r.district_name, residents=r.residents,
+        births=r.births, age_ratio=r.age_ratio,
+        age_to_under_18=r.age_to_under_18,
+        age_18_to_under_65=r.age_18_to_under_65, age_65_and_above=r.age_65_and_above,
+        employed_residents=r.employed_residents,
+        unemployed_residents=r.unemployed_residents, percentage_sgb_iii=r.percentage_sgb_iii,
+        percentage_sgb_ii=r.percentage_sgb_ii,
+        percentage_foreign_citizenship=r.percentage_foreign_citizenship,
+        percentage_female=r.percentage_female,
+        percentage_age_under_25=r.percentage_age_under_25,
+        housing_benefit=r.housing_benefit, notices_of_rent_arrears=r.notices_of_rent_arrears,
+        termination_rent_arrears=r.termination_rent_arrears,
+        termination_for_conduct=r.termination_for_conduct, action_for_eviction=r.action_for_eviction,
+        eviction_notice=r.eviction_notice, eviction_carried=r.eviction_carried,
+        risk_of_homelessness=r.risk_of_homelessness,
+        employable_with_benefits=r.employable_with_benefits,
+        unemployment_benefits=r.unemployment_benefits, basic_income=r.basic_income,
+        assisting_benefits=r.assisting_benefits,
+        beneficiaries_sgbii=r.beneficiaries_sgbii, unemployability=r.unemployability,
+        employability=r.employability, percentage_females=r.percentage_females,
+        percentage_single_parents=r.percentage_single_parents,
+        unemployed_beneficiaries=r.unemployed_beneficiaries,
+        male_basic_beneficiaries=r.male_basic_beneficiaries,
+        female_basic_beneficiaries=r.female_basic_beneficiaries,
+        age_18_to_under_65_basic_beneficiaries=r.age_18_to_under_65_basic_beneficiaries,
+        age_65_and_above_basic_beneficiaries=r.age_65_and_above_basic_beneficiaries,
+        foreign_citizenship=r.foreign_citizenship, german_citizenship=r.german_citizenship) for r in rows]
 
 
 
