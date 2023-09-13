@@ -6,7 +6,7 @@
     - vars.yml
 
   tasks:
-    - name: Insert monoments data to database
+    - name: Add monoment geometries to database
       ansible.builtin.shell:
         cmd: |
           "python {{ item }}"
@@ -16,12 +16,11 @@
         - "insert_boundaries.py /opt/git/open-monuments-map/data/monument_boundaries.geojson"
         - "insert_monuments.py /opt/git/open-monuments-map/data/stadt-flensburg-denkmalschutz.geojson"
 
-    - name: Run a script using an executable in a system path
+    - name: Add districts geometries to database
       ansible.builtin.shell:
         cmd: |
           "python {{ item }}"
-        chdir: /opt/git/open-monuments-map
-        executable: /opt/git/open-monuments-map/venv/bin/python
+        chdir: /opt/git/open-social-map
+        executable: /opt/git/open-social-map/venv/bin/python
       with_items:
-        - "insert_boundaries.py /opt/git/open-monuments-map/data/monument_boundaries.geojson"
-        - "insert_monuments.py /opt/git/open-monuments-map/data/stadt-flensburg-denkmalschutz.geojson"
+        - "insert_geography.py /opt/git/open-social-map/data/flensburg_stadtteile.geojson"

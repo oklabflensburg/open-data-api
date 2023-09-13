@@ -6,14 +6,6 @@
     - vars.yml
 
   tasks:
-    - name: Create a directory if it does not exist
-      ansible.builtin.file:
-        path: /opt/git
-        state: directory
-        mode: "0755"
-        owner: "{{ ansible_user }}"
-        group: "{{ ansible_user }}"
-
     - name: Clone listed project repositories
       ansible.builtin.git:
         repo: "https://github.com/oklabflensburg/{{ item }}.git"
@@ -53,7 +45,6 @@
         - open-recycling-map
         - open-sensor-map
         - open-social-map
-        - open-trees-map
 
     - name: Install python requirements
       ansible.builtin.pip:
@@ -67,4 +58,3 @@
         - open-recycling-map
         - open-sensor-map
         - open-social-map
-        - open-trees-map

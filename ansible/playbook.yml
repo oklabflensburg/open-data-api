@@ -6,6 +6,11 @@
     - vars.yml
 
   pre_tasks:
+    - name: Update system packages
+      ansible.builtin.apt:
+        state: present
+        update_cache: yes
+
     - name: Handle system setup defaults
       block:
         - name: Install system packages
@@ -48,10 +53,10 @@
         path: /etc/postgresql/15/main/pg_hba.conf
       register: postgres_data
 
-    - name: Start and enable services
-      service: "name={{ item }} state=started enabled=yes"
-      with_items:
-        - postgresql
+    - name: Reload postgresql service
+      ansible.builtin.systemd:
+        name: postgresql.service
+        state: reloaded
       when: not postgres_data.stat.exists
 
     - name: Create app database
@@ -114,6 +119,14 @@
         - flensburg_sozialatlas.sql
       become: true
       become_user: postgres
+
+    - name: Create a directory if it does not exist
+      ansible.builtin.file:
+        path: /opt/git
+        state: directory
+        mode: "0755"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
 
   handlers:
     - name: restart postgres
