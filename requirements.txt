@@ -4,10 +4,12 @@ asyncpg==0.28.0
 click==8.1.7
 exceptiongroup==1.1.3
 fastapi==0.103.0
+GeoAlchemy2==0.14.1
 geojson-pydantic==1.0.0
 greenlet==2.0.2
 h11==0.14.0
 idna==3.4
+packaging==23.1
 pydantic==2.3.0
 pydantic-settings==2.0.3
 pydantic_core==2.6.3
