@@ -6,7 +6,7 @@
     - vars.yml
 
   tasks:
-    - name: Add monoment geometries to database
+    - name: Add monument geometries to database
       ansible.builtin.shell:
         cmd: |
           "python {{ item }}"
