@@ -104,7 +104,7 @@ class AgeGroupsOfResidents(BaseModel):
 class AgeRatioByDistrict(BaseModel):
     year: int
     district_id: int
-    quotient: Optional[int]
+    quotient: Optional[float]
 
 
 class AgeRatioByDistricts(AgeRatioByDistrict):
