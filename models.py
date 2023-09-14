@@ -399,7 +399,6 @@ class UnemployedCategorizedResidentsByDistrict(Base):
     id = Column(Integer, primary_key=True)
     year = Column(Integer)
     district_id = Column(ForeignKey('districts.id'))
-    total = Column(Integer)
     unemployed_total = Column(Integer)
     percentage_of_total = Column(Numeric)
     percentage_sgb_iii = Column(Numeric)
