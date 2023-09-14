@@ -161,6 +161,7 @@ async def get_district_details(session: AsyncSession):
         basic_benefits_income_by_districts AS bbid
         ON d.id = bbid.district_id
         AND rd.year = bbid.year
+    WHERE rd.year = 2021
     GROUP BY
         d.id, rd.year
     ORDER BY
