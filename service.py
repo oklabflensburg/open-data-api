@@ -21,6 +21,12 @@ async def get_district_details(session: AsyncSession, district_id: int):
             rd.residents,
             bd.births,
             ard.quotient AS age_ratio,
+            agrd.age_18_to_under_30,
+            agrd.age_30_to_under_45,
+            agrd.age_45_to_under_65,
+            agrd.age_65_to_under_80,
+            agrd.age_0_to_under_7,
+            agrd.age_60_and_older,
             cad.residents AS age_to_under_18,
             ra1865d.residents AS age_18_to_under_65,
             ra65ad.residents AS age_65_and_above,
@@ -73,6 +79,10 @@ async def get_district_details(session: AsyncSession, district_id: int):
             children_age_under_18_by_districts AS cad
             ON d.id = cad.district_id
             AND cad.year = rd.year
+        JOIN
+            age_groups_of_residents_by_districts AS agrd
+            ON d.id = agrd.district_id
+            AND agrd.year = rd.year
         JOIN
             residents_age_18_to_under_65_by_districts AS ra1865d
             ON d.id = ra1865d.district_id

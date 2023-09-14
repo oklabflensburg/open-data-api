@@ -7,10 +7,16 @@ class DistrictDetails(BaseModel):
     district_name: str
     residents: Optional[int]
     births: int
-    age_ratio: int
+    age_ratio: float
     age_to_under_18: int
     age_18_to_under_65: int
     age_65_and_above: int
+    age_18_to_under_30: int
+    age_30_to_under_45: int
+    age_45_to_under_65: int
+    age_65_to_under_80: int
+    age_0_to_under_7: int
+    age_60_and_older: int
     employed_residents: int
     unemployed_residents: int
     percentage_sgb_iii: Optional[float]
