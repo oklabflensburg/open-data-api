@@ -16,7 +16,8 @@ class DistrictDetails(BaseModel):
     age_45_to_under_65: int
     age_65_to_under_80: int
     age_0_to_under_7: int
-    age_60_and_older: int
+    age_60_and_above: int
+    age_80_and_above: int
     employed_residents: int
     unemployed_residents: int
     percentage_sgb_iii: Optional[float]

@@ -319,9 +319,9 @@ async def get_residents_agegroups_by_districts(session: AsyncSession = Depends(g
         age_30_to_under_45=r.age_30_to_under_45,
         age_45_to_under_65=r.age_45_to_under_65,
         age_65_to_under_80=r.age_65_to_under_80,
-        age_80_and_above=r.age_80_and_older,
+        age_80_and_above=r.age_80_and_above,
         age_0_to_under_7=r.age_0_to_under_7,
-        age_60_and_above=r.age_60_and_older) for r in rows]
+        age_60_and_above=r.age_60_and_above) for r in rows]
 
 
 @router.get('/{district_id}/residents/agegroups', response_model=list[schemas.AgeGroupsOfResidentsByDistrict])
@@ -336,9 +336,9 @@ async def get_residents_agegroups_by_district(district_id: int, session: AsyncSe
         age_30_to_under_45=r.age_30_to_under_45,
         age_45_to_under_65=r.age_45_to_under_65,
         age_65_to_under_80=r.age_65_to_under_80,
-        age_80_and_above=r.age_80_and_older,
+        age_80_and_above=r.age_80_and_above,
         age_0_to_under_7=r.age_0_to_under_7,
-        age_60_and_above=r.age_60_and_older) for r in rows]
+        age_60_and_above=r.age_60_and_above) for r in rows]
 
 
 

@@ -111,9 +111,9 @@ class AgeGroupsOfResidentsByDistrict(Base):
     age_30_to_under_45 = Column(Integer)
     age_45_to_under_65 = Column(Integer)
     age_65_to_under_80 = Column(Integer)
-    age_80_and_older = Column(Integer)
+    age_80_and_above = Column(Integer)
     age_0_to_under_7 = Column(Integer)
-    age_60_and_older = Column(Integer)
+    age_60_and_above = Column(Integer)
 
     district = relationship('District')
 

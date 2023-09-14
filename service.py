@@ -31,7 +31,8 @@ async def get_district_details(session: AsyncSession):
                         'age_45_to_under_65', agrd.age_45_to_under_65,
                         'age_65_to_under_80', agrd.age_65_to_under_80,
                         'age_0_to_under_7', agrd.age_0_to_under_7,
-                        'age_60_and_older', agrd.age_60_and_older,
+                        'age_60_and_above', agrd.age_60_and_above,
+                        'age_80_and_above', agrd.age_80_and_above,
                         'age_to_under_18', cad.residents,
                         'age_18_to_under_65', ra1865d.residents,
                         'age_65_and_above', ra65ad.residents
