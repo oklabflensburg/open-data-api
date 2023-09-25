@@ -24,6 +24,7 @@ async def get_district_details(session: AsyncSession):
                 rd.year, json_build_object(
                     'residents', rd.residents,
                     'births', bd.births,
+                    'birth_rate', bd.birth_rate,
                     'age_ratio', ard.quotient,
                     'age_groups', json_build_object(
                         'age_18_to_under_30', agrd.age_18_to_under_30,
@@ -38,6 +39,7 @@ async def get_district_details(session: AsyncSession):
                         'age_65_and_above', ra65ad.residents
                     ),
                     'employed_residents', epid.residents,
+                    'employment_rate', epid.employment_rate,
                     'unemployed_residents', ued.residents,
                     'unemployment_characteristics', json_build_object(
                         'percentage_sgb_iii', uecd.percentage_sgb_iii,
