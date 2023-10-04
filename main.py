@@ -62,12 +62,9 @@ async def get_districts(session: AsyncSession = Depends(get_session)):
 async def get_district_details(session: AsyncSession = Depends(get_session)):
     rows = await service.get_district_details(session)
     schema = schemas.DistrictDetails
+    details = jsonable_encoder(rows)
 
-    result = [r[0] for r in rows]
-
-    details = jsonable_encoder(result)
-
-    return JSONResponse(content=details)
+    return JSONResponse(content=details[0])
 
 
 

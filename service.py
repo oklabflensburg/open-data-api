@@ -16,12 +16,30 @@ async def get_monuments(session: AsyncSession):
 
 async def get_district_details(session: AsyncSession):
     sql = text('''
-    SELECT
-        json_build_object(
-            'district_id', d.id,
-            'district_name', d.name,
-            'district_detail', json_object_agg(
-                rd.year, json_build_object(
+    WITH districts_summary AS (
+        SELECT
+            rd.year,
+            json_build_object(
+                'sum_residents', SUM(rd.residents),
+                'sum_districts_area', ROUND(SUM(CAST(ST_Area(d.wkb_geometry::geography) / 1000000 AS numeric)), 2)
+            ) AS summary
+        FROM
+            districts AS d
+        LEFT JOIN
+            residents_by_districts AS rd
+        ON d.id = rd.district_id
+        WHERE
+            rd.year = 2021
+        GROUP BY
+            rd.year
+    ),
+    district_summary AS (
+        SELECT
+            rd.year,
+            json_object_agg(
+                'detail', json_build_object(
+                    'district_id', d.id,
+                    'district_name', d.name,
                     'residents', rd.residents,
                     'births', bd.births,
                     'birth_rate', bd.birth_rate,
@@ -84,95 +102,106 @@ async def get_district_details(session: AsyncSession):
                         'german_citizenship', mbd.german_citizenship
                     )
                 )
-            )
-        ) AS data_by_year_and_district
-    FROM
-        districts AS d
-    LEFT JOIN
-        residents_by_districts AS rd
+            ) AS district
+        FROM
+            districts AS d
+        LEFT JOIN
+            residents_by_districts AS rd
         ON d.id = rd.district_id
-    LEFT JOIN
-        births_by_districts AS bd
+        LEFT JOIN
+            births_by_districts AS bd
         ON d.id = bd.district_id
         AND bd.year = rd.year
-    LEFT JOIN
-        age_ratio_by_districts AS ard
+        LEFT JOIN
+            age_ratio_by_districts AS ard
         ON d.id = ard.district_id
         AND ard.year = rd.year
-    LEFT JOIN
-        children_age_under_18_by_districts AS cad
+        LEFT JOIN
+            children_age_under_18_by_districts AS cad
         ON d.id = cad.district_id
         AND cad.year = rd.year
-    LEFT JOIN
-        age_groups_of_residents_by_districts AS agrd
+        LEFT JOIN
+            age_groups_of_residents_by_districts AS agrd
         ON d.id = agrd.district_id
         AND agrd.year = rd.year
-    LEFT JOIN
-        residents_age_18_to_under_65_by_districts AS ra1865d
+        LEFT JOIN
+            residents_age_18_to_under_65_by_districts AS ra1865d
         ON d.id = ra1865d.district_id
         AND rd.year = ra1865d.year
-    LEFT JOIN
-        residents_age_65_and_above_by_districts AS ra65ad
+        LEFT JOIN
+            residents_age_65_and_above_by_districts AS ra65ad
         ON d.id = ra65ad.district_id
         AND ra65ad.year = rd.year
-    LEFT JOIN
-        migration_background_by_districts AS mbd
+        LEFT JOIN
+            migration_background_by_districts AS mbd
         ON d.id = mbd.district_id
         AND mbd.year = rd.year
-    LEFT JOIN
-        employed_with_pension_insurance_by_districts AS epid
+        LEFT JOIN
+            employed_with_pension_insurance_by_districts AS epid
         ON d.id = epid.district_id
         AND rd.year = epid.year
-    LEFT JOIN
-        unemployed_residents_by_districts AS ued
+        LEFT JOIN
+            unemployed_residents_by_districts AS ued
         ON d.id = ued.district_id
         AND rd.year = ued.year
-    LEFT JOIN
-        unemployed_residents_by_districts_categorized AS uecd
+        LEFT JOIN
+            unemployed_residents_by_districts_categorized AS uecd
         ON d.id = uecd.district_id
         AND rd.year = uecd.year
-    LEFT JOIN
-        housing_benefit_by_districts AS hbd
+        LEFT JOIN
+            housing_benefit_by_districts AS hbd
         ON d.id = hbd.district_id
         AND rd.year = hbd.year
-    LEFT JOIN
-        housing_assistance_cases_by_districts AS hacd
+        LEFT JOIN
+            housing_assistance_cases_by_districts AS hacd
         ON d.id = hacd.district_id
         AND rd.year = hacd.year
-    LEFT JOIN
-        households_at_risk_of_homelessness_by_districts AS hrhd
+        LEFT JOIN
+            households_at_risk_of_homelessness_by_districts AS hrhd
         ON d.id = hrhd.district_id
         AND rd.year = hrhd.year
-    LEFT JOIN
-        beneficiaries_age_15_to_under_65_by_districts AS ba1565d
+        LEFT JOIN
+            beneficiaries_age_15_to_under_65_by_districts AS ba1565d
         ON d.id = ba1565d.district_id
         AND rd.year = ba1565d.year
-    LEFT JOIN
-        beneficiaries_by_districts AS bfd
+        LEFT JOIN
+            beneficiaries_by_districts AS bfd
         ON d.id = bfd.district_id
         AND rd.year = bfd.year
-    LEFT JOIN
-        beneficiaries_characteristics_by_districts AS bcd
+        LEFT JOIN
+            beneficiaries_characteristics_by_districts AS bcd
         ON d.id = bcd.district_id
         AND rd.year = bcd.year
-    LEFT JOIN
-        inactive_beneficiaries_in_households_by_districts AS iad
+        LEFT JOIN
+            inactive_beneficiaries_in_households_by_districts AS iad
         ON d.id = iad.district_id
         AND rd.year = iad.year
-    LEFT JOIN
-        basic_benefits_income_by_districts AS bbid
+        LEFT JOIN
+            basic_benefits_income_by_districts AS bbid
         ON d.id = bbid.district_id
         AND rd.year = bbid.year
-    WHERE rd.year = 2021
-    GROUP BY
-        d.id, rd.year
-    ORDER BY
-        d.id, rd.year
+        WHERE
+            rd.year = 2021
+        GROUP BY
+            d.id, rd.year
+        ORDER BY
+            d.id, rd.year
+    ),
+    summary AS (
+        SELECT year, summary
+        FROM districts_summary
+    )
+    SELECT jsonb_build_object(
+        'summary', (SELECT summary FROM summary WHERE year = ds.year),
+        'detail', json_agg(ds.district->'detail')
+    ) AS final_json
+    FROM district_summary AS ds
+    GROUP BY ds.year
     ''')
 
     result = await session.execute(sql)
 
-    return result.all()
+    return result.scalars().all()
 
 
 
