@@ -72,6 +72,7 @@ async def get_district_details(session: AsyncSession):
                         'termination_rent_arrears', hacd.termination_rent_arrears,
                         'termination_for_conduct', hacd.termination_for_conduct,
                         'action_for_eviction', hacd.action_for_eviction,
+                        'general_consulting', hacd.general_consulting,
                         'eviction_notice', hacd.eviction_notice,
                         'eviction_carried', hacd.eviction_carried
                     ),
