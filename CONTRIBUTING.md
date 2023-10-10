@@ -1,6 +1,6 @@
-# Contributing to Open Social Map
+# Contributing
 
-> Thank you for your interest in contributing to Open Social Map! We welcome contributions from the community to help improve #opendata #civictech and #opengovernment applications and prototypes. By contributing to this project, you are helping to make social demographic government data more accessible and usable for everyone.
+> Thank you for your interest in contributing to this OK Lab Flensburg project! We welcome contributions from the community to help improve #opendata #civictech and #opengovernment applications and prototypes. By contributing to this project, you are helping to make social demographic government data more accessible and usable for everyone.
 
 
 ## How to Contribute
@@ -93,6 +93,6 @@ We value open and respectful communication within our community. If you have que
 
 By contributing to this project, you agree that your contributions will be licensed under the project's license.
 
-Thank you for contributing to Open Social Map! Your efforts help make government data more transparent, accessible, and useful to citizens.
+Thank you for contributing! Your efforts help make government data more transparent, accessible, and useful to citizens.
 
 Happy coding!
