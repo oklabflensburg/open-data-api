@@ -15,7 +15,11 @@ import service
 
 app = FastAPI(docs_url=None, redoc_url=None, version='1.15.2', title='Opendata API', summary='Some endpoints are not yet implemented')
 Base = declarative_base()
-router = APIRouter(prefix='/sozialatlas/v1')
+
+router1 = APIRouter(prefix='/demographics/v1')
+router2 = APIRouter(prefix='/accidents/v1')
+router3 = APIRouter(prefix='/monuments/v1')
+
 app.mount('/static', StaticFiles(directory='static'), name='static')
 
 
@@ -48,7 +52,7 @@ async def swagger_ui_html(req: Request) -> HTMLResponse:
 
 
 
-@router.get('/monuments', response_model=list[schemas.District], tags=['monuments'])
+@router3.get('/details', response_model=list[schemas.District], tags=['Denkmalschutzliste'])
 async def get_districts(session: AsyncSession = Depends(get_session)):
     rows = await service.get_monuments(session)
     schema = schemas.District
@@ -57,8 +61,15 @@ async def get_districts(session: AsyncSession = Depends(get_session)):
     return JSONResponse(content=monuments)
 
 
+@router2.get('/details', response_model=list, tags=['Unfallatlas'])
+async def get_accident_details_by_city(query: str, session: AsyncSession = Depends(get_session)):
+    rows = await service.get_accident_details_by_city(session, query)
+    details = jsonable_encoder(rows)
 
-@router.get('/district/details', response_model=list, tags=['details'])
+    return JSONResponse(content=details[0])
+
+
+@router1.get('/details', response_model=list, tags=['Sozialatlas'])
 async def get_district_details(session: AsyncSession = Depends(get_session)):
     rows = await service.get_district_details(session)
     schema = schemas.DistrictDetails
@@ -67,8 +78,7 @@ async def get_district_details(session: AsyncSession = Depends(get_session)):
     return JSONResponse(content=details[0])
 
 
-
-@router.get('/districts/', response_model=list[schemas.District], tags=['districts'])
+@router1.get('/districts/', response_model=list[schemas.District], tags=['Sozialatlas'])
 async def get_districts(session: AsyncSession = Depends(get_session)):
     rows = await service.get_districts(session)
     schema = schemas.District
@@ -76,7 +86,7 @@ async def get_districts(session: AsyncSession = Depends(get_session)):
     return [schema(district_id=r.id, district_name=r.name) for r in rows]
 
 
-@router.get('/{district_id}', response_model=list[schemas.District])
+@router1.get('/{district_id}', response_model=list[schemas.District], tags=['Sozialatlas'])
 async def get_district(district_id: int, session: AsyncSession = Depends(get_session)):
     row = await service.get_district(session, district_id)
     schema = schemas.District
@@ -88,7 +98,7 @@ async def get_district(district_id: int, session: AsyncSession = Depends(get_ses
 
 
 
-@router.get('/household/types', response_model=list[schemas.HouseholdType])
+@router1.get('/household/types', response_model=list[schemas.HouseholdType], tags=['Sozialatlas'])
 async def get_household_types(session: AsyncSession = Depends(get_session)):
     rows = await service.get_household_types(session)
     schema = schemas.HouseholdTypes
@@ -96,7 +106,7 @@ async def get_household_types(session: AsyncSession = Depends(get_session)):
     return [schema(household_id=r.id, household_type=r.label) for r in rows]
 
 
-@router.get('/residents/agegroups', response_model=list[schemas.AgeGroupsOfResidents])
+@router1.get('/residents/agegroups', response_model=list[schemas.AgeGroupsOfResidents], tags=['Sozialatlas'])
 async def get_residents_by_age_groups(session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_by_age_groups(session)
     schema = schemas.AgeGroupsOfResidents
@@ -107,7 +117,7 @@ async def get_residents_by_age_groups(session: AsyncSession = Depends(get_sessio
         age_65_to_under_80=r.age_65_to_under_80, age_80_and_above=r.age_80_and_above) for r in rows]
 
 
-@router.get('/residents/nongermans', response_model=list[schemas.NonGermanNationalsResidenceStatus])
+@router1.get('/residents/nongermans', response_model=list[schemas.NonGermanNationalsResidenceStatus], tags=['Sozialatlas'])
 async def get_residents_non_germans(session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_non_germans(session)
     schema = schemas.NonGermanNationalsResidenceStatus
@@ -121,7 +131,7 @@ async def get_residents_non_germans(session: AsyncSession = Depends(get_session)
         suspension_of_deportation=r.suspension_of_deportation) for r in rows]
 
 
-@router.get('/residents/debtcounseling', response_model=list[schemas.DebtCounselingOfResidents])
+@router1.get('/residents/debtcounseling', response_model=list[schemas.DebtCounselingOfResidents], tags=['Sozialatlas'])
 async def get_residents_debt_counseling(session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_debt_counseling(session)
     schema = schemas.DebtCounselingOfResidents
@@ -129,7 +139,7 @@ async def get_residents_debt_counseling(session: AsyncSession = Depends(get_sess
     return [schema(year=r.year, household_type_id=r.household_type_id, residents=r.residents) for r in rows]
 
 
-@router.get('/residents/education/support', response_model=list[schemas.ChildEducationSupport])
+@router1.get('/residents/education/support', response_model=list[schemas.ChildEducationSupport], tags=['Sozialatlas'])
 async def get_residents_education_support(session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_education_support(session)
     schema = schemas.ChildEducationSupport
@@ -146,7 +156,7 @@ async def get_residents_education_support(session: AsyncSession = Depends(get_se
 
 
 
-@router.get('/districts/residents', response_model=list[schemas.ResidentsByDistrict])
+@router1.get('/districts/residents', response_model=list[schemas.ResidentsByDistrict], tags=['Sozialatlas'])
 async def get_residents_by_districts(session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_by_districts(session)
     schema = schemas.ResidentsByDistrict
@@ -154,7 +164,7 @@ async def get_residents_by_districts(session: AsyncSession = Depends(get_session
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
 
 
-@router.get('/{district_id}/residents', response_model=list[schemas.ResidentsByDistrict])
+@router1.get('/{district_id}/residents', response_model=list[schemas.ResidentsByDistrict], tags=['Sozialatlas'])
 async def get_residents_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_by_district(session, district_id)
     schema = schemas.ResidentsByDistrict
@@ -163,7 +173,7 @@ async def get_residents_by_district(district_id: int, session: AsyncSession = De
 
 
 
-@router.get('/districts/residents/births', response_model=list[schemas.BirthsByDistrict])
+@router1.get('/districts/residents/births', response_model=list[schemas.BirthsByDistrict], tags=['Sozialatlas'])
 async def get_residents_births_by_districts(session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_births_by_districts(session)
     schema = schemas.BirthsByDistrict
@@ -174,7 +184,7 @@ async def get_residents_births_by_districts(session: AsyncSession = Depends(get_
         birth_rate=r.birth_rate) for r in rows]
 
 
-@router.get('/{district_id}/residents/births', response_model=list[schemas.BirthsByDistrict])
+@router1.get('/{district_id}/residents/births', response_model=list[schemas.BirthsByDistrict], tags=['Sozialatlas'])
 async def get_residents_births_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_births_by_district(session, district_id)
     schema = schemas.BirthsByDistrict
@@ -185,8 +195,7 @@ async def get_residents_births_by_district(district_id: int, session: AsyncSessi
         birth_rate=r.birth_rate) for r in rows]
 
 
-
-@router.get('/districts/residents/employed', response_model=list[schemas.EmployedWithPensionInsuranceByDistrict])
+@router1.get('/districts/residents/employed', response_model=list[schemas.EmployedWithPensionInsuranceByDistrict], tags=['Sozialatlas'])
 async def get_residents_employed_by_districts(session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_employed_by_districts(session)
     schema = schemas.EmployedWithPensionInsuranceByDistrict
@@ -197,7 +206,7 @@ async def get_residents_employed_by_districts(session: AsyncSession = Depends(ge
         employment_rate=r.employment_rate) for r in rows]
 
 
-@router.get('/{district_id}/residents/employed', response_model=list[schemas.EmployedWithPensionInsuranceByDistrict])
+@router1.get('/{district_id}/residents/employed', response_model=list[schemas.EmployedWithPensionInsuranceByDistrict], tags=['Sozialatlas'])
 async def get_residents_employed_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_employed_by_district(session, district_id)
     schema = schemas.EmployedWithPensionInsuranceByDistrict
@@ -209,7 +218,7 @@ async def get_residents_employed_by_district(district_id: int, session: AsyncSes
 
 
 
-@router.get('/districts/residents/ageratio', response_model=list[schemas.AgeRatioByDistrict])
+@router1.get('/districts/residents/ageratio', response_model=list[schemas.AgeRatioByDistrict], tags=['Sozialatlas'])
 async def get_residents_ageratio_by_districts(session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_ageratio_by_districts(session)
     schema = schemas.AgeRatioByDistrict
@@ -217,7 +226,7 @@ async def get_residents_ageratio_by_districts(session: AsyncSession = Depends(ge
     return [schema(year=r.year, district_id=r.district_id, quotient=r.quotient) for r in rows]
 
 
-@router.get('/{district_id}/residents/ageratio', response_model=list[schemas.AgeRatioByDistrict])
+@router1.get('/{district_id}/residents/ageratio', response_model=list[schemas.AgeRatioByDistrict], tags=['Sozialatlas'])
 async def get_residents_ageratio_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_ageratio_by_district(session, district_id)
     schema = schemas.AgeRatioByDistrict
@@ -226,7 +235,7 @@ async def get_residents_ageratio_by_district(district_id: int, session: AsyncSes
 
 
 
-@router.get('/districts/residents/basicbenefits', response_model=list[schemas.BasicBenefitsIncomeByDistrict])
+@router1.get('/districts/residents/basicbenefits', response_model=list[schemas.BasicBenefitsIncomeByDistrict], tags=['Sozialatlas'])
 async def get_residents_basicbenefits_by_districts(session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_basicbenefits_by_districts(session)
     schema = schemas.BasicBenefitsIncomeByDistrict
@@ -239,7 +248,7 @@ async def get_residents_basicbenefits_by_districts(session: AsyncSession = Depen
         age_65_and_above=r.age_65_and_above) for r in rows]
 
 
-@router.get('/{district_id}/residents/basicbenefits', response_model=list[schemas.BasicBenefitsIncomeByDistrict])
+@router1.get('/{district_id}/residents/basicbenefits', response_model=list[schemas.BasicBenefitsIncomeByDistrict], tags=['Sozialatlas'])
 async def get_residents_basicbenefits_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_basicbenefits_by_district(session, district_id)
     schema = schemas.BasicBenefitsIncomeByDistrict
@@ -253,7 +262,7 @@ async def get_residents_basicbenefits_by_district(district_id: int, session: Asy
 
 
 
-@router.get('/districts/residents/ageunder18', response_model=list[schemas.ChildrenAgeUnder18ByDistrict])
+@router1.get('/districts/residents/ageunder18', response_model=list[schemas.ChildrenAgeUnder18ByDistrict], tags=['Sozialatlas'])
 async def get_residents_ageunder18_by_districts(session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_ageunder18_by_districts(session)
     schema = schemas.ChildrenAgeUnder18ByDistrict
@@ -261,7 +270,7 @@ async def get_residents_ageunder18_by_districts(session: AsyncSession = Depends(
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
 
 
-@router.get('/{district_id}/residents/ageunder18', response_model=list[schemas.ChildrenAgeUnder18ByDistrict])
+@router1.get('/{district_id}/residents/ageunder18', response_model=list[schemas.ChildrenAgeUnder18ByDistrict], tags=['Sozialatlas'])
 async def get_residents_ageunder18_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_ageunder18_by_district(session, district_id)
     schema = schemas.ChildrenAgeUnder18ByDistrict
@@ -270,7 +279,7 @@ async def get_residents_ageunder18_by_district(district_id: int, session: AsyncS
 
 
 
-@router.get('/districts/residents/age18tounder65', response_model=list[schemas.ResidentsAge18ToUnder65ByDistrict])
+@router1.get('/districts/residents/age18tounder65', response_model=list[schemas.ResidentsAge18ToUnder65ByDistrict], tags=['Sozialatlas'])
 async def get_residents_age18tounder65_by_districts(session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_age18tounder65_by_districts(session)
     schema = schemas.ResidentsAge18ToUnder65ByDistrict
@@ -278,7 +287,7 @@ async def get_residents_age18tounder65_by_districts(session: AsyncSession = Depe
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
 
 
-@router.get('/{district_id}/residents/age18tounder65', response_model=list[schemas.ResidentsAge18ToUnder65ByDistrict])
+@router1.get('/{district_id}/residents/age18tounder65', response_model=list[schemas.ResidentsAge18ToUnder65ByDistrict], tags=['Sozialatlas'])
 async def get_residents_age18tounder65_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_age18tounder65_by_district(session, district_id)
     schema = schemas.ResidentsAge18ToUnder65ByDistrict
@@ -287,7 +296,7 @@ async def get_residents_age18tounder65_by_district(district_id: int, session: As
 
 
 
-@router.get('/districts/residents/age65andabove', response_model=list[schemas.ResidentsAge65AndAboveByDistrict])
+@router1.get('/districts/residents/age65andabove', response_model=list[schemas.ResidentsAge65AndAboveByDistrict], tags=['Sozialatlas'])
 async def get_residents_age65andabove_by_districts(session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_age65andabove_by_districts(session)
     schema = schemas.ResidentsAge65AndAboveByDistrict
@@ -295,7 +304,7 @@ async def get_residents_age65andabove_by_districts(session: AsyncSession = Depen
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
 
 
-@router.get('/{district_id}/residents/age65andabove', response_model=list[schemas.ResidentsAge65AndAboveByDistrict])
+@router1.get('/{district_id}/residents/age65andabove', response_model=list[schemas.ResidentsAge65AndAboveByDistrict], tags=['Sozialatlas'])
 async def get_residents_age65andabove_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_age65andabove_by_district(session, district_id)
     schema = schemas.ResidentsAge65AndAboveByDistrict
@@ -304,7 +313,7 @@ async def get_residents_age65andabove_by_district(district_id: int, session: Asy
 
 
 
-@router.get('/districts/residents/agegroups', response_model=list[schemas.AgeGroupsOfResidentsByDistrict])
+@router1.get('/districts/residents/agegroups', response_model=list[schemas.AgeGroupsOfResidentsByDistrict], tags=['Sozialatlas'])
 async def get_residents_agegroups_by_districts(session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_agegroups_by_districts(session)
     schema = schemas.AgeGroupsOfResidentsByDistrict
@@ -321,7 +330,7 @@ async def get_residents_agegroups_by_districts(session: AsyncSession = Depends(g
         age_60_and_above=r.age_60_and_above) for r in rows]
 
 
-@router.get('/{district_id}/residents/agegroups', response_model=list[schemas.AgeGroupsOfResidentsByDistrict])
+@router1.get('/{district_id}/residents/agegroups', response_model=list[schemas.AgeGroupsOfResidentsByDistrict], tags=['Sozialatlas'])
 async def get_residents_agegroups_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_agegroups_by_district(session, district_id)
     schema = schemas.AgeGroupsOfResidentsByDistrict
@@ -339,7 +348,7 @@ async def get_residents_agegroups_by_district(district_id: int, session: AsyncSe
 
 
 
-@router.get('/districts/residents/unemployed', response_model=list[schemas.UnemployedResidentsByDistrict])
+@router1.get('/districts/residents/unemployed', response_model=list[schemas.UnemployedResidentsByDistrict], tags=['Sozialatlas'])
 async def get_residents_unemployed_by_districts(session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_unemployed_by_districts(session)
     schema = schemas.UnemployedResidentsByDistrict
@@ -347,7 +356,7 @@ async def get_residents_unemployed_by_districts(session: AsyncSession = Depends(
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
 
 
-@router.get('/{district_id}/residents/unemployed', response_model=list[schemas.UnemployedResidentsByDistrict])
+@router1.get('/{district_id}/residents/unemployed', response_model=list[schemas.UnemployedResidentsByDistrict], tags=['Sozialatlas'])
 async def get_residents_unemployed_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_unemployed_by_district(session, district_id)
     schema = schemas.UnemployedResidentsByDistrict
@@ -356,7 +365,7 @@ async def get_residents_unemployed_by_district(district_id: int, session: AsyncS
 
 
 
-@router.get('/districts/residents/unemployed/categorized', response_model=list[schemas.UnemployedCategorizedResidentsByDistrict])
+@router1.get('/districts/residents/unemployed/categorized', response_model=list[schemas.UnemployedCategorizedResidentsByDistrict], tags=['Sozialatlas'])
 async def get_residents_unemployed_by_categories_by_districts(session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_unemployed_by_categories_by_districts(session)
     schema = schemas.UnemployedCategorizedResidentsByDistrict
@@ -372,7 +381,7 @@ async def get_residents_unemployed_by_categories_by_districts(session: AsyncSess
         percentage_age_under_25=r.percentage_age_under_25) for r in rows]
 
 
-@router.get('/{district_id}/residents/unemployed/categorized', response_model=list[schemas.UnemployedCategorizedResidentsByDistrict])
+@router1.get('/{district_id}/residents/unemployed/categorized', response_model=list[schemas.UnemployedCategorizedResidentsByDistrict], tags=['Sozialatlas'])
 async def get_residents_unemployed_by_categories_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_unemployed_by_categories_by_district(session, district_id)
     schema = schemas.UnemployedCategorizedResidentsByDistrict
@@ -389,7 +398,7 @@ async def get_residents_unemployed_by_categories_by_district(district_id: int, s
 
 
 
-@router.get('/districts/residents/beneficiaries', response_model=list[schemas.BeneficiariesByDistrict])
+@router1.get('/districts/residents/beneficiaries', response_model=list[schemas.BeneficiariesByDistrict], tags=['Sozialatlas'])
 async def get_residents_beneficiaries_by_districts(session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_beneficiaries_by_districts(session)
     schema = schemas.BeneficiariesByDistrict
@@ -397,7 +406,7 @@ async def get_residents_beneficiaries_by_districts(session: AsyncSession = Depen
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
 
 
-@router.get('/{district_id}/residents/beneficiaries', response_model=list[schemas.BeneficiariesByDistrict])
+@router1.get('/{district_id}/residents/beneficiaries', response_model=list[schemas.BeneficiariesByDistrict], tags=['Sozialatlas'])
 async def get_residents_beneficiaries_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_beneficiaries_by_district(session, district_id)
     schema = schemas.BeneficiariesByDistrict
@@ -406,7 +415,7 @@ async def get_residents_beneficiaries_by_district(district_id: int, session: Asy
 
 
 
-@router.get('/districts/residents/beneficiaries/inactive', response_model=list[schemas.InactiveBeneficiariesInHouseholdsByDistrict])
+@router1.get('/districts/residents/beneficiaries/inactive', response_model=list[schemas.InactiveBeneficiariesInHouseholdsByDistrict], tags=['Sozialatlas'])
 async def get_residents_beneficiaries_inactive_by_districts(session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_beneficiaries_inactive_by_districts(session)
     schema = schemas.InactiveBeneficiariesInHouseholdsByDistrict
@@ -414,7 +423,7 @@ async def get_residents_beneficiaries_inactive_by_districts(session: AsyncSessio
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
 
 
-@router.get('/{district_id}/residents/beneficiaries/inactive', response_model=list[schemas.InactiveBeneficiariesInHouseholdsByDistrict])
+@router1.get('/{district_id}/residents/beneficiaries/inactive', response_model=list[schemas.InactiveBeneficiariesInHouseholdsByDistrict], tags=['Sozialatlas'])
 async def get_residents_beneficiaries_inactive_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_beneficiaries_inactive_by_district(session, district_id)
     schema = schemas.InactiveBeneficiariesInHouseholdsByDistrict
@@ -423,7 +432,7 @@ async def get_residents_beneficiaries_inactive_by_district(district_id: int, ses
 
 
 
-@router.get('/districts/residents/beneficiaries/characteristics', response_model=list[schemas.BeneficiariesCharacteristicsByDistrict])
+@router1.get('/districts/residents/beneficiaries/characteristics', response_model=list[schemas.BeneficiariesCharacteristicsByDistrict], tags=['Sozialatlas'])
 async def get_residents_beneficiaries_by_characteristics_by_districts(session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_beneficiaries_characteristics_by_districts(session)
     schema = schemas.BeneficiariesCharacteristicsByDistrict
@@ -437,7 +446,7 @@ async def get_residents_beneficiaries_by_characteristics_by_districts(session: A
         percentage_foreign_citizenship=r.percentage_foreign_citizenship) for r in rows]
 
 
-@router.get('/{district_id}/residents/beneficiaries/characteristics', response_model=list[schemas.BeneficiariesCharacteristicsByDistrict])
+@router1.get('/{district_id}/residents/beneficiaries/characteristics', response_model=list[schemas.BeneficiariesCharacteristicsByDistrict], tags=['Sozialatlas'])
 async def get_residents_beneficiaries_by_characteristics_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_beneficiaries_characteristics_by_district(session, district_id)
     schema = schemas.BeneficiariesCharacteristicsByDistrict
@@ -452,7 +461,7 @@ async def get_residents_beneficiaries_by_characteristics_by_district(district_id
 
 
 
-@router.get('/districts/residents/beneficiaries/age15tounder65', response_model=list[schemas.BeneficiariesAge15ToUnder65ByDistrict])
+@router1.get('/districts/residents/beneficiaries/age15tounder65', response_model=list[schemas.BeneficiariesAge15ToUnder65ByDistrict], tags=['Sozialatlas'])
 async def get_residents_beneficiaries_age15tounder65_by_districts(session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_beneficiaries_age15tounder65_by_districts(session)
     schema = schemas.BeneficiariesAge15ToUnder65ByDistrict
@@ -466,7 +475,7 @@ async def get_residents_beneficiaries_age15tounder65_by_districts(session: Async
         assisting_benefits=r.assisting_benefits) for r in rows]
 
 
-@router.get('/{district_id}/residents/beneficiaries/age15tounder65', response_model=list[schemas.BeneficiariesAge15ToUnder65ByDistrict])
+@router1.get('/{district_id}/residents/beneficiaries/age15tounder65', response_model=list[schemas.BeneficiariesAge15ToUnder65ByDistrict], tags=['Sozialatlas'])
 async def get_residents_beneficiaries_age15tounder65_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_beneficiaries_age15tounder65_by_district(session, district_id)
     schema = schemas.BeneficiariesAge15ToUnder65ByDistrict
@@ -481,7 +490,7 @@ async def get_residents_beneficiaries_age15tounder65_by_district(district_id: in
 
 
 
-@router.get('/districts/residents/migration/background', response_model=list[schemas.MigrationBackgroundByDistrict])
+@router1.get('/districts/residents/migration/background', response_model=list[schemas.MigrationBackgroundByDistrict], tags=['Sozialatlas'])
 async def get_residents_migration_background_by_districts(session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_migration_background_by_districts(session)
     schema = schemas.MigrationBackgroundByDistrict
@@ -492,7 +501,7 @@ async def get_residents_migration_background_by_districts(session: AsyncSession 
         german_citizenship=r.german_citizenship) for r in rows]
 
 
-@router.get('/{district_id}/residents/migration/background', response_model=list[schemas.MigrationBackgroundByDistrict])
+@router1.get('/{district_id}/residents/migration/background', response_model=list[schemas.MigrationBackgroundByDistrict], tags=['Sozialatlas'])
 async def get_residents_migration_background_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_migration_background_by_district(session, district_id)
     schema = schemas.MigrationBackgroundByDistrict
@@ -504,7 +513,7 @@ async def get_residents_migration_background_by_district(district_id: int, sessi
 
 
 
-@router.get('/districts/residents/housing/assistance', response_model=list[schemas.HousingAssistanceCasesByDistrict])
+@router1.get('/districts/residents/housing/assistance', response_model=list[schemas.HousingAssistanceCasesByDistrict], tags=['Sozialatlas'])
 async def get_residents_housing_assistance_by_districts(session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_housing_assistance_by_districts(session)
     schema = schemas.HousingAssistanceCasesByDistrict
@@ -519,7 +528,7 @@ async def get_residents_housing_assistance_by_districts(session: AsyncSession = 
         eviction_carried=r.eviction_carried) for r in rows]
 
 
-@router.get('/{district_id}/residents/housing/assistance', response_model=list[schemas.HousingAssistanceCasesByDistrict])
+@router1.get('/{district_id}/residents/housing/assistance', response_model=list[schemas.HousingAssistanceCasesByDistrict], tags=['Sozialatlas'])
 async def get_residents_housing_assistance_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_housing_assistance_by_district(session, district_id)
     schema = schemas.HousingAssistanceCasesByDistrict
@@ -535,7 +544,7 @@ async def get_residents_housing_assistance_by_district(district_id: int, session
 
 
 
-@router.get('/districts/residents/housing/benefit', response_model=list[schemas.HousingBenefitByDistrict])
+@router1.get('/districts/residents/housing/benefit', response_model=list[schemas.HousingBenefitByDistrict], tags=['Sozialatlas'])
 async def get_residents_housing_benefit_by_district(session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_housing_benefit_by_districts(session)
     schema = schemas.HousingBenefitByDistrict
@@ -544,7 +553,7 @@ async def get_residents_housing_benefit_by_district(session: AsyncSession = Depe
 
 
 
-@router.get('/districts/residents/housing/benefit', response_model=list[schemas.HousingBenefitByDistrict])
+@router1.get('/districts/residents/housing/benefit', response_model=list[schemas.HousingBenefitByDistrict], tags=['Sozialatlas'])
 async def get_residents_housing_benefit_by_districts(session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_housing_benefit_by_districts(session)
     schema = schemas.HousingBenefitByDistrict
@@ -552,7 +561,7 @@ async def get_residents_housing_benefit_by_districts(session: AsyncSession = Dep
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
 
 
-@router.get('/{district_id}/residents/housing/benefit', response_model=list[schemas.HousingBenefitByDistrict])
+@router1.get('/{district_id}/residents/housing/benefit', response_model=list[schemas.HousingBenefitByDistrict], tags=['Sozialatlas'])
 async def get_residents_housing_benefit_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_housing_benefit_by_district(session, district_id)
     schema = schemas.HousingBenefitByDistrict
@@ -561,8 +570,8 @@ async def get_residents_housing_benefit_by_district(district_id: int, session: A
 
 
 
-@router.get('/districts/residents/risk/homelessness',
-        response_model=list[schemas.HouseholdsAtRiskOfHomelessnessByDistricts])
+@router1.get('/districts/residents/risk/homelessness',
+        response_model=list[schemas.HouseholdsAtRiskOfHomelessnessByDistricts], tags=['Sozialatlas'])
 async def get_residents_risk_homelessness_by_districts(session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_risk_homelessness_by_districts(session)
     schema = schemas.HouseholdsAtRiskOfHomelessnessByDistricts
@@ -570,7 +579,7 @@ async def get_residents_risk_homelessness_by_districts(session: AsyncSession = D
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
 
 
-@router.get('/{district_id}/residents/risk/homelessness', response_model=list[schemas.HouseholdsAtRiskOfHomelessnessByDistrict])
+@router1.get('/{district_id}/residents/risk/homelessness', response_model=list[schemas.HouseholdsAtRiskOfHomelessnessByDistrict], tags=['Sozialatlas'])
 async def get_residents_risk_homelessness_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_risk_homelessness_by_district(session, district_id)
     schema = schemas.HouseholdsAtRiskOfHomelessnessByDistrict
@@ -578,4 +587,6 @@ async def get_residents_risk_homelessness_by_district(district_id: int, session:
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
 
 
-app.include_router(router)
+app.include_router(router1)
+app.include_router(router2)
+app.include_router(router3)
