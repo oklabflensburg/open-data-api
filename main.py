@@ -61,12 +61,22 @@ async def get_districts(session: AsyncSession = Depends(get_session)):
     return JSONResponse(content=monuments)
 
 
+
+@router2.get('/meta', response_model=list, tags=['Unfallatlas'])
+async def get_accident_meta(session: AsyncSession = Depends(get_session)):
+    rows = await service.get_accident_meta(session)
+    details = jsonable_encoder(rows)
+
+    return JSONResponse(content=details[0])
+
+
 @router2.get('/details', response_model=list, tags=['Unfallatlas'])
 async def get_accident_details_by_city(query: str, session: AsyncSession = Depends(get_session)):
     rows = await service.get_accident_details_by_city(session, query)
     details = jsonable_encoder(rows)
 
     return JSONResponse(content=details[0])
+
 
 
 @router1.get('/details', response_model=list, tags=['Sozialatlas'])

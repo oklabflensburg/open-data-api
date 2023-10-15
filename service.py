@@ -14,101 +14,117 @@ async def get_monuments(session: AsyncSession):
 
 
 
+async def get_accident_meta(session: AsyncSession):
+    stmt = text('''
+    SELECT json_build_array(
+        json_build_object(
+            'istfuss', (
+                SELECT json_agg(row_to_json(f))
+                FROM istfuss AS f
+            )
+        ),
+        json_build_object(
+            'istgkfz', (
+                SELECT json_agg(row_to_json(g))
+                FROM istgkfz AS g
+            )
+        ),
+        json_build_object(
+            'istkrad', (
+                SELECT json_agg(row_to_json(k))
+                FROM istkrad AS k
+            )
+        ),
+        json_build_object(
+            'istpkw', (
+                SELECT json_agg(row_to_json(p))
+                FROM istpkw AS p
+            )
+        ),
+        json_build_object(
+            'istrad', (
+                SELECT json_agg(row_to_json(r))
+                FROM istrad AS r
+            )
+        ),
+        json_build_object(
+            'istsonstig', (
+                SELECT json_agg(row_to_json(s))
+                FROM istsonstig AS s
+            )
+        ),
+        json_build_object(
+            'uart', (
+                SELECT json_agg(row_to_json(a))
+                FROM uart AS a
+            )
+        ),
+        json_build_object(
+            'ukategorie', (
+                SELECT json_agg(row_to_json(c))
+                FROM ukategorie AS c
+            )
+        ),
+        json_build_object(
+            'uland', (
+                SELECT json_agg(row_to_json(l))
+                FROM uland AS l
+            )
+        ),
+        json_build_object(
+            'ulichtverh', (
+                SELECT json_agg(row_to_json(y))
+                FROM ulichtverh AS y
+            )
+        ),
+        json_build_object(
+            'ustrzustan', (
+                SELECT json_agg(row_to_json(z))
+                FROM ustrzustan AS z
+            )
+        ),
+        json_build_object(
+            'utyp1', (
+                SELECT json_agg(row_to_json(t))
+                FROM utyp1 AS t
+            )
+        )
+    ) AS meta
+    ''')
+
+    result = await session.execute(stmt)
+
+    return result.scalars().all()
+
+
 async def get_accident_details_by_city(session: AsyncSession, query: str):
     sql = text('''
-    SELECT jsonb_build_object(
+    SELECT json_build_object(
         'type', 'FeatureCollection',
-        'center', COUNT(fc),
-        'features', jsonb_agg(fc.feature)
-    )
+        'features', json_agg(fc.feature)
+    ) AS data
     FROM (
-        SELECT jsonb_build_object(
-            'type', 'Feature',
-            -- 'id', objectid::text,
-            'geometry', ST_AsGeoJSON(ST_Transform(a.wkb_geometry, 4326))::jsonb,
-            'properties', to_jsonb(ul) || to_jsonb(uw) || to_jsonb(um) ||
-            jsonb_build_object('ags', concat(a.uland, a.uregbez, a.ukreis, a.ugemeinde),
-            'ujahr', a.ujahr, 'ustunde', a.ustunde) ||
-            COALESCE(to_jsonb(t), to_jsonb(tt)) ||
-            COALESCE(to_jsonb(k), to_jsonb(kk)) ||
-            COALESCE(to_jsonb(i), to_jsonb(ii)) ||
-            COALESCE(to_jsonb(p), to_jsonb(pp)) ||
-            COALESCE(to_jsonb(r), to_jsonb(rr)) ||
-            COALESCE(to_jsonb(j), to_jsonb(jj)) ||
-            COALESCE(to_jsonb(f), to_jsonb(ff)) ||
-            COALESCE(to_jsonb(s), to_jsonb(ss)) ||
-            COALESCE(to_jsonb(m), to_jsonb(mm)) ||
-            COALESCE(to_jsonb(g), to_jsonb(gg))
+        SELECT json_build_object(
+        'type', 'Feature', 
+        'geometry', ST_AsGeoJSON(ST_Transform(a.wkb_geometry, 4326))::json,
+        'properties', json_build_object(
+            'ags', a.ags, 'ujahr', a.ujahr,
+            'ustunde', a.ustunde, 'uwochentag', a.uwochentag,
+            'umonat', a.umonat, 'uland', a.uland, 'uart', a.uart, 'utyp1', a.utyp1,
+            'ukategorie', a.ukategorie, 'ulichtverh', a.ulichtverh,
+            'istrad', a.istrad, 'istpkw', a.istpkw, 'istfuss', a.istfuss,
+            'istgkfz', a.istgkfz, 'istkrad', a.istkrad, 'istsonstig', a.istsonstig)
         ) AS feature
         FROM accidents AS a
 
         JOIN vg250 AS v
-        ON ST_WITHIN(a.wkb_geometry, v.wkb_geometry)
-
-        LEFT JOIN uwochentag AS uw
-        ON a.uwochentag = uw.id::text
-
-        LEFT JOIN uland AS ul
-        ON a.uland = LPAD(ul.id::text, 2, '0')
-
-        LEFT JOIN umonat AS um
-        ON a.umonat = LPAD(um.id::text, 2, '0')
-
-        LEFT JOIN uart AS t
-        ON a.uart = t.id::text
-        LEFT JOIN (SELECT '' AS uart) AS tt
-        ON a.uart IS NULL
-
-        LEFT JOIN ukategorie AS k
-        ON a.ukategorie = k.id::text
-        LEFT JOIN (SELECT '' AS ukategorie) AS kk
-        ON a.ukategorie IS NULL
-
-        LEFT JOIN istrad AS r
-        ON a.istrad = r.id::text
-        LEFT JOIN (SELECT '' AS istrad) AS rr
-        ON a.istrad IS NULL
-
-        LEFT JOIN ulichtverh AS i
-        ON a.ulichtverh = i.id::text
-        LEFT JOIN (SELECT '' AS ulichtverh) AS ii
-        ON a.ulichtverh IS NULL
-
-        LEFT JOIN istpkw AS j
-        ON a.istpkw = j.id::text
-        LEFT JOIN (SELECT '' AS istpkw) AS jj
-        ON a.istpkw IS NULL
-
-        LEFT JOIN istfuss AS f
-        ON a.istfuss = f.id::text
-        LEFT JOIN (SELECT '' AS istfuss) AS ff
-        ON a.istfuss IS NULL
-
-        LEFT JOIN istsonstig AS s
-        ON a.istsonstig = s.id::text
-        LEFT JOIN (SELECT '' AS istsonstig) AS ss
-        ON a.istsonstig IS NULL
-
-        LEFT JOIN istgkfz AS g
-        ON a.istgkfz = g.id::text
-        LEFT JOIN (SELECT '' AS istgkfz) AS gg
-        ON a.istgkfz IS NULL
-
-        LEFT JOIN istkrad AS m
-        ON a.istkrad = m.id::text
-        LEFT JOIN (SELECT '' AS istkrad) AS mm
-        ON a.istkrad IS NULL
-
-        LEFT JOIN utyp1 AS p
-        ON a.utyp1 = p.id::text
-        LEFT JOIN (SELECT '' AS utyp1) AS pp
-        ON a.utyp1 IS NULL
+        ON a.ags = v.ags
 
         WHERE LOWER(v.gen) = :q
-    ) AS fc;
+    ) AS fc
     ''')
 
-    stmt = sql.bindparams(q=query)
+    stmt = sql.bindparams(q=query.lower())
     result = await session.execute(stmt)
 
     return result.scalars().all()
