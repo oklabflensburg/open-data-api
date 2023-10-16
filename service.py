@@ -16,78 +16,62 @@ async def get_monuments(session: AsyncSession):
 
 async def get_accident_meta(session: AsyncSession):
     stmt = text('''
-    SELECT json_build_array(
-        json_build_object(
-            'istfuss', (
-                SELECT json_agg(row_to_json(f))
-                FROM istfuss AS f
-            )
+    SELECT json_build_object(
+        'istfuss', (
+            SELECT json_agg(row_to_json(f))
+            FROM istfuss AS f
         ),
-        json_build_object(
-            'istgkfz', (
-                SELECT json_agg(row_to_json(g))
-                FROM istgkfz AS g
-            )
+        'istgkfz', (
+            SELECT json_agg(row_to_json(g))
+            FROM istgkfz AS g
         ),
-        json_build_object(
-            'istkrad', (
-                SELECT json_agg(row_to_json(k))
-                FROM istkrad AS k
-            )
+        'istkrad', (
+            SELECT json_agg(row_to_json(k))
+            FROM istkrad AS k
         ),
-        json_build_object(
-            'istpkw', (
-                SELECT json_agg(row_to_json(p))
-                FROM istpkw AS p
-            )
+        'istpkw', (
+            SELECT json_agg(row_to_json(p))
+            FROM istpkw AS p
         ),
-        json_build_object(
-            'istrad', (
-                SELECT json_agg(row_to_json(r))
-                FROM istrad AS r
-            )
+        'istrad', (
+            SELECT json_agg(row_to_json(r))
+            FROM istrad AS r
         ),
-        json_build_object(
-            'istsonstig', (
-                SELECT json_agg(row_to_json(s))
-                FROM istsonstig AS s
-            )
+        'istsonstig', (
+            SELECT json_agg(row_to_json(s))
+            FROM istsonstig AS s
         ),
-        json_build_object(
-            'uart', (
-                SELECT json_agg(row_to_json(a))
-                FROM uart AS a
-            )
+        'uart', (
+            SELECT json_agg(row_to_json(a))
+            FROM uart AS a
         ),
-        json_build_object(
-            'ukategorie', (
-                SELECT json_agg(row_to_json(c))
-                FROM ukategorie AS c
-            )
+        'ukategorie', (
+            SELECT json_agg(row_to_json(c))
+            FROM ukategorie AS c
         ),
-        json_build_object(
-            'uland', (
-                SELECT json_agg(row_to_json(l))
-                FROM uland AS l
-            )
+        'uland', (
+            SELECT json_agg(row_to_json(l))
+            FROM uland AS l
         ),
-        json_build_object(
-            'ulichtverh', (
-                SELECT json_agg(row_to_json(y))
-                FROM ulichtverh AS y
-            )
+        'ulichtverh', (
+            SELECT json_agg(row_to_json(y))
+            FROM ulichtverh AS y
         ),
-        json_build_object(
-            'ustrzustan', (
-                SELECT json_agg(row_to_json(z))
-                FROM ustrzustan AS z
-            )
+        'ustrzustan', (
+            SELECT json_agg(row_to_json(z))
+            FROM ustrzustan AS z
         ),
-        json_build_object(
-            'utyp1', (
-                SELECT json_agg(row_to_json(t))
-                FROM utyp1 AS t
-            )
+        'uwochentag', (
+            SELECT json_agg(row_to_json(w))
+            FROM uwochentag AS w
+        ),
+        'umonat', (
+            SELECT json_agg(row_to_json(m))
+            FROM umonat AS m
+        ),
+        'utyp1', (
+            SELECT json_agg(row_to_json(t))
+            FROM utyp1 AS t
         )
     ) AS meta
     ''')
