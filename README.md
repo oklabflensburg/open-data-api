@@ -27,7 +27,7 @@ To run your own instance of the open data API, first clone the repository and in
 git clone https://github.com/oklabflensburg/open-data-api.git
 cd open-data-api
 virtualenv venv
-source venv/bin/activate
+source venv/local/bin/activate
 pip install -r requirements.txt
 deactivate
 ```
@@ -56,7 +56,7 @@ sudo -i -Hu postgres psql -U postgres -h localhost -d postgres -p 5432 < data/cl
 sudo -i -Hu postgres psql -U postgres -h localhost -d postgres -p 5433 < data/flensburg_sozialatlas.sql
 sudo -i -Hu postgres psql -U postgres -h localhost -d postgres -p 5432 < data/flensburg_sozialatlas_metadaten.sql
 virtualenv venv
-source venv/bin/activate
+source venv/local/bin/activate
 pip install -r requirements.txt
 python ./insert_districts.py ../static/flensburg_stadtteile.geojson
 deactivate
@@ -74,9 +74,26 @@ sudo -i -Hu postgres psql -U postgres -h localhost -d postgres -p 5432 < data/de
 ogr2ogr -f "PostgreSQL" PG:"dbname=postgres user=postgres port=5432 host=localhost" "data/vg250.geojson" -nln vg250
 cd tools
 virtualenv venv
-source venv/bin/activate
+source venv/local/bin/activate
 pip install -r requirements.txt
 python ./insert_boundaries.py ../data/denkmalliste_geometrien.geojson
+deactivate
+cd ..
+```
+
+Run the following commands to receive a propper result calling the accident open data API endpoints.
+
+```sh
+cd ..
+git clone https://github.com/oklabflensburg/open-accident-map.git
+cd open-accident-map
+git lfs pull
+sudo -i -Hu postgres psql -U postgres -h localhost -d postgres -p 5432 < data/unfallorte_deutschland_schema.sql
+cd tools
+virtualenv venv
+source venv/local/bin/activate
+pip install -r requirements.txt
+for i in {16..22}; do python ./insert_accidents.py ../data/accidents_20$i.geojson; done
 deactivate
 cd ..
 ```
@@ -88,7 +105,7 @@ Now you should be ready start the open data API loacally and test all routes
 
 ```sh
 cd ../open-data-api
-source venv/bin/activate
+source venv/local/bin/activate
 uvicorn main:app --reload
 ```
 
