@@ -58,7 +58,7 @@ sudo -i -Hu postgres psql -U postgres -h localhost -d postgres -p 5432 < data/fl
 virtualenv venv
 source venv/local/bin/activate
 pip install -r requirements.txt
-python ./insert_districts.py ../static/flensburg_stadtteile.geojson
+python insert_districts.py ../static/flensburg_stadtteile.geojson
 deactivate
 ```
 
@@ -69,14 +69,14 @@ cd ..
 git clone https://github.com/oklabflensburg/open-monuments-map.git
 cd open-monuments-map
 git lfs pull
-sudo -i -Hu postgres psql -U postgres -h localhost -d postgres -p 5432 < data/flensburg_denkmalschutz.sql
-sudo -i -Hu postgres psql -U postgres -h localhost -d postgres -p 5432 < data/denkmalliste_geometrien_schema.sql
+sudo -i -Hu postgres psql -U postgres -h localhost -d postgres -p 5432 < data/denkmalliste_schema.sql
 ogr2ogr -f "PostgreSQL" PG:"dbname=postgres user=postgres port=5432 host=localhost" "data/vg250.geojson" -nln vg250
 cd tools
 virtualenv venv
 source venv/local/bin/activate
 pip install -r requirements.txt
-python ./insert_boundaries.py ../data/denkmalliste_geometrien.geojson
+python insert_boundaries.py ../data/denkmalliste_geometrien.geojson
+python insert_monuments.py ../data/stadt-flensburg-denkmalschutz.geojson
 deactivate
 cd ..
 ```
@@ -93,7 +93,7 @@ cd tools
 virtualenv venv
 source venv/local/bin/activate
 pip install -r requirements.txt
-for i in {16..22}; do python ./insert_accidents.py ../data/accidents_20$i.geojson; done
+for i in {16..22}; do python insert_accidents.py ../data/accidents_20$i.geojson; done
 deactivate
 cd ..
 ```
