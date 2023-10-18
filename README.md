@@ -15,7 +15,7 @@
 If you wih to run your own instance of this open data API follow these steps. First you may want to install system dependencies for your Ubuntu machine.
 
 ```sh
-sudo apt install git virtualenv python3 python3-pip postgresql-15 postgresql-15-postgis-3 postgis
+sudo apt install git git-lfs virtualenv python3 python3-pip postgresql-15 postgresql-15-postgis-3 postgis gdal-bin
 ```
 
 
