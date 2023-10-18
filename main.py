@@ -52,13 +52,12 @@ async def swagger_ui_html(req: Request) -> HTMLResponse:
 
 
 
-@router3.get('/details', response_model=list[schemas.District], tags=['Denkmalschutzliste'])
-async def get_districts(session: AsyncSession = Depends(get_session)):
-    rows = await service.get_monuments(session)
-    schema = schemas.District
+@router3.get('/details', response_model=list, tags=['Denkmalschutzliste'])
+async def get_monuments(object_id: int, session: AsyncSession = Depends(get_session)):
+    rows = await service.get_monuments(session, object_id)
     monuments = jsonable_encoder(rows)
 
-    return JSONResponse(content=monuments)
+    return JSONResponse(content=monuments[0])
 
 
 

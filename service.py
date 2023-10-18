@@ -6,9 +6,55 @@ import models
 
 
 
-async def get_monuments(session: AsyncSession):
-    model = models.Monument
-    result = await session.execute(select(model))
+async def get_monuments(session: AsyncSession, object_id: int):
+    stmt = text('''
+    SELECT
+        json_build_object(
+            'type', 'FeatureCollection',
+            'crs', json_build_object(
+                'type', 'name',
+                'properties', json_build_object(
+                    'name', 'urn:ogc:def:crs:OGC:1.3:CRS84'
+                )
+            ),
+            'features', json_agg(
+                json_build_object(
+                    'type', 'Feature',
+                    'geometry', ST_AsGeoJSON(m.wkb_geometry)::json,
+                    'properties', json_build_object(
+                        'object_id', m.object_id,
+                        'place_name', m.place_name,
+                        'address', m.address,
+                        'postal_code', m.postal_code,
+                        'image_url', m.image_url,
+                        'designation', m.designation,
+                        'description', m.description,
+                        'monument_type', m.monument_type,
+                        'reasons', (
+                            SELECT string_agg(mr.label, ', ')
+                            FROM monument_reason AS mr
+                            WHERE mxr.monument_id = m.id
+                        )
+                    )
+                )
+            )
+        )
+    FROM monuments AS m
+
+    JOIN monument_x_reason AS mxr
+    ON mxr.monument_id = m.id
+
+    JOIN monument_reason AS mr
+    ON mxr.reason_id = mr.id
+
+    JOIN vg250 AS v
+    ON ST_Within(ST_GeomFromEWKB(m.wkb_geometry), ST_GeomFromEWKB(v.wkb_geometry))
+
+    WHERE m.object_id = :q
+    ''')
+
+    sql = stmt.bindparams(q=object_id)
+    result = await session.execute(sql)
 
     return result.scalars().all()
 
@@ -82,7 +128,7 @@ async def get_accident_meta(session: AsyncSession):
 
 
 async def get_accident_details_by_city(session: AsyncSession, query: str):
-    sql = text('''
+    stmt = text('''
     SELECT json_build_object(
         'type', 'FeatureCollection',
         'features', json_agg(fc.feature)
@@ -108,8 +154,8 @@ async def get_accident_details_by_city(session: AsyncSession, query: str):
     ) AS fc
     ''')
 
-    stmt = sql.bindparams(q=query.lower())
-    result = await session.execute(stmt)
+    sql = stmt.bindparams(q=query.lower())
+    result = await session.execute(sql)
 
     return result.scalars().all()
 
