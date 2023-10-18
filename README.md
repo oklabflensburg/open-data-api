@@ -52,13 +52,33 @@ To use the all open data API endpoints you may import following data
 cd ..
 git clone https://github.com/oklabflensburg/open-social-map.git
 cd open-social-map
+sudo -i -Hu postgres psql -U postgres -h localhost -d postgres -p 5432 < data/cleanup_database_schema.sql
+sudo -i -Hu postgres psql -U postgres -h localhost -d postgres -p 5433 < data/flensburg_sozialatlas.sql
+sudo -i -Hu postgres psql -U postgres -h localhost -d postgres -p 5432 < data/flensburg_sozialatlas_metadaten.sql
 virtualenv venv
 source venv/bin/activate
 pip install -r requirements.txt
-psql -U postgres -h localhost -d postgres -p 5432 < data/cleanup_database_schema.sql
-psql -U postgres -h localhost -d postgres -p 5432 < data/flensburg_sozialatlas_metadaten.sql
-./insert_geography.py data/flensburg_stadtteile.geojson
+python ./insert_districts.py ../static/flensburg_stadtteile.geojson
 deactivate
+```
+
+Run the following commands to receive a propper result calling the monument open data API endpoints.
+
+```sh
+cd ..
+git clone https://github.com/oklabflensburg/open-monuments-map.git
+cd open-monuments-map
+git lfs pull
+sudo -i -Hu postgres psql -U postgres -h localhost -d postgres -p 5432 < data/flensburg_denkmalschutz.sql
+sudo -i -Hu postgres psql -U postgres -h localhost -d postgres -p 5432 < data/denkmalliste_geometrien_schema.sql
+ogr2ogr -f "PostgreSQL" PG:"dbname=postgres user=postgres port=5432 host=localhost" "data/vg250.geojson" -nln vg250
+cd tools
+virtualenv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python ./insert_boundaries.py ../data/denkmalliste_geometrien.geojson
+deactivate
+cd ..
 ```
 
 
@@ -73,7 +93,7 @@ uvicorn main:app --reload
 ```
 
 
-## Contribute
+## How to contribute
 
 You are welcome to contribute to the open data API. You may have a look in our [CONTRIBUTING.md](CONTRIBUTING.md) guide.
 
