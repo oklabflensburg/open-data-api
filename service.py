@@ -47,7 +47,7 @@ async def get_monuments(session: AsyncSession, object_id: int):
     JOIN monument_reason AS mr
     ON mxr.reason_id = mr.id
 
-    JOIN vg250 AS v
+    JOIN vg250gem AS v
     ON ST_Within(ST_GeomFromEWKB(m.wkb_geometry), ST_GeomFromEWKB(v.wkb_geometry))
 
     WHERE m.object_id = :q
@@ -147,7 +147,7 @@ async def get_accident_details_by_city(session: AsyncSession, query: str):
         ) AS feature
         FROM accidents AS a
 
-        JOIN vg250 AS v
+        JOIN vg250gem AS v
         ON a.ags = v.ags
 
         WHERE LOWER(v.gen) = :q

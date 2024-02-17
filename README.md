@@ -64,13 +64,23 @@ deactivate
 
 Run the following commands to receive a propper result calling the monument open data API endpoints.
 
+First add all German administrative geometries with `ogr2ogr`
+
+```
+ogr2ogr -f "PostgreSQL" PG:"dbname=postgres user=postgres port=5432 host=localhost" "data/vg250gem.geojson" -nln vg250gem
+ogr2ogr -f "PostgreSQL" PG:"dbname=postgres user=postgres port=5432 host=localhost" "data/vg250vwg.geojson" -nln vg250vwg
+ogr2ogr -f "PostgreSQL" PG:"dbname=postgres user=postgres port=5432 host=localhost" "data/vg250krs.geojson" -nln vg250krs
+ogr2ogr -f "PostgreSQL" PG:"dbname=postgres user=postgres port=5432 host=localhost" "data/vg250lan.geojson" -nln vg250lan
+ogr2ogr -f "PostgreSQL" PG:"dbname=postgres user=postgres port=5432 host=localhost" "data/vg250rbz.geojson" -nln vg250rbz
+ogr2ogr -f "PostgreSQL" PG:"dbname=postgres user=postgres port=5432 host=localhost" "data/vg250sta.geojson" -nln vg250sta
+```
+
 ```sh
 cd ..
 git clone https://github.com/oklabflensburg/open-monuments-map.git
 cd open-monuments-map
 git lfs pull
 sudo -i -Hu postgres psql -U postgres -h localhost -d postgres -p 5432 < data/denkmalliste_schema.sql
-ogr2ogr -f "PostgreSQL" PG:"dbname=postgres user=postgres port=5432 host=localhost" "data/vg250.geojson" -nln vg250
 cd tools
 virtualenv venv
 source venv/local/bin/activate
