@@ -15,7 +15,9 @@
 If you wih to run your own instance of this open data API follow these steps. First you may want to install system dependencies for your Ubuntu machine.
 
 ```sh
-sudo apt install git git-lfs virtualenv python3 python3-pip postgresql-15 postgresql-15-postgis-3 postgis gdal-bin
+sudo apt install git git-lfs
+sudo apt install python3 python3-pip python3-venv
+sudo apt install postgresql-16 postgis-3 gdal-bin
 ```
 
 
@@ -26,9 +28,9 @@ To run your own instance of the open data API, first clone the repository and in
 ```sh
 git clone https://github.com/oklabflensburg/open-data-api.git
 cd open-data-api
-virtualenv venv
-source venv/local/bin/activate
-pip install -r requirements.txt
+python3 -m venv venv
+source venv/bin/activate
+pip3 install -r requirements.txt
 deactivate
 ```
 
@@ -53,12 +55,12 @@ cd ..
 git clone https://github.com/oklabflensburg/open-social-map.git
 cd open-social-map
 sudo -i -Hu postgres psql -U postgres -h localhost -d postgres -p 5432 < data/cleanup_database_schema.sql
-sudo -i -Hu postgres psql -U postgres -h localhost -d postgres -p 5433 < data/flensburg_sozialatlas.sql
+sudo -i -Hu postgres psql -U postgres -h localhost -d postgres -p 5432 < data/flensburg_sozialatlas.sql
 sudo -i -Hu postgres psql -U postgres -h localhost -d postgres -p 5432 < data/flensburg_sozialatlas_metadaten.sql
-virtualenv venv
-source venv/local/bin/activate
-pip install -r requirements.txt
-python insert_districts.py ../static/flensburg_stadtteile.geojson
+python3 -m venv venv
+source venv/bin/activate
+pip3 install -r requirements.txt
+python3 insert_districts.py ../static/flensburg_stadtteile.geojson
 deactivate
 ```
 
@@ -82,11 +84,11 @@ cd open-monuments-map
 git lfs pull
 sudo -i -Hu postgres psql -U postgres -h localhost -d postgres -p 5432 < data/denkmalliste_schema.sql
 cd tools
-virtualenv venv
-source venv/local/bin/activate
-pip install -r requirements.txt
-python insert_boundaries.py ../data/denkmalliste_geometrien.geojson
-python insert_monuments.py ../data/stadt-flensburg-denkmalschutz.geojson
+python3 -m venv venv
+source venv/bin/activate
+pip3 install -r requirements.txt
+python3 insert_boundaries.py ../data/denkmalliste_geometrien.geojson
+python3 insert_monuments.py ../data/stadt-flensburg-denkmalschutz.geojson
 deactivate
 cd ..
 ```
@@ -100,10 +102,10 @@ cd open-accident-map
 git lfs pull
 sudo -i -Hu postgres psql -U postgres -h localhost -d postgres -p 5432 < data/unfallorte_deutschland_schema.sql
 cd tools
-virtualenv venv
-source venv/local/bin/activate
-pip install -r requirements.txt
-for i in {16..22}; do python insert_accidents.py ../data/accidents_20$i.geojson; done
+python3 -m venv venv
+source venv/bin/activate
+pip3 install -r requirements.txt
+for i in {16..22}; do python3 insert_accidents.py ../data/accidents_20$i.geojson; done
 deactivate
 cd ..
 ```
@@ -115,7 +117,7 @@ Now you should be ready start the open data API loacally and test all routes
 
 ```sh
 cd ../open-data-api
-source venv/local/bin/activate
+source venv/bin/activate
 uvicorn main:app --reload
 ```
 
