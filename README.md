@@ -32,9 +32,10 @@ Make sure to add your user to the `oklab`-group.
 ```
 sudo adduser oklab
 sudo usermod -a -G www-data oklab
-mkdir -p /opt/oklab
+sudo mkdir -p /opt/oklab
+sudo chown -R oklab:oklab /opt/oklab
+sudo chmod 770 -R /opt/oklab
 cd /opt/oklab/
-sudo chmod 770 -R .
 ```
 
 
@@ -105,9 +106,7 @@ To use the all open data API endpoints you may import following data
 cd ..
 git clone https://github.com/oklabflensburg/open-social-map.git
 cd open-social-map
-psql -U oklab -h localhost -d oklab -p 5432 < data/cleanup_database_schema.sql
-psql -U oklab -h localhost -d oklab -p 5432 < data/flensburg_sozialatlas.sql
-psql -U oklab -h localhost -d oklab -p 5432 < data/flensburg_sozialatlas_metadaten.sql
+psql -U oklab -h localhost -d oklab -p 5432 < data/flensburg_stadtteile.sql
 cp ../open-data-api/.env .
 cd tools
 python3 -m venv venv
@@ -115,7 +114,17 @@ source venv/bin/activate
 pip3 install -r requirements.txt
 python3 insert_districts.py ../static/flensburg_stadtteile.geojson
 deactivate
+psql -U oklab -h localhost -d oklab -p 5432 < data/flensburg_sozialatlas.sql
+psql -U oklab -h localhost -d oklab -p 5432 < data/flensburg_sozialatlas_metadaten.sql
 ```
+
+In case you messed up anything, you can run this line but be aware it will delete all tables
+
+```
+psql -U oklab -h localhost -d oklab -p 5432 < data/cleanup_database_schema.sql
+```
+
+After running this line you must repeat all steps above to import all data
 
 
 ```sh
