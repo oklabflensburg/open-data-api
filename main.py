@@ -64,17 +64,26 @@ async def get_monuments(object_id: int, session: AsyncSession = Depends(get_sess
 @router2.get('/meta', response_model=list, tags=['Unfallatlas'])
 async def get_accident_meta(session: AsyncSession = Depends(get_session)):
     rows = await service.get_accident_meta(session)
-    details = jsonable_encoder(rows)
+    result =jsonable_encoder(rows)
 
-    return JSONResponse(content=details[0])
+    return JSONResponse(content=result[0])
 
 
 @router2.get('/details', response_model=list, tags=['Unfallatlas'])
 async def get_accident_details_by_city(query: str, session: AsyncSession = Depends(get_session)):
     rows = await service.get_accident_details_by_city(session, query)
-    details = jsonable_encoder(rows)
+    result =jsonable_encoder(rows)
 
-    return JSONResponse(content=details[0])
+    return JSONResponse(content=result[0])
+
+
+
+@router1.get('/meta', response_model=list, tags=['Sozialatlas'])
+async def get_demographics_meta(session: AsyncSession = Depends(get_session)):
+    rows = await service.get_demographics_meta(session)
+    result =jsonable_encoder(rows)
+
+    return JSONResponse(content=result)
 
 
 
@@ -82,9 +91,9 @@ async def get_accident_details_by_city(query: str, session: AsyncSession = Depen
 async def get_district_details(session: AsyncSession = Depends(get_session)):
     rows = await service.get_district_details(session)
     schema = schemas.DistrictDetails
-    details = jsonable_encoder(rows)
+    result =jsonable_encoder(rows)
 
-    return JSONResponse(content=details[0])
+    return JSONResponse(content=result[0])
 
 
 @router1.get('/districts/', response_model=list[schemas.District], tags=['Sozialatlas'])

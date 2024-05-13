@@ -60,6 +60,29 @@ async def get_monuments(session: AsyncSession, object_id: int):
 
 
 
+async def get_demographics_meta(session: AsyncSession):
+    stmt = text('''
+    SELECT json_build_object(
+        cmd.table_name, json_agg(
+            json_build_object(cmd.column_name, cmd.column_label)
+        )
+    ) AS column_meta_data
+
+    FROM column_meta_data cmd
+
+    JOIN i18n AS i
+    ON cmd.i18n_id = i.id
+
+    GROUP BY cmd.table_name
+    ORDER BY cmd.table_name
+    ''')
+
+    result = await session.execute(stmt)
+
+    return result.scalars().all()
+
+
+
 async def get_accident_meta(session: AsyncSession):
     stmt = text('''
     SELECT json_build_object(
