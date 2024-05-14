@@ -277,8 +277,8 @@ class BeneficiariesByDistricts(BeneficiariesByDistrict):
 
 
 class BeneficiariesCharacteristicsByDistrict(BaseModel):
-    district_id: int
     year: int
+    district_id: Optional[int]
     unemployability: Optional[int]
     employability: Optional[int]
     percentage_females: Optional[float]
@@ -302,7 +302,7 @@ class InactiveBeneficiariesInHouseholdsByDistricts(InactiveBeneficiariesInHouseh
 
 class BasicBenefitsIncomeByDistrict(BaseModel):
     year: int
-    district_id: int
+    district_id: Optional[int]
     male: Optional[int]
     female: Optional[int]
     age_18_to_under_65: Optional[int]
