@@ -1,6 +1,7 @@
 ---
-db_user: postgres
-db_password: postgres
-db_name: postgres
+ansible_python_interpreter: /usr/bin/python3
+db_user: oklab
+db_password: oklab
+db_name: oklab
 db_host: localhost
 db_port: 5432

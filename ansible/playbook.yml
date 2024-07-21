@@ -11,6 +11,17 @@
         state: present
         update_cache: yes
 
+    - name: Create a user 'oklab' with a home directory
+      ansible.builtin.user:
+        name: oklab
+        shell: /bin/bash
+        create_home: yes
+        generate_ssh_key: yes
+        ssh_key_bits: 2048
+        ssh_key_file: .ssh/id_rsa
+        groups: www-data
+        append: yes
+
     - name: Handle system setup defaults
       block:
         - name: Install system packages
@@ -18,10 +29,13 @@
           with_items:
             - acl
             - git
+            - git-lfs
             - gnupg2
-            - virtualenv
             - python3
+            - python3-venv
             - python3-pip
+            - gdal-bin
+            - osm2pgsql
 
         - name: Add postgresql signing key to keyring file
           ansible.builtin.get_url:
@@ -38,9 +52,9 @@
         - name: Install database packages
           ansible.builtin.apt: "name={{ item }} state=present update_cache=yes"
           with_items:
-            - postgresql-15
-            - postgresql-15-postgis-3
-            - postgresql-client-15
+            - postgresql-16
+            - postgresql-16-postgis-3
+            - postgresql-client-16
 
         - name: Make sure psycopg2 is installed
           ansible.builtin.pip:
@@ -48,9 +62,78 @@
             state: present
 
   tasks:
+    - name: Create a directory if it does not exist
+      ansible.builtin.file:
+        path: /opt/git
+        state: directory
+        mode: "0755"
+        owner: oklab
+        group: oklab
+
+    - name: Git checkout open-data-api all repositories
+      ansible.builtin.git:
+        repo: https://github.com/oklabflensburg/open-data-api.git
+        dest: /opt/git/open-data-api
+      become_user: oklab
+
+    - name: Ensure the virtual environment exists
+      ansible.builtin.pip:
+        requirements: /opt/git/open-data-api/requirements.txt
+        virtualenv: /opt/git/open-data-api/venv
+        virtualenv_command: "{{ ansible_python_interpreter }} -m venv"
+      become_user: oklab
+
+    - name: Git checkout open-social-map all repositories
+      ansible.builtin.git:
+        repo: https://github.com/oklabflensburg/open-social-map.git
+        dest: /opt/git/open-social-map
+      become_user: oklab
+
+    - name: Create dotenv file for open-social-map
+      ansible.builtin.template:
+        src: dotenv.j2
+        dest: /opt/git/open-social-map/.env
+        owner: oklab
+        group: oklab
+        mode: '0644'
+      become_user: oklab
+
+    - name: Ensure the virtual environment exists
+      ansible.builtin.pip:
+        requirements: /opt/git/open-social-map/tools/requirements.txt
+        virtualenv: /opt/git/open-social-map/tools/venv
+        virtualenv_command: "{{ ansible_python_interpreter }} -m venv"
+      become_user: oklab
+
+    - name: Git checkout open-monuments-map all repositories
+      ansible.builtin.git:
+        repo: https://github.com/oklabflensburg/open-monuments-map.git
+        dest: /opt/git/open-monuments-map
+      become_user: oklab
+
+    - name: Ensure the virtual environment exists
+      ansible.builtin.pip:
+        requirements: /opt/git/open-monuments-map/tools/requirements.txt
+        virtualenv: /opt/git/open-monuments-map/tools/venv
+        virtualenv_command: "{{ ansible_python_interpreter }} -m venv"
+      become_user: oklab
+
+    - name: Git checkout open-accident-map all repositories
+      ansible.builtin.git:
+        repo: https://github.com/oklabflensburg/open-accident-map.git
+        dest: /opt/git/open-accident-map
+      become_user: oklab
+
+    - name: Ensure the virtual environment exists
+      ansible.builtin.pip:
+        requirements: /opt/git/open-accident-map/tools/requirements.txt
+        virtualenv: /opt/git/open-accident-map/tools/venv
+        virtualenv_command: "{{ ansible_python_interpreter }} -m venv"
+      become_user: oklab
+
     - name: Find out if PostgreSQL is initialized
       ansible.builtin.stat:
-        path: /etc/postgresql/15/main/pg_hba.conf
+        path: /etc/postgresql/16/main/pg_hba.conf
       register: postgres_data
 
     - name: Reload postgresql service
@@ -59,74 +142,92 @@
         state: reloaded
       when: not postgres_data.stat.exists
 
-    - name: Create app database
-      postgresql_db:
-        state: present
-        name: "{{ db_name }}"
-      become: yes
-      become_user: postgres
-
-    - name: Create db user
+    - name: "Create database user {{ db_user }}"
       postgresql_user:
         state: present
         name: "{{ db_user }}"
         password: "{{ db_password }}"
-      become: yes
       become_user: postgres
 
-    - name: Grant db user access to app db
+    - name: Create database
+      community.postgresql.postgresql_db:
+        encoding: UTF-8
+        name: "{{ db_name }}"
+        owner: "{{ db_user }}"
+        state: present
+      become_user: postgres
+
+    - name: Grant database user access to app db
       postgresql_privs:
         type: database
-        database: "{{ db_name }}"
-        roles: "{{ db_user }}"
-        grant_option: no
+        database: postgres
+        roles: PUBLIC
         privs: all
-      become: yes
       become_user: postgres
 
-    - name: Allow md5 connection for the db user
+    - name: Adds postgis extension to the database
+      community.postgresql.postgresql_ext:
+        name: postgis
+        db: "{{ db_name }}"
+        login_user: postgres
+        schema: public
+        cascade: yes
+      become_user: postgres
+
+    - name: Set database user connection authentication method
       postgresql_pg_hba:
-        dest: "/etc/postgresql/15/main/pg_hba.conf"
-        contype: host
-        databases: all
-        method: md5
-        users: "{{ db_user }}"
-        create: true
+        dest: "/etc/postgresql/16/main/pg_hba.conf"
+        contype: "{{ item.contype }}"
+        databases: "{{ item.database }}"
+        method: trust
+        users: "{{ item.user }}"
+        create: yes
+        state: present
+      loop:
+        - { user: 'oklab', contype: 'host', database: 'oklab' }
+        - { user: 'oklab', contype: 'local', database: 'oklab' }
+        - { user: 'postgres', contype: 'host', database: 'all' }
+        - { user: 'postgres', contype: 'local', database: 'all' }
       become: yes
       become_user: postgres
       notify: restart postgres
 
-    - name: pull project sql files
-      ansible.builtin.get_url:
-        url: "{{ item }}"
-        dest: "/tmp/"
+    - name: Adds postgis extension to the database
+      community.postgresql.postgresql_ext:
+        name: postgis
+        db: "{{ db_name }}"
+        login_user: postgres
+        schema: public
+        cascade: yes
+      become_user: postgres
+
+    - name: Run SQL script to reset public schema
+      community.postgresql.postgresql_script:
+        db: oklab
+        port: "{{ db_port }}"
+        path: "{{ item }}"
       with_items:
-        - https://raw.githubusercontent.com/oklabflensburg/open-social-map/main/data/cleanup_database_schema.sql
-        - https://raw.githubusercontent.com/oklabflensburg/open-social-map/main/data/flensburg_sozialatlas_metadaten.sql
-        - https://raw.githubusercontent.com/oklabflensburg/open-monuments-map/main/data/flensburg_denkmalschutz.sql
-        - https://raw.githubusercontent.com/oklabflensburg/open-social-map/main/data/flensburg_sozialatlas.sql
+        - /opt/git/open-social-map/data/cleanup_database_schema.sql
       become: yes
       become_user: postgres
 
-    - name: Add data to postgresql database
+    - name: Run SQL to create schema
       community.postgresql.postgresql_script:
         db: "{{ db_name }}"
-        path: "/tmp/{{ item }}"
+        port: "{{ db_port }}"
+        login_host: "{{ db_host }}"
+        login_user: "{{ db_user }}"
+        path: "{{ item }}"
       with_items:
-        - cleanup_database_schema.sql
-        - flensburg_sozialatlas_metadaten.sql
-        - flensburg_denkmalschutz.sql
-        - flensburg_sozialatlas.sql
-      become: true
-      become_user: postgres
+        - /opt/git/open-social-map/data/flensburg_stadtteile.sql
+        - /opt/git/open-social-map/data/flensburg_sozialatlas_metadaten.sql
+        - /opt/git/open-social-map/data/flensburg_sozialatlas.sql
+        - /opt/git/open-monuments-map/data/denkmalliste_schema.sql
+      become_user: oklab
 
-    - name: Create a directory if it does not exist
-      ansible.builtin.file:
-        path: /opt/git
-        state: directory
-        mode: "0755"
-        owner: "{{ ansible_user }}"
-        group: "{{ ansible_user }}"
+    - name: Run a script using an executable in a system path
+      ansible.builtin.command: /opt/git/open-social-map/tools/venv/bin/python3 /opt/git/open-social-map/tools/insert_districts.py /opt/git/open-social-map/static/flensburg_stadtteile.geojson
+      become_user: oklab
 
   handlers:
     - name: restart postgres
