@@ -69,6 +69,9 @@ Note since the `oklab`-user does not have superuser permissions you must login w
 ```
 \c oklab
 CREATE EXTENSION IF NOT EXISTS postgis;
+CREATE EXTENSION IF NOT EXISTS hstore;
+ALTER TABLE geometry_columns OWNER TO oklab;
+ALTER TABLE spatial_ref_sys OWNER TO oklab;
 exit
 ```
 
