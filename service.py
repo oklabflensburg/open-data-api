@@ -6,6 +6,22 @@ import models
 
 
 
+async def get_biotop_meta(session: AsyncSession, lat: float, lng: float):
+    stmt = text('''
+    SELECT bm.code, bm.designation, ST_AsGeoJSON(b.geom) AS geojson
+    FROM sh_biotop AS b
+    JOIN sh_biotop_meta AS bm
+    ON b.hauptcode = bm.code
+    WHERE ST_Contains(geom, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326))
+    ''')
+
+    sql = stmt.bindparams(lat=lat, lng=lng)
+    result = await session.execute(sql)
+
+    return result.mappings().all()
+
+
+
 async def get_monuments(session: AsyncSession, object_id: int):
     stmt = text('''
     SELECT

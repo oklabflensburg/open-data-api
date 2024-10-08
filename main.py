@@ -19,8 +19,10 @@ Base = declarative_base()
 router1 = APIRouter(prefix='/demographics/v1')
 router2 = APIRouter(prefix='/accidents/v1')
 router3 = APIRouter(prefix='/monuments/v1')
+router4 = APIRouter(prefix='/biotope/v1')
 
 app.mount('/static', StaticFiles(directory='static'), name='static')
+
 
 
 @app.on_event('startup')
@@ -49,6 +51,18 @@ async def swagger_ui_html(req: Request) -> HTMLResponse:
         openapi_url='/openapi.json',
         swagger_favicon_url='/static/favicon.ico'
     )
+
+
+
+@router4.get('/point', response_model=list, tags=['Biotopkartierung'])
+async def get_biotop_meta(lat: float, lng: float, session: AsyncSession = Depends(get_session)):
+    rows = await service.get_biotop_meta(session, lat, lng)
+    response = jsonable_encoder(rows)
+
+    try:
+        return JSONResponse(content=response[0])
+    except IndexError as e:
+        raise HTTPException(status_code=404, detail='Not found')
 
 
 
@@ -605,6 +619,7 @@ async def get_residents_risk_homelessness_by_district(district_id: int, session:
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
 
 
+app.include_router(router4)
 app.include_router(router1)
 app.include_router(router2)
 app.include_router(router3)
