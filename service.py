@@ -8,11 +8,23 @@ import models
 
 async def get_biotop_meta(session: AsyncSession, lat: float, lng: float):
     stmt = text('''
-    SELECT bm.code, bm.designation, ST_AsGeoJSON(b.geom) AS geojson
-    FROM sh_biotop AS b
-    JOIN sh_biotop_meta AS bm
-    ON b.hauptcode = bm.code
-    WHERE ST_Contains(geom, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326))
+    SELECT
+        bm.code,
+        bm.designation,
+        b.biotopbez AS description,
+        b.wertbiotop AS valuable_biotope,
+        b.herkunft AS mapping_origin,
+        b.ortnr AS place_number,
+        b.gemeindena AS place_name,
+        b.shape_area,
+        ST_AsGeoJSON(b.geom) AS geojson
+    FROM
+        sh_biotop AS b
+    JOIN
+        sh_biotop_meta AS bm
+        ON b.hauptcode = bm.code
+    WHERE
+        ST_Contains(geom, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326))
     ''')
 
     sql = stmt.bindparams(lat=lat, lng=lng)
@@ -174,7 +186,7 @@ async def get_accident_details_by_city(session: AsyncSession, query: str):
     ) AS data
     FROM (
         SELECT json_build_object(
-        'type', 'Feature', 
+        'type', 'Feature',
         'geometry', ST_AsGeoJSON(ST_Transform(a.wkb_geometry, 4326))::json,
         'properties', json_build_object(
             'ags', a.ags, 'ujahr', a.ujahr,
@@ -402,7 +414,7 @@ async def get_districts(session: AsyncSession):
 async def get_district(session: AsyncSession, district_id: int):
     model = models.District
     result = await session.execute(select(model.id, model.name).filter(model.id==district_id))
-    
+
     return result.first()
 
 
