@@ -65,6 +65,17 @@ async def get_biotop_meta(lat: float, lng: float, session: AsyncSession = Depend
         raise HTTPException(status_code=404, detail='Not found')
 
 
+@router4.get('/origin', response_model=list, tags=['Biotopkartierung'])
+async def get_biotop_origin(code: str, session: AsyncSession = Depends(get_session)):
+    rows = await service.get_biotop_origin(session, code)
+    response = jsonable_encoder(rows)
+
+    try:
+        return JSONResponse(content=response[0])
+    except IndexError as e:
+        raise HTTPException(status_code=404, detail='Not found')
+
+
 
 @router3.get('/details', response_model=list, tags=['Denkmalschutzliste'])
 async def get_monuments(object_id: int, session: AsyncSession = Depends(get_session)):

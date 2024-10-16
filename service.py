@@ -6,6 +6,23 @@ import models
 
 
 
+async def get_biotop_origin(session: AsyncSession, code: str):
+    stmt = text('''
+    SELECT
+        bo.description
+    FROM
+        sh_biotop_origin AS bo
+    WHERE
+        LOWER(bo.code) = :code
+    ''')
+
+    sql = stmt.bindparams(code=code.lower())
+    result = await session.execute(sql)
+
+    return result.mappings().all()
+
+
+
 async def get_biotop_meta(session: AsyncSession, lat: float, lng: float):
     stmt = text('''
     SELECT
