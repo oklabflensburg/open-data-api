@@ -20,6 +20,7 @@ router1 = APIRouter(prefix='/demographics/v1')
 router2 = APIRouter(prefix='/accidents/v1')
 router3 = APIRouter(prefix='/monuments/v1')
 router4 = APIRouter(prefix='/biotope/v1')
+router5 = APIRouter(prefix='/alkis/v1')
 
 app.mount('/static', StaticFiles(directory='static'), name='static')
 
@@ -51,6 +52,18 @@ async def swagger_ui_html(req: Request) -> HTMLResponse:
         openapi_url='/openapi.json',
         swagger_favicon_url='/static/favicon.ico'
     )
+
+
+
+@router5.get('/parcel', response_model=list, tags=['ALKIS® SH'])
+async def get_parcel_meta(lat: float, lng: float, session: AsyncSession = Depends(get_session)):
+    rows = await service.get_parcel_meta(session, lat, lng)
+    response = jsonable_encoder(rows)
+
+    try:
+        return JSONResponse(content=response[0])
+    except IndexError as e:
+        raise HTTPException(status_code=404, detail='Not found')
 
 
 
@@ -630,6 +643,8 @@ async def get_residents_risk_homelessness_by_district(district_id: int, session:
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
 
 
+
+app.include_router(router5)
 app.include_router(router4)
 app.include_router(router1)
 app.include_router(router2)

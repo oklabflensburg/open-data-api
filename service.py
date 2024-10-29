@@ -50,6 +50,33 @@ async def get_biotop_meta(session: AsyncSession, lat: float, lng: float):
     return result.mappings().all()
 
 
+async def get_parcel_meta(session: AsyncSession, lat: float, lng: float):
+    stmt = text('''
+    SELECT
+        adv_id,
+        beginnt AS begins,
+        land AS country,
+        regierungsbezirk AS administrative_district,
+        kreis AS district,
+        gemeinde AS municipality,
+        gemarkungsnummer AS parcel_number,
+        flurnummer AS parcel_section_number,
+        nenner AS denominator,
+        zaehler AS numerator,
+        abweichender_rechtszustand AS deviating_legal_status,
+        ST_AsGeoJSON(wkb_geometry) AS geojson
+    FROM
+        sh_alkis_parcel
+    WHERE
+        ST_Contains(wkb_geometry, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326))
+    ''')
+
+    sql = stmt.bindparams(lat=lat, lng=lng)
+    result = await session.execute(sql)
+
+    return result.mappings().all()
+
+
 
 async def get_monuments(session: AsyncSession, object_id: int):
     stmt = text('''

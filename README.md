@@ -25,9 +25,9 @@ sudo apt install postgresql-16 postgis gdal-bin
 ```
 
 
-## Create User
+## Creating Dedicated User Accounts
 
-Make sure to add your user to the `oklab`-group.
+The Open Data API will run as a global service on your machine. It is therefore best to install it under its own separate user account. In the following we assume this user is called `oklab` and the installation will be in `/opt/oklab`. To create the user and directory run:
 
 ```
 sudo adduser oklab
