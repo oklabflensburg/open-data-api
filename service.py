@@ -32,16 +32,16 @@ async def get_biotop_meta(session: AsyncSession, lat: float, lng: float):
         b.wertbiotop AS valuable_biotope,
         b.herkunft AS mapping_origin,
         b.ortnr AS place_number,
-        b.gemeindena AS place_name,
-        b.shape_area,
-        ST_AsGeoJSON(b.geom) AS geojson
+        b.gemeindename AS place_name,
+        ST_Area(ST_Transform(b.shape, 3587)) AS shape_area,
+        ST_AsGeoJSON(b.shape) AS geojson
     FROM
-        sh_biotop AS b
+        sh4_bksh_belangflaechen AS b
     JOIN
         sh_biotop_meta AS bm
         ON b.hauptcode = bm.code
     WHERE
-        ST_Contains(geom, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326))
+        ST_Contains(b.shape, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326))
     ''')
 
     sql = stmt.bindparams(lat=lat, lng=lng)
