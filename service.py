@@ -64,6 +64,11 @@ async def get_parcel_meta(session: AsyncSession, lat: float, lng: float):
         nenner AS denominator,
         zaehler AS numerator,
         abweichender_rechtszustand AS deviating_legal_status,
+        CONCAT(
+            LPAD(land::text, 2, '0'),
+            LPAD(gemarkungsnummer::text, 4, '0'),
+            LPAD(flurnummer::text, 3, '0')
+        ) AS field_number,
         ST_AsGeoJSON(wkb_geometry) AS geojson
     FROM
         sh_alkis_parcel
