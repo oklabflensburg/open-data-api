@@ -69,6 +69,7 @@ async def get_parcel_meta(session: AsyncSession, lat: float, lng: float):
             LPAD(gemarkungsnummer::text, 4, '0'),
             LPAD(flurnummer::text, 3, '0')
         ) AS field_number,
+        ST_Area(ST_Transform(wkb_geometry, 3587)) AS shape_area,
         ST_AsGeoJSON(wkb_geometry) AS geojson
     FROM
         sh_alkis_parcel
