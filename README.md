@@ -15,27 +15,24 @@
 If you wih to run your own instance of this open data API follow these steps. First you may want to install system dependencies for your Ubuntu machine.
 
 ```sh
+sudo apt update
 sudo apt install wget
 sudo apt install git git-lfs
 sudo apt install python3 python3-pip python3-venv
-sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
-wget -qO- https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo tee /etc/apt/trusted.gpg.d/pgdg.asc &>/dev/null
-sudo apt update
-sudo apt install postgresql-16 postgis gdal-bin
+sudo apt install postgresql-16 postgresql-postgis gdal-bin
 ```
 
 
 ## Creating Dedicated User Accounts
 
-The Open Data API will run as a global service on your machine. It is therefore best to install it under its own separate user account. In the following we assume this user is called `oklab` and the installation will be in `/opt/oklab`. To create the user and directory run:
+The Open Data API will run as a global service on your machine. It is therefore best to install it under its own separate user account. In the following we assume this user is called `oklab` and the installation will be in `/srv/oklab`. To create the user and directory run:
 
 ```
 sudo adduser oklab
 sudo usermod -a -G www-data oklab
-sudo mkdir -p /opt/oklab
-sudo chown -R oklab:oklab /opt/oklab
-sudo chmod 770 -R /opt/oklab
-cd /opt/oklab/
+sudo mkdir -p /srv/oklab
+sudo chown -R oklab:oklab /srv/oklab
+sudo chmod 770 -R /srv/oklab
 ```
 
 
@@ -215,11 +212,11 @@ User=oklab
 Group=www-data
 DynamicUser=true
 
-WorkingDirectory=/opt/oklab/open-data-api
+WorkingDirectory=/srv/oklab/open-data-api
 PrivateTmp=true
 
-EnvironmentFile=/opt/oklab/open-data-api/.env
-ExecStart=/opt/oklab/open-data-api/venv/bin/uvicorn \
+EnvironmentFile=/srv/oklab/open-data-api/.env
+ExecStart=/srv/oklab/open-data-api/venv/bin/uvicorn \
         --proxy-headers \
         --forwarded-allow-ips='*' \
         --workers=4 \
