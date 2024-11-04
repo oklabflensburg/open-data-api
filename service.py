@@ -53,26 +53,31 @@ async def get_biotop_meta(session: AsyncSession, lat: float, lng: float):
 async def get_parcel_meta(session: AsyncSession, lat: float, lng: float):
     stmt = text('''
     SELECT
-        adv_id,
-        beginnt AS begins,
-        land AS country,
-        regierungsbezirk AS administrative_district,
-        kreis AS district,
-        gemeinde AS municipality,
-        gemarkungsnummer AS parcel_number,
-        flurnummer AS parcel_section_number,
-        nenner AS denominator,
-        zaehler AS numerator,
-        abweichender_rechtszustand AS deviating_legal_status,
+        p.adv_id,
+        p.beginnt AS begins,
+        p.land AS country,
+        p.regierungsbezirk AS administrative_district,
+        p.kreis AS district,
+        p.gemeinde AS municipality_number,
+        lp.gemeindename AS municipality_name,
+        p.gemarkungsnummer AS land_parcel_number,
+        lp.gemarkungsname AS land_parcel_name,
+        p.flurnummer AS parcel_number,
+        p.nenner AS parcel_denominator,
+        p.zaehler AS parcel_numerator,
+        p.abweichender_rechtszustand AS deviating_legal_status,
         CONCAT(
-            LPAD(land::text, 2, '0'),
-            LPAD(gemarkungsnummer::text, 4, '0'),
-            LPAD(flurnummer::text, 3, '0')
+            LPAD(p.land::text, 2, '0'),
+            LPAD(p.gemarkungsnummer::text, 4, '0'),
+            LPAD(p.flurnummer::text, 3, '0')
         ) AS field_number,
         ST_Area(ST_Transform(wkb_geometry, 3587)) AS shape_area,
         ST_AsGeoJSON(wkb_geometry) AS geojson
     FROM
-        sh_alkis_parcel
+        sh_alkis_parcel AS p
+    JOIN
+        de_land_parcel_meta AS lp
+        ON p.gemarkungsnummer = lp.gemarkungsnummer
     WHERE
         ST_Contains(wkb_geometry, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326))
     ''')
