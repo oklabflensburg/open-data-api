@@ -198,7 +198,7 @@ curl -X 'GET' 'http://localhost:8000/demographics/v1/details'  -H 'accept: appli
 
 ## Setup service
 
-Congrats you are a hero you almost got the most. Now create a file `/etc/systemd/system/open-data-api.service` and add these lines to your service file. Make sure to replace all custom stuff according your local machine setup.
+Congrats you are a hero you almost got the most. Now create a file `/usr/lib/systemd/system/open-data-api.service` and add these lines to your service file. Make sure to replace all custom stuff according your local machine setup.
 
 ```conf
 [Unit]
