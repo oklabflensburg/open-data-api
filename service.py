@@ -59,6 +59,7 @@ async def get_parcel_meta(session: AsyncSession, lat: float, lng: float):
         lp.gemeindename AS municipality_name,
         p.gemarkungsnummer AS land_parcel_number,
         lp.gemarkungsname AS land_parcel_name,
+        p.flurnummer AS field_parcel_number,
         CASE
             WHEN p.nenner IS NULL
             THEN p.zaehler::text
