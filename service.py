@@ -54,29 +54,20 @@ async def get_parcel_meta(session: AsyncSession, lat: float, lng: float):
     stmt = text('''
     SELECT
         p.adv_id,
-        p.beginnt AS begins,
-        p.gemeinde AS municipality_number,
-        lp.gemeindename AS municipality_name,
-        p.gemarkungsnummer AS land_parcel_number,
-        lp.gemarkungsname AS land_parcel_name,
-        p.flurnummer AS field_parcel_number,
-        CASE
-            WHEN p.nenner IS NULL
-            THEN p.zaehler::text
-            ELSE p.zaehler::text || '/' || p.nenner::text
-        END AS parcel_number,
-        CONCAT(
-            LPAD(p.land::text, 2, '0'),
-            LPAD(p.gemarkungsnummer::text, 4, '0'),
-            LPAD(p.flurnummer::text, 3, '0')
-        ) AS field_number,
+        p.start_time,
+        p.field_number,
+        p.parcel_number,
+        p.municipality_number,
+        p.cadastral_district_number,
+        lp.cadastral_district_name,
+        lp.municipality_name,
         ST_Area(ST_Transform(wkb_geometry, 3587)) AS shape_area,
         ST_AsGeoJSON(wkb_geometry) AS geojson
     FROM
         sh_alkis_parcel AS p
     JOIN
-        de_land_parcel_meta AS lp
-        ON p.gemarkungsnummer = lp.gemarkungsnummer
+        de_cadastral_district_meta AS lp
+        ON p.cadastral_district_number = lp.cadastral_district_number
     WHERE
         ST_Contains(
             wkb_geometry,
