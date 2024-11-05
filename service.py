@@ -55,17 +55,15 @@ async def get_parcel_meta(session: AsyncSession, lat: float, lng: float):
     SELECT
         p.adv_id,
         p.beginnt AS begins,
-        p.land AS country,
-        p.regierungsbezirk AS administrative_district,
-        p.kreis AS district,
         p.gemeinde AS municipality_number,
         lp.gemeindename AS municipality_name,
         p.gemarkungsnummer AS land_parcel_number,
         lp.gemarkungsname AS land_parcel_name,
-        p.flurnummer AS parcel_number,
-        p.nenner AS parcel_denominator,
-        p.zaehler AS parcel_numerator,
-        p.abweichender_rechtszustand AS deviating_legal_status,
+        CASE
+            WHEN p.nenner IS NULL
+            THEN p.zaehler::text
+            ELSE p.zaehler::text || '/' || p.nenner::text
+        END AS parcel_number,
         CONCAT(
             LPAD(p.land::text, 2, '0'),
             LPAD(p.gemarkungsnummer::text, 4, '0'),
@@ -79,7 +77,10 @@ async def get_parcel_meta(session: AsyncSession, lat: float, lng: float):
         de_land_parcel_meta AS lp
         ON p.gemarkungsnummer = lp.gemarkungsnummer
     WHERE
-        ST_Contains(wkb_geometry, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326))
+        ST_Contains(
+            wkb_geometry,
+            ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)
+        )
     ''')
 
     sql = stmt.bindparams(lat=lat, lng=lng)
