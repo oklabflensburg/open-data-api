@@ -6,6 +6,23 @@ import models
 
 
 
+async def get_municipality_name(session: AsyncSession, key: str):
+    stmt = text('''
+    SELECT
+        municipality_name
+    FROM
+        de_municipality_keys
+    WHERE
+        LOWER(municipality_key) = :key
+    ''')
+
+    sql = stmt.bindparams(key=key.lower())
+    result = await session.execute(sql)
+
+    return result.mappings().all()
+
+
+
 async def get_biotop_origin(session: AsyncSession, code: str):
     stmt = text('''
     SELECT

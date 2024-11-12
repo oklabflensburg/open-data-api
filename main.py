@@ -55,9 +55,20 @@ async def swagger_ui_html(req: Request) -> HTMLResponse:
 
 
 
-@router5.get('/parcel', response_model=list, tags=['ALKIS® SH'])
+@router5.get('/parcel', response_model=list, tags=['Verwaltungsgebiete'])
 async def get_parcel_meta(lat: float, lng: float, session: AsyncSession = Depends(get_session)):
     rows = await service.get_parcel_meta(session, lat, lng)
+    response = jsonable_encoder(rows)
+
+    try:
+        return JSONResponse(content=response[0])
+    except IndexError as e:
+        raise HTTPException(status_code=404, detail='Not found')
+
+
+@router5.get('/ags', response_model=list, tags=['Verwaltungsgebiete'])
+async def get_municipality_name(key: str, session: AsyncSession = Depends(get_session)):
+    rows = await service.get_municipality_name(session, key)
     response = jsonable_encoder(rows)
 
     try:
