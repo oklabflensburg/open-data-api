@@ -8,6 +8,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session
 from typing import List
 
+import json
+
 import base
 import schemas
 import service
@@ -70,14 +72,59 @@ async def get_parcel_meta(lat: float, lng: float, session: AsyncSession = Depend
     '/ags',
     response_model=list,
     tags=['Verwaltungsgebiete'],
-    description=('Retrieves the name of a municipality based on the provided key, using the Official Municipality Key (AGS) as found in the directory of municipalities from the Federal Statistical Office. The list also includes entries for city districts or localities in the city-states of Hamburg, Bremen, and Berlin, with corresponding notes for these entries.')
+    description=('Retrieves the name of a municipality based on the provided municipality key.')
 )
-async def get_municipality_name(
+async def get_municipality_by_key(
     key: str = Query(..., min_length=8, max_length=8),
     session: AsyncSession = Depends(get_session)
 ):
-    rows = await service.get_municipality_name(session, key)
-    response = jsonable_encoder(rows)
+    rows = await service.get_municipality_by_key(session, key)
+    result_list = []
+
+    for row in rows:
+        row_dict = dict(row)
+
+        if 'geojson' in row_dict and isinstance(row_dict['geojson'], str):
+            try:
+                row_dict['geojson'] = json.loads(row_dict['geojson'])
+            except json.JSONDecodeError:
+                raise HTTPException(status_code=500, detail='Invalid GeoJSON format')
+
+        result_list.append(row_dict)
+
+    response = jsonable_encoder(result_list)
+
+    try:
+        return JSONResponse(content=response[0])
+    except IndexError:
+        raise HTTPException(status_code=404, detail='Not found')
+
+
+@router5.get(
+    '/name',
+    response_model=list,
+    tags=['Verwaltungsgebiete'],
+    description=('Retrieves the official municipality key (AGS) based on the provided municipality name.')
+)
+async def get_municipality_by_name(
+    name: str = Query(..., min_length=2),
+    session: AsyncSession = Depends(get_session)
+):
+    rows = await service.get_municipality_by_name(session, name)
+    result_list = []
+
+    for row in rows:
+        row_dict = dict(row)
+
+        if 'geojson' in row_dict and isinstance(row_dict['geojson'], str):
+            try:
+                row_dict['geojson'] = json.loads(row_dict['geojson'])
+            except json.JSONDecodeError:
+                raise HTTPException(status_code=500, detail='Invalid GeoJSON format')
+
+        result_list.append(row_dict)
+
+    response = jsonable_encoder(result_list)
 
     try:
         return JSONResponse(content=response[0])

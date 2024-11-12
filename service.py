@@ -6,17 +6,46 @@ import models
 
 
 
-async def get_municipality_name(session: AsyncSession, key: str):
+async def get_municipality_by_key(session: AsyncSession, key: str):
     stmt = text('''
     SELECT
-        municipality_name
+        mk.municipality_key, mk.municipality_name, vg.gen AS geographical_name,
+        TO_CHAR(vg.beginn, 'DD.MM.YYYY') AS date_of_entry, vg.ewz AS population,
+        ST_AsGeoJSON(vg.geom) AS geojson
     FROM
-        de_municipality_keys
+        de_municipality_keys AS mk
+    LEFT JOIN vg250_gem AS vg
+        ON mk.municipality_key = vg.ags
+        AND vg.gf = 4
     WHERE
-        LOWER(municipality_key) = :key
+        LOWER(mk.municipality_key) = :key
     ''')
 
     sql = stmt.bindparams(key=key.lower())
+    result = await session.execute(sql)
+
+    return result.mappings().all()
+
+
+
+async def get_municipality_by_name(session: AsyncSession, name: str):
+    stmt = text('''
+    SELECT
+        mk.municipality_key, mk.municipality_name, vg.gen AS geographical_name,
+        TO_CHAR(vg.beginn, 'DD.MM.YYYY') AS date_of_entry, vg.ewz AS population,
+        ST_AsGeoJSON(vg.geom) AS geojson
+    FROM
+        vg250_gem AS vg
+    LEFT JOIN
+        de_municipality_keys AS mk
+        ON vg.ags = mk.municipality_key
+        AND vg.gf = 4
+    WHERE
+        LOWER(vg.gen) LIKE :name
+    ''')
+
+    query = f'{name.lower()}%'
+    sql = stmt.bindparams(name=query)
     result = await session.execute(sql)
 
     return result.mappings().all()
