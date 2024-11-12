@@ -497,6 +497,23 @@ sudo systemctl enable nginx.service
 ```
 
 
+## Insert municipality keys
+
+Tool to fetch and insert offical german municipality keys
+
+```sh
+psql -U oklab -h localhost -d oklab -p 5432 < ../data/de_official_municipality_keys_schema.sql
+```
+
+```sh
+cd tools
+source venv/bin/activate
+pip3 install -r requirements.txt
+python3 insert_municipality_key.py --env ../.env --target ../data --url https://www.xrepository.de/api/xrepository/urn:de:bund:destatis:bevoelkerungsstatistik:schluessel:ags_2024-10-31/download/AGS_2024-10-31.json --verbose
+deactivate
+```
+
+
 ## How to contribute
 
 You are welcome to contribute to the open data API. You may have a look in our [CONTRIBUTING.md](CONTRIBUTING.md) guide.
