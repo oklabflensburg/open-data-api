@@ -507,6 +507,7 @@ psql -U oklab -h localhost -d oklab -p 5432 < ../data/de_official_municipality_k
 
 ```sh
 cd tools
+python3 -m venv venv
 source venv/bin/activate
 pip3 install -r requirements.txt
 python3 insert_municipality_key.py --env ../.env --target ../data --url https://www.xrepository.de/api/xrepository/urn:de:bund:destatis:bevoelkerungsstatistik:schluessel:ags_2024-10-31/download/AGS_2024-10-31.json --verbose
