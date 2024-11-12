@@ -61,15 +61,20 @@ psql -U oklab
 exit
 ```
 
-Note since the `oklab`-user does not have superuser permissions you must login with `psql`
+Note since the `oklab`-user does not have superuser permissions you must login with the `postgres` user.
 
 ```
+psql -U postgres
 \c oklab
+
 CREATE EXTENSION IF NOT EXISTS postgis;
 CREATE EXTENSION IF NOT EXISTS hstore;
+
+ALTER TABLE geography_columns OWNER TO oklab;
 ALTER TABLE geometry_columns OWNER TO oklab;
 ALTER TABLE spatial_ref_sys OWNER TO oklab;
-exit
+
+\q
 ```
 
 
