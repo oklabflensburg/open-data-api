@@ -1,4 +1,4 @@
-from fastapi import Request, Depends, FastAPI, APIRouter, HTTPException
+from fastapi import Request, Depends, FastAPI, APIRouter, HTTPException, Query
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.staticfiles import StaticFiles
@@ -66,14 +66,22 @@ async def get_parcel_meta(lat: float, lng: float, session: AsyncSession = Depend
         raise HTTPException(status_code=404, detail='Not found')
 
 
-@router5.get('/ags', response_model=list, tags=['Verwaltungsgebiete'])
-async def get_municipality_name(key: str, session: AsyncSession = Depends(get_session)):
+@router5.get(
+    '/ags',
+    response_model=list,
+    tags=['Verwaltungsgebiete'],
+    description=('Retrieves the name of a municipality based on the provided key, using the Official Municipality Key (AGS) as found in the directory of municipalities from the Federal Statistical Office. The list also includes entries for city districts or localities in the city-states of Hamburg, Bremen, and Berlin, with corresponding notes for these entries.')
+)
+async def get_municipality_name(
+    key: str = Query(..., min_length=8, max_length=8),
+    session: AsyncSession = Depends(get_session)
+):
     rows = await service.get_municipality_name(session, key)
     response = jsonable_encoder(rows)
 
     try:
         return JSONResponse(content=response[0])
-    except IndexError as e:
+    except IndexError:
         raise HTTPException(status_code=404, detail='Not found')
 
 
