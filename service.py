@@ -346,7 +346,7 @@ async def get_district_details(session: AsyncSession):
             rd.year,
             json_build_object(
                 'sum_residents', SUM(rd.residents),
-                'sum_districts_area', ROUND(SUM(CAST(ST_Area(d.wkb_geometry::geography) / 1000000 AS numeric)), 2)
+                'sum_districts_area', ROUND(SUM(CAST( ST_Area(ST_Transform(d.geom, 3587)) / 1000000 AS numeric)), 2)
             ) AS summary
         FROM
             districts AS d
