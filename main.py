@@ -22,7 +22,7 @@ router1 = APIRouter(prefix='/demographics/v1')
 router2 = APIRouter(prefix='/accidents/v1')
 router3 = APIRouter(prefix='/monuments/v1')
 router4 = APIRouter(prefix='/biotope/v1')
-router5 = APIRouter(prefix='/alkis/v1')
+router5 = APIRouter(prefix='/administrative/v1')
 
 app.mount('/static', StaticFiles(directory='static'), name='static')
 
@@ -39,6 +39,23 @@ async def init_schemas():
 async def get_session() -> AsyncSession:
     async with base.async_session() as session:
         yield session
+
+
+def process_rows(rows):
+    result_list = []
+
+    for row in rows:
+        row_dict = dict(row)
+
+        if 'geojson' in row_dict and isinstance(row_dict['geojson'], str):
+            try:
+                row_dict['geojson'] = json.loads(row_dict['geojson'])
+            except json.JSONDecodeError:
+                raise HTTPException(status_code=500, detail='Invalid GeoJSON format')
+
+        result_list.append(row_dict)
+
+    return jsonable_encoder(result_list)
 
 
 
@@ -69,67 +86,34 @@ async def get_parcel_meta(lat: float, lng: float, session: AsyncSession = Depend
 
 
 @router5.get(
-    '/ags',
+    '/municipality',
     response_model=list,
     tags=['Verwaltungsgebiete'],
-    description=('Retrieves the name of a municipality based on the provided municipality key.')
+    description=('Retrieves the geometry, bounding box, shape area, and statistical information of a municipality based on the provided municipality key (AGS) or the municipality name.')
 )
-async def get_municipality_by_key(
-    key: str = Query(..., min_length=8, max_length=8),
+async def get_municipality(
+    key: str = Query(None, min_length=8, max_length=8),
+    name: str = Query(None, min_length=2),
     session: AsyncSession = Depends(get_session)
 ):
-    rows = await service.get_municipality_by_key(session, key)
-    result_list = []
+    if key:
+        rows = await service.get_municipality_by_key(session, key)
+        processed_rows = process_rows(rows)
 
-    for row in rows:
-        row_dict = dict(row)
+        if len(processed_rows) == 0:
+            raise HTTPException(status_code=404, detail='No municipality was found')
 
-        if 'geojson' in row_dict and isinstance(row_dict['geojson'], str):
-            try:
-                row_dict['geojson'] = json.loads(row_dict['geojson'])
-            except json.JSONDecodeError:
-                raise HTTPException(status_code=500, detail='Invalid GeoJSON format')
+        return JSONResponse(content=processed_rows)
+    elif name:
+        rows = await service.get_municipality_by_name(session, name)
+        processed_rows = process_rows(rows)
 
-        result_list.append(row_dict)
+        if len(processed_rows) == 0:
+            raise HTTPException(status_code=404, detail='No municipality was found')
 
-    response = jsonable_encoder(result_list)
-
-    try:
-        return JSONResponse(content=response[0])
-    except IndexError:
-        raise HTTPException(status_code=404, detail='Not found')
-
-
-@router5.get(
-    '/name',
-    response_model=list,
-    tags=['Verwaltungsgebiete'],
-    description=('Retrieves the official municipality key (AGS) based on the provided municipality name.')
-)
-async def get_municipality_by_name(
-    name: str = Query(..., min_length=2),
-    session: AsyncSession = Depends(get_session)
-):
-    rows = await service.get_municipality_by_name(session, name)
-    result_list = []
-
-    for row in rows:
-        row_dict = dict(row)
-
-        if 'geojson' in row_dict and isinstance(row_dict['geojson'], str):
-            try:
-                row_dict['geojson'] = json.loads(row_dict['geojson'])
-            except json.JSONDecodeError:
-                raise HTTPException(status_code=500, detail='Invalid GeoJSON format')
-
-        result_list.append(row_dict)
-
-    response = jsonable_encoder(result_list)
-
-    try:
-        return JSONResponse(content=response[0])
-    except IndexError:
-        raise HTTPException(status_code=404, detail='Not found')
+        return JSONResponse(content=processed_rows)
+    else:
+        raise HTTPException(status_code=400, detail='Either "key" or "name" parameter must be provided')
 
 
 

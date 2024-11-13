@@ -9,14 +9,35 @@ import models
 async def get_municipality_by_key(session: AsyncSession, key: str):
     stmt = text('''
     SELECT
-        mk.municipality_key, mk.municipality_name, vg.gen AS geographical_name,
-        TO_CHAR(vg.beginn, 'DD.MM.YYYY') AS date_of_entry, vg.ewz AS population,
-        ST_AsGeoJSON(vg.geom) AS geojson
+        jsonb_build_object(
+            'municipality_key', mk.municipality_key,
+            'municipality_name', mk.municipality_name,
+            'geographical_name', vg.gen,
+            'population', vg.ewz,
+            'date_of_entry', TO_CHAR(vg.beginn, 'DD.MM.YYYY'),
+            'shape_area', ST_Area(ST_Transform(vg.geom, 3587)),
+            'bbox', jsonb_build_object(
+                'xmin', ST_XMin(agg.bbox),
+                'ymin', ST_YMin(agg.bbox),
+                'xmax', ST_XMax(agg.bbox),
+                'ymax', ST_YMax(agg.bbox)
+            ),
+            'geojson', ST_AsGeoJSON(vg.geom)::jsonb
+        ) as municipality
     FROM
         de_municipality_keys AS mk
     LEFT JOIN vg250_gem AS vg
         ON mk.municipality_key = vg.ags
         AND vg.gf = 4
+    LEFT JOIN (
+        SELECT
+            ags,
+            ST_Extent(geom) AS bbox
+        FROM
+            vg250_gem
+        GROUP BY ags
+    ) AS agg
+        ON vg.ags = agg.ags
     WHERE
         LOWER(mk.municipality_key) = :key
     ''')
@@ -31,12 +52,24 @@ async def get_municipality_by_key(session: AsyncSession, key: str):
 async def get_municipality_by_name(session: AsyncSession, name: str):
     stmt = text('''
     SELECT
-        mk.municipality_key, mk.municipality_name, vg.gen AS geographical_name,
-        TO_CHAR(vg.beginn, 'DD.MM.YYYY') AS date_of_entry, vg.ewz AS population,
-        ST_AsGeoJSON(vg.geom) AS geojson
+        jsonb_build_object(
+            'municipality_key', mk.municipality_key,
+            'municipality_name', mk.municipality_name,
+            'geographical_name', vg.gen,
+            'population', vg.ewz,
+            'date_of_entry', TO_CHAR(vg.beginn, 'DD.MM.YYYY'),
+            'shape_area', ST_Area(ST_Transform(vg.geom, 3587)),
+            'bbox', jsonb_build_object(
+                'xmin', ST_XMin(vg.geom),
+                'ymin', ST_YMin(vg.geom),
+                'xmax', ST_XMax(vg.geom),
+                'ymax', ST_YMax(vg.geom)
+            ),
+            'geojson', ST_AsGeoJSON(vg.geom)::jsonb
+        ) as municipality
     FROM
         vg250_gem AS vg
-    LEFT JOIN
+    JOIN
         de_municipality_keys AS mk
         ON vg.ags = mk.municipality_key
         AND vg.gf = 4
