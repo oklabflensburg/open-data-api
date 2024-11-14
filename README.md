@@ -520,6 +520,21 @@ deactivate
 ```
 
 
+## Insert energy units
+
+Tool to insert solar energy units from local file system.
+
+```sh
+cd tools
+python3 -m venv venv
+source venv/bin/activate
+pip3 install -r requirements.txt
+python3 insert_energy_csv.py --env ../.env --src ~/EinheitenSolar_1.xml
+deactivate
+```
+
+
+
 ## Retrieve administrative areas
 
 Download latest administrative areas 1:250,000 with population figures (VG250-EW) from the [Federal Agency for Cartography and Geodesy](https://gdz.bkg.bund.de/index.php/default/verwaltungsgebiete-1-250-000-mit-einwohnerzahlen-stand-31-12-vg250-ew-31-12.html).
