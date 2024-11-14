@@ -529,7 +529,7 @@ cd tools
 python3 -m venv venv
 source venv/bin/activate
 pip3 install -r requirements.txt
-python3 insert_energy_csv.py --env ../.env --src ~/EinheitenSolar_1.xml
+python3 insert_solar_units.py --env ../.env --src ~/EinheitenSolar_1.xml --verbose
 deactivate
 ```
 
