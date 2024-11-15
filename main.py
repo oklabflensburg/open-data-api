@@ -145,7 +145,7 @@ async def get_municipality(
             raise HTTPException(status_code=404, detail='No municipality was found')
 
         return JSONResponse(content=processed_rows)
-    elif name:
+    elif municipality_name:
         rows = await service.get_municipality_by_name(session, municipality_name)
         processed_rows = process_rows(rows)
 
