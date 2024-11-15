@@ -314,21 +314,21 @@ async def get_accident_details_by_city(session: AsyncSession, query: str):
     FROM (
         SELECT json_build_object(
         'type', 'Feature',
-        'geometry', ST_AsGeoJSON(ST_Transform(a.wkb_geometry, 4326))::json,
+        'geometry', ST_AsGeoJSON(ap.geom)::json,
         'properties', json_build_object(
-            'ags', a.ags, 'ujahr', a.ujahr,
-            'ustunde', a.ustunde, 'uwochentag', a.uwochentag,
-            'umonat', a.umonat, 'uland', a.uland, 'uart', a.uart, 'utyp1', a.utyp1,
-            'ukategorie', a.ukategorie, 'ulichtverh', a.ulichtverh,
-            'istrad', a.istrad, 'istpkw', a.istpkw, 'istfuss', a.istfuss,
-            'istgkfz', a.istgkfz, 'istkrad', a.istkrad, 'istsonstig', a.istsonstig)
+            'ujahr', ap.ujahr, 'ustunde', ap.ustunde, 'uwochentag', ap.uwochentag,
+            'umonat', ap.umonat, 'uland', ap.uland, 'uart', ap.uart, 'utyp1', ap.utyp1,
+            'ukategorie', ap.ukategorie, 'ulichtverh', ap.ulichtverh, 'istrad', ap.istrad,
+            'istpkw', ap.istpkw, 'istfuss', ap.istfuss, 'istgkfz', ap.istgkfz,
+            'istkrad', ap.istkrad, 'istsonstig', ap.istsonstig)
         ) AS feature
-        FROM accidents AS a
+        FROM vg250_gem AS vg
 
-        JOIN vg250gem AS v
-        ON a.ags = v.ags
+        JOIN de_accident_points AS ap
+        ON ST_Within(ap.geom, vg.geom)
 
-        WHERE LOWER(v.gen) = :q
+        WHERE LOWER(vg.gen) = :q
+        AND vg.gf = 4
     ) AS fc
     ''')
 
