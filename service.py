@@ -6,6 +6,31 @@ import models
 
 
 
+async def get_solar_unit_by_municipality_key(session: AsyncSession, key: str):
+    stmt = text('''
+    SELECT * FROM de_solar_units
+    WHERE LOWER(municipality_key) = :key
+    ''')
+
+    sql = stmt.bindparams(key=key.lower())
+    result = await session.execute(sql)
+
+    return result.mappings().all()
+
+
+async def get_solar_unit_by_id(session: AsyncSession, unit_id: str):
+    stmt = text('''
+    SELECT * FROM de_solar_units
+    WHERE LOWER(unit_registration_number) = :unit_id
+    ''')
+
+    sql = stmt.bindparams(unit_id=unit_id.lower())
+    result = await session.execute(sql)
+
+    return result.mappings().all()
+
+
+
 async def get_municipality_by_key(session: AsyncSession, key: str):
     stmt = text('''
     SELECT

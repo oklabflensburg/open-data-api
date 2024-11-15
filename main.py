@@ -23,6 +23,8 @@ router2 = APIRouter(prefix='/accidents/v1')
 router3 = APIRouter(prefix='/monuments/v1')
 router4 = APIRouter(prefix='/biotope/v1')
 router5 = APIRouter(prefix='/administrative/v1')
+router6 = APIRouter(prefix='/energy/v1')
+
 
 app.mount('/static', StaticFiles(directory='static'), name='static')
 
@@ -74,6 +76,45 @@ async def swagger_ui_html(req: Request) -> HTMLResponse:
 
 
 
+@router6.get(
+    '/unit/solar/id',
+    response_model=list,
+    tags=['Marktstammdatenregister'],
+    description=('Retrieves the solar unit details based on the provided 15 digit solar unit registration number.')
+)
+async def get_solar_unit_by_id(
+    unit_id: str = Query(None, min_length=15, max_length=15),
+    session: AsyncSession = Depends(get_session)
+):
+    rows = await service.get_solar_unit_by_id(session, unit_id)
+    response = jsonable_encoder(rows)
+
+    try:
+        return JSONResponse(content=response[0])
+    except IndexError as e:
+        raise HTTPException(status_code=404, detail=f'Solar unit with {unit_id} not found')
+
+
+@router6.get(
+    '/unit/solar/key',
+    response_model=list,
+    tags=['Marktstammdatenregister'],
+    description=('Retrieves a list of solar units with each details based on the provided german municipality key (AGS).')
+)
+async def get_solar_unit_by_municipality_key(
+    municipality_key: str = Query(None, min_length=8, max_length=8),
+    session: AsyncSession = Depends(get_session)
+):
+    rows = await service.get_solar_unit_by_municipality_key(session, municipality_key)
+    response = jsonable_encoder(rows)
+
+    if len(response) == 0:
+        raise HTTPException(status_code=404, detail=f'No solar units for municipality key {municipality_key} found')
+
+    return JSONResponse(content=response)
+
+
+
 @router5.get('/parcel', response_model=list, tags=['Verwaltungsgebiete'])
 async def get_parcel_meta(lat: float, lng: float, session: AsyncSession = Depends(get_session)):
     rows = await service.get_parcel_meta(session, lat, lng)
@@ -92,12 +133,12 @@ async def get_parcel_meta(lat: float, lng: float, session: AsyncSession = Depend
     description=('Retrieves the geometry, bounding box, shape area, and statistical information of a municipality based on the provided municipality key (AGS) or the municipality name.')
 )
 async def get_municipality(
-    key: str = Query(None, min_length=8, max_length=8),
-    name: str = Query(None, min_length=2),
+    municipality_key: str = Query(None, min_length=8, max_length=8),
+    municipality_name: str = Query(None, min_length=2),
     session: AsyncSession = Depends(get_session)
 ):
-    if key:
-        rows = await service.get_municipality_by_key(session, key)
+    if municipality_key:
+        rows = await service.get_municipality_by_key(session, municipality_key)
         processed_rows = process_rows(rows)
 
         if len(processed_rows) == 0:
@@ -105,7 +146,7 @@ async def get_municipality(
 
         return JSONResponse(content=processed_rows)
     elif name:
-        rows = await service.get_municipality_by_name(session, name)
+        rows = await service.get_municipality_by_name(session, municipality_name)
         processed_rows = process_rows(rows)
 
         if len(processed_rows) == 0:
@@ -694,6 +735,7 @@ async def get_residents_risk_homelessness_by_district(district_id: int, session:
 
 
 
+app.include_router(router6)
 app.include_router(router5)
 app.include_router(router4)
 app.include_router(router1)
