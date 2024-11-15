@@ -507,7 +507,7 @@ sudo systemctl enable nginx.service
 Tool to fetch and insert offical german municipality keys
 
 ```sh
-psql -U oklab -h localhost -d oklab -p 5432 < ../data/de_official_municipality_keys_schema.sql
+psql -U oklab -h localhost -d oklab -p 5432 < data/de_official_municipality_keys_schema.sql
 ```
 
 ```sh
@@ -523,6 +523,10 @@ deactivate
 ## Insert energy units
 
 Tool to insert solar energy units from local file system.
+
+```sh
+psql -U oklab -h localhost -d oklab -p 5432 < data/de_solar_units_schema.sql
+```
 
 ```sh
 cd tools
