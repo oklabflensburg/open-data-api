@@ -6,6 +6,95 @@ import models
 
 
 
+async def get_wind_unit_by_municipality_key(session: AsyncSession, key: str):
+    stmt = text('''
+    SELECT
+        jsonb_build_object(
+            'unit_registration_number', unit_registration_number,
+            'last_update', last_update, 'power_unit_name', power_unit_name,
+            'location_registration_number', location_registration_number,
+            'network_operatorcheck_status', network_operatorcheck_status,
+            'operator_registration_number', operator_registration_number,
+            'country', country, 'state', state, 'district', district, 'city', city,
+            'location', location, 'postcode', postcode, 'municipality_name', municipality_name,
+            'municipality_key', municipality_key, 'cadastral_district', cadastral_district,
+            'field_parcel_numbers', field_parcel_numbers, 'street_not_found', street_not_found,
+            'house_number_not_available', house_number_not_available,
+            'house_number_not_found', house_number_not_found,
+            'registration_date', registration_date, 'commissioning_date', commissioning_date,
+            'unit_system_status', unit_system_status, 'supply_type', supply_type,
+            'unit_operational_status', unit_operational_status,
+            'not_present_migrated_units', not_present_migrated_units,
+            'weic_not_available', weic_not_available, 'energy_source', energy_source,
+            'power_plant_number_not_available', power_plant_number_not_available,
+            'gross_power', gross_power, 'net_rated_power', net_rated_power,
+            'connection_high_voltage', connection_high_voltage,
+            'remote_control_capability_nb', remote_control_capability_nb,
+            'remote_control_capability_dv', remote_control_capability_dv,
+            'gen_registration_number', gen_registration_number,
+            'wind_park_name', wind_park_name, 'manufacturer', manufacturer,
+            'technology', technology, 'model_designation', model_designation,
+            'hub_height', hub_height, 'rotor_diameter', rotor_diameter,
+            'rotor_blade_deicing_system', rotor_blade_deicing_system,
+            'shutdown_power_limitation', shutdown_power_limitation,
+            'eeg_registration_number', eeg_registration_number,
+            'geojson', ST_AsGeoJSON(wkb_geometry)::jsonb
+        )
+    FROM de_wind_units
+    WHERE LOWER(municipality_key) = :key
+    ''')
+
+    sql = stmt.bindparams(key=key.lower())
+    result = await session.execute(sql)
+
+    return result.mappings().all()
+
+
+async def get_wind_unit_by_id(session: AsyncSession, unit_id: str):
+    stmt = text('''
+        SELECT
+        jsonb_build_object(
+            'unit_registration_number', unit_registration_number,
+            'last_update', last_update, 'power_unit_name', power_unit_name,
+            'location_registration_number', location_registration_number,
+            'network_operatorcheck_status', network_operatorcheck_status,
+            'operator_registration_number', operator_registration_number,
+            'country', country, 'state', state, 'district', district, 'city', city,
+            'location', location, 'postcode', postcode, 'municipality_name', municipality_name,
+            'municipality_key', municipality_key, 'cadastral_district', cadastral_district,
+            'field_parcel_numbers', field_parcel_numbers, 'street_not_found', street_not_found,
+            'house_number_not_available', house_number_not_available,
+            'house_number_not_found', house_number_not_found,
+            'registration_date', registration_date, 'commissioning_date', commissioning_date,
+            'unit_system_status', unit_system_status, 'supply_type', supply_type,
+            'unit_operational_status', unit_operational_status,
+            'not_present_migrated_units', not_present_migrated_units,
+            'weic_not_available', weic_not_available, 'energy_source', energy_source,
+            'power_plant_number_not_available', power_plant_number_not_available,
+            'gross_power', gross_power, 'net_rated_power', net_rated_power,
+            'connection_high_voltage', connection_high_voltage,
+            'remote_control_capability_nb', remote_control_capability_nb,
+            'remote_control_capability_dv', remote_control_capability_dv,
+            'gen_registration_number', gen_registration_number,
+            'wind_park_name', wind_park_name, 'manufacturer', manufacturer,
+            'technology', technology, 'model_designation', model_designation,
+            'hub_height', hub_height, 'rotor_diameter', rotor_diameter,
+            'rotor_blade_deicing_system', rotor_blade_deicing_system,
+            'shutdown_power_limitation', shutdown_power_limitation,
+            'eeg_registration_number', eeg_registration_number,
+            'geojson', ST_AsGeoJSON(wkb_geometry)::jsonb
+        )
+    FROM de_wind_units
+    WHERE LOWER(unit_registration_number) = :unit_id
+    ''')
+
+    sql = stmt.bindparams(unit_id=unit_id.lower())
+    result = await session.execute(sql)
+
+    return result.mappings().all()
+
+
+
 async def get_solar_unit_by_municipality_key(session: AsyncSession, key: str):
     stmt = text('''
     SELECT * FROM de_solar_units
