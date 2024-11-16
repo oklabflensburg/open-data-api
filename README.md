@@ -520,6 +520,26 @@ deactivate
 ```
 
 
+
+## Insert wind turbine units
+
+Tool to insert wind turbine units from local file system.
+
+```sh
+psql -U oklab -h localhost -d oklab -p 5432 < ../data/de_wind_units_schema.sql
+```
+
+```sh
+cd tools
+python3 -m venv venv
+source venv/bin/activate
+pip3 install -r requirements.txt
+python3 insert_wind_units.py --env ../.env --src ~/EinheitenWind.xml --verbose
+deactivate
+```
+
+
+
 ## Insert energy units
 
 Tool to insert solar energy units from local file system.
