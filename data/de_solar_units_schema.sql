@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS de_solar_units (
     country VARCHAR,
     state VARCHAR,
     district VARCHAR,
-    municipality VARCHAR,
+    municipality_name VARCHAR,
     municipality_key VARCHAR,
     postcode VARCHAR,
     city VARCHAR,
@@ -21,13 +21,13 @@ CREATE TABLE IF NOT EXISTS de_solar_units (
     operational_status VARCHAR,
     not_present_migrated_units VARCHAR,
     power_unit_name VARCHAR,
-    weic_nv VARCHAR,
-    power_plant_number_nv VARCHAR,
+    weic_not_available VARCHAR,
+    power_plant_number_not_available VARCHAR,
     energy_source VARCHAR,
     gross_power VARCHAR,
     net_rated_power VARCHAR,
     remote_controllability VARCHAR,
-    type_feed_in VARCHAR,
+    supply_type VARCHAR,
     assigned_active_power_inverter VARCHAR,
     amount_modules VARCHAR,
     location VARCHAR,
@@ -41,4 +41,4 @@ CREATE TABLE IF NOT EXISTS de_solar_units (
 
 
 -- UNIQUE INDEX
-CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_unit_registration_number ON de_solar_units (unit_registration_number);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_unq_solar_unit_reg_num ON de_solar_units (unit_registration_number);

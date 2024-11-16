@@ -4,8 +4,10 @@ import click
 import traceback
 import logging as log
 import psycopg2
+import psycopg2.extras
 
 from datetime import datetime
+from shapely.geometry import Point
 from dotenv import load_dotenv
 from pathlib import Path
 from lxml import etree
@@ -64,18 +66,22 @@ def parse_value(elem, tag_name, conversion_func=None):
 def insert_row(cur, row):
     columns = [
         'unit_registration_number', 'last_update', 'location_registration_number',
-        'network_operator_status', 'operator_registration_number', 'country', 'state',
-        'district', 'municipality_name', 'municipality_key', 'postcode', 'city',
-        'registration_date', 'commissioning_date', 'system_status', 'operational_status',
+        'network_operatorCheck_status', 'operator_registration_number', 'country', 'state',
+        'district', 'municipality_name', 'municipality_key', 'postcode', 'cadastral_district',
+        'field_parcel_numbers', 'street_not_found', 'house_number_not_available',
+        'house_number_not_found', 'city', 'longitude', 'latitude', 'registration_date',
+        'commissioning_date', 'unit_system_status', 'unit_operational_status',
         'not_present_migrated_units', 'power_unit_name', 'weic_not_available',
-        'power_plant_number_not_available', 'energy_source', 'gross_power', 'net_rated_power',
-        'remote_controllability', 'supply_type', 'assigned_active_power_inverter',
-        'amount_modules', 'location', 'power_limitation', 'uniform_orientation_tilt_angle',
-        'main_orientation', 'main_orientation_tilt_angle', 'usage_area', 'eeg_registration_number'
+        'power_plant_number_not_available', 'energy_source', 'gross_power',
+        'net_rated_power', 'connection_high_voltage', 'remote_control_capability_nb',
+        'remote_control_capability_dv', 'supply_type', 'gen_registration_number',
+        'wind_park_name', 'location', 'manufacturer', 'technology', 'model_designation',
+        'hub_height', 'rotor_diameter', 'rotor_blade_deicing_system',
+        'shutdown_power_limitation', 'eeg_registration_number', 'wkb_geometry'
     ]
 
     sql = f'''
-        INSERT INTO de_solar_units ({", ".join(columns)})
+        INSERT INTO de_wind_units ({", ".join(columns)})
         VALUES ({", ".join(["%s"] * len(columns))}) RETURNING id
     '''
 
@@ -89,17 +95,17 @@ def insert_row(cur, row):
         log.error(f'Error inserting row: {e}')
 
 
-def read_solar_units(conn, src):
+def read_wind_units(conn, src):
     cur = conn.cursor()
 
-    context = etree.iterparse(src, events=('end',), tag='EinheitSolar')
+    context = etree.iterparse(src, events=('end',), tag='EinheitWind')
 
     for event, elem in context:
         unit = {
             'unit_registration_number': parse_value(elem, 'EinheitMastrNummer'),
-            'last_update': parse_value(elem, 'DatumLetzteAktualisierung', parse_datetime),
+            'last_update': parse_value(elem, 'DatumLetzteAktualisierung'),
             'location_registration_number': parse_value(elem, 'LokationMaStRNummer'),
-            'network_operator_status': parse_value(elem, 'NetzbetreiberpruefungStatus'),
+            'network_operatorCheck_status': parse_value(elem, 'NetzbetreiberpruefungStatus'),
             'operator_registration_number': parse_value(elem, 'AnlagenbetreiberMastrNummer'),
             'country': parse_value(elem, 'Land'),
             'state': parse_value(elem, 'Bundesland'),
@@ -107,11 +113,18 @@ def read_solar_units(conn, src):
             'municipality_name': parse_value(elem, 'Gemeinde'),
             'municipality_key': parse_value(elem, 'Gemeindeschluessel'),
             'postcode': parse_value(elem, 'Postleitzahl'),
+            'cadastral_district': parse_value(elem, 'Gemarkung'),
+            'field_parcel_numbers': parse_value(elem, 'FlurFlurstuecknummern'),
+            'street_not_found': parse_value(elem, 'StrasseNichtGefunden'),
+            'house_number_not_available': parse_value(elem, 'Hausnummer_nv'),
+            'house_number_not_found': parse_value(elem, 'HausnummerNichtGefunden'),
             'city': parse_value(elem, 'Ort'),
+            'longitude': parse_value(elem, 'Laengengrad', float),
+            'latitude': parse_value(elem, 'Breitengrad', float),
             'registration_date': parse_value(elem, 'Registrierungsdatum', parse_datetime),
             'commissioning_date': parse_value(elem, 'Inbetriebnahmedatum', parse_datetime),
-            'system_status': parse_value(elem, 'EinheitSystemstatus'),
-            'operational_status': parse_value(elem, 'EinheitBetriebsstatus'),
+            'unit_system_status': parse_value(elem, 'EinheitSystemstatus'),
+            'unit_operational_status': parse_value(elem, 'EinheitBetriebsstatus'),
             'not_present_migrated_units': parse_value(elem, 'NichtVorhandenInMigriertenEinheiten'),
             'power_unit_name': parse_value(elem, 'NameStromerzeugungseinheit'),
             'weic_not_available': parse_value(elem, 'Weic_nv'),
@@ -119,18 +132,27 @@ def read_solar_units(conn, src):
             'energy_source': parse_value(elem, 'Energietraeger'),
             'gross_power': parse_value(elem, 'Bruttoleistung'),
             'net_rated_power': parse_value(elem, 'Nettonennleistung'),
-            'remote_controllability': parse_value(elem, 'FernsteuerbarkeitNb'),
+            'connection_high_voltage': parse_value(elem, 'AnschlussAnHoechstOderHochSpannung'),
+            'remote_control_capability_nb': parse_value(elem, 'FernsteuerbarkeitNb'),
+            'remote_control_capability_dv': parse_value(elem, 'FernsteuerbarkeitDv'),
             'supply_type': parse_value(elem, 'Einspeisungsart'),
-            'assigned_active_power_inverter': parse_value(elem, 'ZugeordneteWirkleistungWechselrichter'),
-            'amount_modules': parse_value(elem, 'AnzahlModule'),
+            'gen_registration_number': parse_value(elem, 'GenMastrNummer'),
+            'wind_park_name': parse_value(elem, 'NameWindpark'),
             'location': parse_value(elem, 'Lage'),
-            'power_limitation': parse_value(elem, 'Leistungsbegrenzung'),
-            'uniform_orientation_tilt_angle': parse_value(elem, 'EinheitlicheAusrichtungUndNeigungswinkel'),
-            'main_orientation': parse_value(elem, 'Hauptausrichtung'),
-            'main_orientation_tilt_angle': parse_value(elem, 'HauptausrichtungNeigungswinkel'),
-            'usage_area': parse_value(elem, 'Nutzungsbereich'),
-            'eeg_registration_number': parse_value(elem, 'EegMaStRNummer')
+            'manufacturer': parse_value(elem, 'Hersteller'),
+            'technology': parse_value(elem, 'Technologie'),
+            'model_designation': parse_value(elem, 'Typenbezeichnung'),
+            'hub_height': parse_value(elem, 'Nabenhoehe'),
+            'rotor_diameter': parse_value(elem, 'Rotordurchmesser'),
+            'rotor_blade_deicing_system': parse_value(elem, 'Rotorblattenteisungssystem'),
+            'shutdown_power_limitation': parse_value(elem, 'AuflageAbschaltungLeistungsbegrenzung'),
+            'eeg_registration_number': parse_value(elem, 'EegMaStRNummer'),
+            'wkb_geometry': None
         }
+
+        if unit['longitude'] and unit['latitude']:
+            point = Point(unit['longitude'], unit['latitude'])
+            unit['wkb_geometry'] = point.wkb
 
         insert_row(cur, unit)
         elem.clear()
@@ -157,7 +179,7 @@ def main(env, src, verbose, debug):
     log.info(f'your system recursion limit: {recursion_limit}')
 
     conn = connect_database(env)
-    read_solar_units(conn, Path(src))
+    read_wind_units(conn, Path(src))
 
 
 if __name__ == '__main__':
