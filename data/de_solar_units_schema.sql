@@ -8,8 +8,8 @@ CREATE TABLE IF NOT EXISTS de_solar_units (
     location_registration_number VARCHAR,
     network_operator_audit INT,
     operator_registration_number VARCHAR,
-    country VARCHAR,
-    state VARCHAR,
+    country INT,
+    state INT,
     district VARCHAR,
     municipality_name VARCHAR,
     municipality_key VARCHAR,
@@ -39,6 +39,9 @@ CREATE TABLE IF NOT EXISTS de_solar_units (
     eeg_registration_number VARCHAR
 );
 
+
+-- INDEX
+CREATE INDEX IF NOT EXISTS idx_unit_solar_municipality_key ON de_solar_units (municipality_key);
 
 -- UNIQUE INDEX
 CREATE UNIQUE INDEX IF NOT EXISTS idx_unq_solar_unit_reg_num ON de_solar_units (unit_registration_number);

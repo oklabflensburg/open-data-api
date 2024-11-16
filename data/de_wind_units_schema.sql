@@ -8,8 +8,8 @@ CREATE TABLE IF NOT EXISTS de_wind_units (
     location_registration_number VARCHAR,
     network_operator_audit INT,
     operator_registration_number VARCHAR,
-    country VARCHAR,
-    state VARCHAR,
+    country INT,
+    state INT,
     district VARCHAR,
     municipality_name VARCHAR,
     municipality_key VARCHAR,
@@ -51,6 +51,9 @@ CREATE TABLE IF NOT EXISTS de_wind_units (
     wkb_geometry GEOMETRY(POINT, 4326)
 );
 
+
+-- INDEX
+CREATE INDEX IF NOT EXISTS idx_wind_unit_municipality_key ON de_wind_units (municipality_key);
 
 -- UNIQUE INDEX
 CREATE UNIQUE INDEX IF NOT EXISTS idx_unq_wind_unit_reg_num ON de_wind_units (unit_registration_number);
