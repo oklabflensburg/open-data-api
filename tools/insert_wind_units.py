@@ -66,7 +66,7 @@ def parse_value(elem, tag_name, conversion_func=None):
 def insert_row(cur, row):
     columns = [
         'unit_registration_number', 'last_update', 'location_registration_number',
-        'network_operatorCheck_status', 'operator_registration_number', 'country', 'state',
+        'network_operator_audit', 'operator_registration_number', 'country', 'state',
         'district', 'municipality_name', 'municipality_key', 'postcode', 'cadastral_district',
         'field_parcel_numbers', 'street_not_found', 'house_number_not_available',
         'house_number_not_found', 'city', 'longitude', 'latitude', 'registration_date',
@@ -105,7 +105,7 @@ def read_wind_units(conn, src):
             'unit_registration_number': parse_value(elem, 'EinheitMastrNummer'),
             'last_update': parse_value(elem, 'DatumLetzteAktualisierung'),
             'location_registration_number': parse_value(elem, 'LokationMaStRNummer'),
-            'network_operatorCheck_status': parse_value(elem, 'NetzbetreiberpruefungStatus'),
+            'network_operator_audit': parse_value(elem, 'NetzbetreiberpruefungStatus'),
             'operator_registration_number': parse_value(elem, 'AnlagenbetreiberMastrNummer'),
             'country': parse_value(elem, 'Land'),
             'state': parse_value(elem, 'Bundesland'),

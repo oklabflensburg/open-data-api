@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS de_wind_units (
     unit_registration_number VARCHAR,
     last_update TIMESTAMP WITH TIME ZONE,
     location_registration_number VARCHAR,
-    network_operatorCheck_status VARCHAR,
+    network_operator_audit INT,
     operator_registration_number VARCHAR,
     country VARCHAR,
     state VARCHAR,
