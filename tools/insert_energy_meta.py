@@ -71,6 +71,15 @@ def parse_json(conn, data):
         if row['FilterName'] == 'Volleinspeisung oder Teileinspeisung':
             insert_energy_supply(cur, row['ListObject'])
 
+        if row['FilterName'] == 'Hersteller der Windenergieanlage':
+            insert_turbine_manufacturer(cur, row['ListObject'])
+
+        if row['FilterName'] == 'Leistungsbegrenzung':
+            insert_power_limitation(cur, row['ListObject'])
+
+        if row['FilterName'] == 'Technologie der Stromerzeugung':
+            insert_power_technology(cur, row['ListObject'])
+
 
 def insert_energy_source(cur, rows):
     for row in rows:
@@ -189,6 +198,66 @@ def insert_energy_supply(cur, rows):
             last_inserted_id = cur.fetchone()[0]
 
             log.info(f'inserted {name} with id {last_inserted_id} in table de_energy_supply_meta')
+        except Exception as e:
+            log.error(e)
+
+
+def insert_turbine_manufacturer(cur, rows):
+    for row in rows:
+        id = row['Value']
+        name = row['Name']
+
+        sql = ''' 
+            INSERT INTO de_turbine_manufacturer_meta (id, name)
+            VALUES (%s, %s) RETURNING id
+        '''
+
+        try:
+            cur.execute(sql, (id, name))
+
+            last_inserted_id = cur.fetchone()[0]
+
+            log.info(f'inserted {name} with id {last_inserted_id} in table de_turbine_manufacturer_meta')
+        except Exception as e:
+            log.error(e)
+
+
+def insert_power_limitation(cur, rows):
+    for row in rows:
+        id = row['Value']
+        name = row['Name']
+
+        sql = ''' 
+            INSERT INTO de_power_limitation_meta (id, name)
+            VALUES (%s, %s) RETURNING id
+        '''
+
+        try:
+            cur.execute(sql, (id, name))
+
+            last_inserted_id = cur.fetchone()[0]
+
+            log.info(f'inserted {name} with id {last_inserted_id} in table de_power_limitation_meta')
+        except Exception as e:
+            log.error(e)
+
+
+def insert_power_technology(cur, rows):
+    for row in rows:
+        id = row['Value']
+        name = row['Name']
+
+        sql = ''' 
+            INSERT INTO de_power_technology_meta (id, name)
+            VALUES (%s, %s) RETURNING id
+        '''
+
+        try:
+            cur.execute(sql, (id, name))
+
+            last_inserted_id = cur.fetchone()[0]
+
+            log.info(f'inserted {name} with id {last_inserted_id} in table de_power_technology_meta')
         except Exception as e:
             log.error(e)
 
