@@ -57,13 +57,19 @@ def parse_json(conn, data):
             insert_energy_source(cur, row['ListObject'])
 
         if row['FilterName'] == 'Bundesland':
-            insert_energy_unit_state(cur, row['ListObject'])
+            insert_energy_state(cur, row['ListObject'])
 
         if row['FilterName'] == 'Netzbetreiberprüfung':
             insert_network_operator_audit(cur, row['ListObject'])
 
         if row['FilterName'] == 'Land':
-            insert_energy_unit_country(cur, row['ListObject'])
+            insert_energy_country(cur, row['ListObject'])
+
+        if row['FilterName'] == 'Lage der Einheit':
+            insert_energy_location(cur, row['ListObject'])
+
+        if row['FilterName'] == 'Volleinspeisung oder Teileinspeisung':
+            insert_energy_supply(cur, row['ListObject'])
 
 
 def insert_energy_source(cur, rows):
@@ -86,13 +92,13 @@ def insert_energy_source(cur, rows):
             log.error(e)
 
 
-def insert_energy_unit_state(cur, rows):
+def insert_energy_state(cur, rows):
     for row in rows:
         id = row['Value']
         name = row['Name']
 
         sql = '''
-            INSERT INTO de_energy_unit_state_meta (id, name)
+            INSERT INTO de_energy_state_meta (id, name)
             VALUES (%s, %s) RETURNING id
         '''
 
@@ -101,19 +107,19 @@ def insert_energy_unit_state(cur, rows):
 
             last_inserted_id = cur.fetchone()[0]
 
-            log.info(f'inserted {name} with id {last_inserted_id} in table de_energy_unit_state_meta')
+            log.info(f'inserted {name} with id {last_inserted_id} in table de_energy_state_meta')
         except Exception as e:
             log.error(e)
 
 
 
-def insert_energy_unit_country(cur, rows):
+def insert_energy_country(cur, rows):
     for row in rows:
         id = row['Value']
         name = row['Name']
 
         sql = '''
-            INSERT INTO de_energy_unit_country_meta (id, name)
+            INSERT INTO de_energy_country_meta (id, name)
             VALUES (%s, %s) RETURNING id
         '''
 
@@ -122,7 +128,7 @@ def insert_energy_unit_country(cur, rows):
 
             last_inserted_id = cur.fetchone()[0]
 
-            log.info(f'inserted {name} with id {last_inserted_id} in table de_energy_unit_country_meta')
+            log.info(f'inserted {name} with id {last_inserted_id} in table de_energy_country_meta')
         except Exception as e:
             log.error(e)
 
@@ -143,6 +149,46 @@ def insert_network_operator_audit(cur, rows):
             last_inserted_id = cur.fetchone()[0]
 
             log.info(f'inserted {name} with id {last_inserted_id} in table de_network_operator_audit_meta')
+        except Exception as e:
+            log.error(e)
+
+
+def insert_energy_location(cur, rows):
+    for row in rows:
+        id = row['Value']
+        name = row['Name']
+
+        sql = '''
+            INSERT INTO de_energy_location_meta (id, name)
+            VALUES (%s, %s) RETURNING id
+        '''
+
+        try:
+            cur.execute(sql, (id, name))
+
+            last_inserted_id = cur.fetchone()[0]
+
+            log.info(f'inserted {name} with id {last_inserted_id} in table de_energy_location_meta')
+        except Exception as e:
+            log.error(e)
+
+
+def insert_energy_supply(cur, rows):
+    for row in rows:
+        id = row['Value']
+        name = row['Name']
+
+        sql = '''
+            INSERT INTO de_energy_supply_meta (id, name)
+            VALUES (%s, %s) RETURNING id
+        '''
+
+        try:
+            cur.execute(sql, (id, name))
+
+            last_inserted_id = cur.fetchone()[0]
+
+            log.info(f'inserted {name} with id {last_inserted_id} in table de_energy_supply_meta')
         except Exception as e:
             log.error(e)
 
