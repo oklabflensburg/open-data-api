@@ -520,13 +520,30 @@ deactivate
 ```
 
 
+## Insert energy meta
+
+Tool to fetch and insert wind turbine and solar energy meta data.
+
+```sh
+psql -U oklab -h localhost -d oklab -p 5432 < data/de_energy_meta_schema.sql
+```
+
+```sh
+cd tools
+python3 -m venv venv
+source venv/bin/activate
+pip3 install -r requirements.txt
+python3 insert_energy_meta.py --env ../.env --target ~ --url https://www.marktstammdatenregister.de/MaStR/Einheit/EinheitJson/GetFilterColumnsErweiterteOeffentlicheEinheitStromerzeugung --verbose
+deactivate
+```
+
 
 ## Insert wind turbine units
 
 Tool to insert wind turbine units from local file system.
 
 ```sh
-psql -U oklab -h localhost -d oklab -p 5432 < ../data/de_wind_units_schema.sql
+psql -U oklab -h localhost -d oklab -p 5432 < data/de_wind_units_schema.sql
 ```
 
 ```sh
@@ -539,8 +556,7 @@ deactivate
 ```
 
 
-
-## Insert energy units
+## Insert solar engery units
 
 Tool to insert solar energy units from local file system.
 
@@ -556,7 +572,6 @@ pip3 install -r requirements.txt
 python3 insert_solar_units.py --env ../.env --src ~/EinheitenSolar_1.xml --verbose
 deactivate
 ```
-
 
 
 ## Retrieve administrative areas

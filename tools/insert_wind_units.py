@@ -75,7 +75,7 @@ def insert_row(cur, row):
         'power_plant_number_not_available', 'energy_source_id', 'gross_power',
         'net_rated_power', 'connection_high_voltage', 'remote_control_capability_nb',
         'remote_control_capability_dv', 'supply_type_id', 'gen_registration_number',
-        'wind_park_name', 'location_id', 'manufacturer', 'technology', 'model_designation',
+        'wind_park_name', 'location_id', 'manufacturer_id', 'technology_id', 'model_designation',
         'hub_height', 'rotor_diameter', 'rotor_blade_deicing_system',
         'shutdown_power_limitation', 'eeg_registration_number', 'wkb_geometry'
     ]
