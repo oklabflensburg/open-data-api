@@ -217,7 +217,65 @@ async def get_solar_unit_by_municipality_key(session: AsyncSession, key: str):
 
 async def get_solar_unit_by_id(session: AsyncSession, unit_id: str):
     stmt = text('''
-    SELECT * FROM de_solar_units
+    SELECT
+        jsonb_build_object(
+            'unit_registration_number', unit_registration_number,
+            'last_update', last_update, 'network_operator_audit', noa.name,
+            'location_registration_number', location_registration_number,
+            'operator_registration_number', operator_registration_number,
+            'country', ecm.name, 'state', usm.name, 'district', district,
+            'location', elm.name, 'postcode', postcode, 'city', city,
+            'municipality_name', municipality_name,
+            'municipality_key', municipality_key,
+            'registration_date', registration_date,
+            'commissioning_date', commissioning_date,
+            'unit_system_status_id', unit_system_status_id,
+            'unit_operational_status', unit_operational_status,
+            'not_present_migrated_units', not_present_migrated_units,
+            'power_unit_name', power_unit_name, 'usage_area', uam.name,
+            'weic_not_available', weic_not_available,
+            'power_plant_number_not_available', power_plant_number_not_available,
+            'energy_source', esm.name, 'supply_type', ust.name,
+            'gross_power', gross_power, 'net_rated_power', net_rated_power,
+            'remote_controllability', remote_controllability,
+            'assigned_active_power_inverter', assigned_active_power_inverter,
+            'amount_modules', amount_modules, 'power_limitation', plm.name,
+            'uniform_orientation_tilt_angle_id', uniform_orientation_tilt_angle_id,
+            'main_orientation', smo.name, 'main_orientation_tilt_angle', ota.name,
+            'eeg_registration_number', eeg_registration_number
+        )
+    FROM de_solar_units AS su
+
+    LEFT JOIN de_energy_country_meta AS ecm
+    ON ecm.id = su.country_id
+
+    LEFT JOIN de_energy_location_meta AS elm
+    ON elm.id = su.location_id
+
+    LEFT JOIN de_energy_source_meta AS esm
+    ON esm.id = su.energy_source_id
+
+    LEFT JOIN de_energy_state_meta AS usm
+    ON usm.id = su.state_id
+
+    LEFT JOIN de_energy_supply_meta AS ust
+    ON ust.id = su.supply_type_id
+
+    LEFT JOIN de_network_operator_audit_meta AS noa
+    ON noa.id = su.network_operator_audit_id
+
+    LEFT JOIN de_main_orientation_meta AS smo
+    ON smo.id = su.main_orientation_id
+
+    LEFT JOIN de_orientation_tilt_angle_meta AS ota
+    ON ota.id = su.main_orientation_tilt_angle_id
+
+    LEFT JOIN de_usage_area_meta AS uam
+    ON uam.id = su.usage_area_id
+
+    LEFT JOIN de_power_limitation_meta AS plm
+    ON plm.id = su.power_limitation_id
+
     WHERE LOWER(unit_registration_number) = :unit_id
     ''')
 
