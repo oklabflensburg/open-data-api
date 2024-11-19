@@ -89,6 +89,15 @@ def parse_json(conn, data):
         if row['FilterName'] == 'Nutzungsbereich des Gebäudes mit Solaranlage':
             insert_usage_area(cur, row['ListObject'])
 
+        if row['FilterName'] == 'Betriebs-Status':
+            insert_operational_status(cur, row['ListObject'])
+
+        if row['FilterName'] == 'Biomasseart':
+            insert_biomass_type(cur, row['ListObject'])
+
+        if row['FilterName'] == 'Hauptbrennstoff der Einheit':
+            insert_primary_fuel(cur, row['ListObject'])
+
 
 def insert_energy_source(cur, rows):
     for row in rows:
@@ -327,6 +336,66 @@ def insert_usage_area(cur, rows):
             last_inserted_id = cur.fetchone()[0]
 
             log.info(f'inserted {name} with id {last_inserted_id} in table de_usage_area_meta')
+        except Exception as e:
+            log.error(e)
+
+
+def insert_operational_status(cur, rows):
+    for row in rows:
+        id = row['Value']
+        name = row['Name']
+
+        sql = ''' 
+            INSERT INTO de_operational_status_meta (id, name)
+            VALUES (%s, %s) RETURNING id
+        '''
+
+        try:
+            cur.execute(sql, (id, name))
+
+            last_inserted_id = cur.fetchone()[0]
+
+            log.info(f'inserted {name} with id {last_inserted_id} in table de_operational_status_meta')
+        except Exception as e:
+            log.error(e)
+
+
+def insert_biomass_type(cur, rows):
+    for row in rows:
+        id = row['Value']
+        name = row['Name']
+
+        sql = ''' 
+            INSERT INTO de_biomass_type_meta (id, name)
+            VALUES (%s, %s) RETURNING id
+        '''
+
+        try:
+            cur.execute(sql, (id, name))
+
+            last_inserted_id = cur.fetchone()[0]
+
+            log.info(f'inserted {name} with id {last_inserted_id} in table de_biomass_type_meta')
+        except Exception as e:
+            log.error(e)
+
+
+def insert_primary_fuel(cur, rows):
+    for row in rows:
+        id = row['Value']
+        name = row['Name']
+
+        sql = ''' 
+            INSERT INTO de_primary_fuel_meta (id, name)
+            VALUES (%s, %s) RETURNING id
+        '''
+
+        try:
+            cur.execute(sql, (id, name))
+
+            last_inserted_id = cur.fetchone()[0]
+
+            log.info(f'inserted {name} with id {last_inserted_id} in table de_primary_fuel_meta')
         except Exception as e:
             log.error(e)
 

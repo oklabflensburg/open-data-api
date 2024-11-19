@@ -48,7 +48,7 @@ def connect_database(env_path):
 
 
 def parse_datetime(s):
-    date_string = s 
+    date_string = s
 
     if '.' in date_string:
         parts = date_string.split('.')
@@ -75,23 +75,25 @@ def parse_value(elem, tag_name, conversion_func=None):
 
 def insert_row(cur, row):
     columns = [
-        'unit_registration_number', 'last_update', 'location_registration_number',
-        'network_operator_audit_id', 'operator_registration_number', 'country_id', 'state_id',
-        'district', 'municipality_name', 'municipality_key', 'postcode', 'cadastral_district',
-        'field_parcel_numbers', 'street_not_found', 'house_number_not_available',
-        'house_number_not_found', 'city', 'longitude', 'latitude', 'registration_date',
-        'commissioning_date', 'unit_system_status_id', 'unit_operational_status_id',
-        'not_present_migrated_units', 'unit_name', 'weic_not_available',
-        'power_plant_number_not_available', 'energy_source_id', 'gross_power',
-        'net_rated_power', 'connection_high_voltage', 'remote_control_capability_nb',
-        'remote_control_capability_dv', 'supply_type_id', 'gen_registration_number',
-        'wind_park_name', 'location_id', 'manufacturer_id', 'technology_id', 'model_designation',
-        'hub_height', 'rotor_diameter', 'rotor_blade_deicing_system',
-        'shutdown_power_limitation', 'eeg_registration_number', 'wkb_geometry'
+        'unit_registration_number', 'last_update', 'unit_name',
+        'location_registration_number', 'network_operator_audit_id',
+        'operator_registration_number', 'country_id', 'state_id', 
+        'district', 'municipality_name', 'municipality_key',
+        'postcode', 'street', 'street_not_found', 'house_number',
+        'house_number_not_available', 'house_number_not_found',
+        'location', 'longitude', 'latitude', 'registration_date',
+        'commissioning_date', 'unit_system_status_id', 'gross_capacity',
+        'unit_operational_status_id', 'not_present_in_migrated_units',
+        'weic_not_available', 'plant_number_not_available',
+        'energy_source_id', 'net_nominal_capacity', 'supply_type_id',
+        'remote_control_capability_nb', 'remote_control_capability_dv',
+        'generator_registration_number', 'primary_fuel_id', 
+        'eeg_registration_number', 'kwk_registration_number',
+        'biomass_type_id', 'technology_id', 'wkb_geometry'
     ]
 
     sql = f'''
-        INSERT INTO de_wind_units ({", ".join(columns)})
+        INSERT INTO de_biomass_units ({", ".join(columns)})
         VALUES ({", ".join(["%s"] * len(columns))}) RETURNING id
     '''
 
@@ -105,10 +107,10 @@ def insert_row(cur, row):
         log.error(f'Error inserting row: {e}')
 
 
-def read_wind_units(conn, src):
+def read_biomass_units(conn, src):
     cur = conn.cursor()
 
-    context = etree.iterparse(src, events=('end',), tag='EinheitWind')
+    context = etree.iterparse(src, events=('end',), tag='EinheitBiomasse')
 
     for event, elem in context:
         unit = {
@@ -123,40 +125,34 @@ def read_wind_units(conn, src):
             'municipality_name': parse_value(elem, 'Gemeinde'),
             'municipality_key': parse_value(elem, 'Gemeindeschluessel'),
             'postcode': parse_value(elem, 'Postleitzahl'),
-            'cadastral_district': parse_value(elem, 'Gemarkung'),
-            'field_parcel_numbers': parse_value(elem, 'FlurFlurstuecknummern'),
+            'street': parse_value(elem, 'Strasse'),
             'street_not_found': parse_value(elem, 'StrasseNichtGefunden'),
+            'house_number': parse_value(elem, 'Hausnummer'),
             'house_number_not_available': parse_value(elem, 'Hausnummer_nv'),
             'house_number_not_found': parse_value(elem, 'HausnummerNichtGefunden'),
-            'city': parse_value(elem, 'Ort'),
+            'location': parse_value(elem, 'Ort'),
             'longitude': parse_value(elem, 'Laengengrad', float),
             'latitude': parse_value(elem, 'Breitengrad', float),
             'registration_date': parse_value(elem, 'Registrierungsdatum', parse_date),
             'commissioning_date': parse_value(elem, 'Inbetriebnahmedatum', parse_date),
             'unit_system_status_id': parse_value(elem, 'EinheitSystemstatus'),
-            'unit_operational_status_id': parse_value(elem, 'EinheitBetriebsstatus', int),
-            'not_present_migrated_units': parse_value(elem, 'NichtVorhandenInMigriertenEinheiten'),
+            'unit_operational_status_id': parse_value(elem, 'EinheitBetriebsstatus'),
+            'not_present_in_migrated_units': parse_value(elem, 'NichtVorhandenInMigriertenEinheiten'),
             'unit_name': parse_value(elem, 'NameStromerzeugungseinheit'),
             'weic_not_available': parse_value(elem, 'Weic_nv'),
-            'power_plant_number_not_available': parse_value(elem, 'Kraftwerksnummer_nv'),
+            'plant_number_not_available': parse_value(elem, 'Kraftwerksnummer_nv'),
             'energy_source_id': parse_value(elem, 'Energietraeger', int),
-            'gross_power': parse_value(elem, 'Bruttoleistung', float),
-            'net_rated_power': parse_value(elem, 'Nettonennleistung', float),
-            'connection_high_voltage': parse_value(elem, 'AnschlussAnHoechstOderHochSpannung'),
+            'gross_capacity': parse_value(elem, 'Bruttoleistung', float),
+            'net_nominal_capacity': parse_value(elem, 'Nettonennleistung', float),
             'remote_control_capability_nb': parse_value(elem, 'FernsteuerbarkeitNb'),
             'remote_control_capability_dv': parse_value(elem, 'FernsteuerbarkeitDv'),
             'supply_type_id': parse_value(elem, 'Einspeisungsart', int),
-            'gen_registration_number': parse_value(elem, 'GenMastrNummer'),
-            'wind_park_name': parse_value(elem, 'NameWindpark'),
-            'location_id': parse_value(elem, 'Lage', int),
-            'manufacturer_id': parse_value(elem, 'Hersteller', int),
+            'generator_registration_number': parse_value(elem, 'GenMastrNummer'),
+            'primary_fuel_id': parse_value(elem, 'Hauptbrennstoff', int),
+            'biomass_type_id': parse_value(elem, 'Biomasseart', int),
             'technology_id': parse_value(elem, 'Technologie', int),
-            'model_designation': parse_value(elem, 'Typenbezeichnung'),
-            'hub_height': parse_value(elem, 'Nabenhoehe'),
-            'rotor_diameter': parse_value(elem, 'Rotordurchmesser'),
-            'rotor_blade_deicing_system': parse_value(elem, 'Rotorblattenteisungssystem'),
-            'shutdown_power_limitation': parse_value(elem, 'AuflageAbschaltungLeistungsbegrenzung'),
             'eeg_registration_number': parse_value(elem, 'EegMaStRNummer'),
+            'kwk_registration_number': parse_value(elem, 'KwkMaStRNummer'),
             'wkb_geometry': None
         }
 
@@ -189,7 +185,7 @@ def main(env, src, verbose, debug):
     log.info(f'your system recursion limit: {recursion_limit}')
 
     conn = connect_database(env)
-    read_wind_units(conn, Path(src))
+    read_biomass_units(conn, Path(src))
 
 
 if __name__ == '__main__':

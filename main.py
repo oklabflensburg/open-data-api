@@ -77,6 +77,45 @@ async def swagger_ui_html(req: Request) -> HTMLResponse:
 
 
 @router6.get(
+    '/unit/biomass/id',
+    response_model=list,
+    tags=['Marktstammdatenregister'],
+    description=('Retrieves details about a specific biomass unit based on the provided 15 digit solar unit registration number.')
+)
+async def get_biomass_unit_by_id(
+    unit_id: str = Query(None, min_length=15, max_length=15),
+    session: AsyncSession = Depends(get_session)
+):
+    rows = await service.get_biomass_unit_by_id(session, unit_id)
+    response = jsonable_encoder(rows)
+
+    try:
+        return JSONResponse(content=response[0])
+    except IndexError as e:
+        raise HTTPException(status_code=404, detail=f'Biomass unit with id "{unit_id}" not found')
+
+
+@router6.get(
+    '/unit/biomass/key',
+    response_model=list,
+    tags=['Marktstammdatenregister'],
+    description=('Retrieves a list of biomass units with each details based on the provided german municipality key (AGS).')
+)
+async def get_wind_biomass_by_municipality_key(
+    municipality_key: str = Query(None, min_length=8, max_length=8),
+    session: AsyncSession = Depends(get_session)
+):
+    rows = await service.get_biomass_unit_by_municipality_key(session, municipality_key)
+    response = jsonable_encoder(rows)
+
+    if len(response) == 0:
+        raise HTTPException(status_code=404, detail=f'No biomass units for municipality key {municipality_key} found')
+
+    return JSONResponse(content=response)
+
+
+
+@router6.get(
     '/unit/wind/id',
     response_model=list,
     tags=['Marktstammdatenregister'],
@@ -92,7 +131,7 @@ async def get_wind_unit_by_id(
     try:
         return JSONResponse(content=response[0])
     except IndexError as e:
-        raise HTTPException(status_code=404, detail=f'Wind turbine with {unit_id} not found')
+        raise HTTPException(status_code=404, detail=f'Wind turbine unit with id "{unit_id}" not found')
 
 
 @router6.get(
@@ -131,7 +170,7 @@ async def get_solar_unit_by_id(
     try:
         return JSONResponse(content=response[0])
     except IndexError as e:
-        raise HTTPException(status_code=404, detail=f'Solar unit with {unit_id} not found')
+        raise HTTPException(status_code=404, detail=f'Solar unit with id "{unit_id}" not found')
 
 
 @router6.get(
