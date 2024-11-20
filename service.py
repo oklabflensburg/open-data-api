@@ -7,6 +7,145 @@ import models
 
 
 
+async def get_combustion_unit_by_municipality_key(session: AsyncSession, key: str):
+    stmt = text('''
+    SELECT
+        cu.unit_registration_number,
+        cu.last_update,
+        cu.unit_name,
+        cu.location_registration_number,
+        noa.name AS network_operator_audit,
+        cu.operator_registration_number,
+        ecm.name AS country,
+        usm.name AS state,
+        cu.district,
+        cu.municipality_name,
+        cu.municipality_key,
+        cu.postcode,
+        cu.street,
+        cu.street_not_found,
+        cu.house_number,
+        cu.house_number_not_available,
+        cu.house_number_not_found,
+        cu.location,
+        cu.registration_date,
+        cu.commissioning_date,
+        cu.unit_system_status_id,
+        osm.name AS unit_operational_status,
+        cu.not_present_in_migrated_units,
+        cu.weic_not_available,
+        cu.plant_number_not_available,
+        esm.name AS energy_source,
+        cu.gross_capacity,
+        cu.net_nominal_capacity,
+        cu.remote_control_nb,
+        ust.name AS supply_type,
+        cu.plant_name,
+        cu.plant_block_name,
+        pfm.name AS primary_fuel,
+        cu.emergency_power_generator,
+        cu.kwk_registration_number,
+        ptu.name AS technology,
+        ST_AsGeoJSON(cu.wkb_geometry, 15)::jsonb AS geojson
+    FROM
+        de_combustion_units AS cu
+    LEFT JOIN
+        de_energy_country_meta AS ecm ON ecm.id = cu.country_id
+    LEFT JOIN
+        de_energy_source_meta AS esm ON esm.id = cu.energy_source_id
+    LEFT JOIN
+        de_energy_state_meta AS usm ON usm.id = cu.state_id
+    LEFT JOIN
+        de_energy_supply_meta AS ust ON ust.id = cu.supply_type_id
+    LEFT JOIN
+        de_network_operator_audit_meta AS noa ON noa.id = cu.network_operator_audit_id
+    LEFT JOIN
+        de_operational_status_meta AS osm ON osm.id = cu.unit_operational_status_id
+    LEFT JOIN
+        de_power_technology_meta AS ptu ON ptu.id = cu.technology_id
+    LEFT JOIN
+        de_primary_fuel_meta AS pfm ON pfm.id = cu.primary_fuel_id
+    WHERE
+        LOWER(municipality_key) = :key
+    ''')
+
+    sql = stmt.bindparams(key=key.lower())
+    result = await session.execute(sql)
+    rows = result.mappings().all()
+
+    return [dict(row) for row in rows]
+
+
+async def get_combustion_unit_by_id(session: AsyncSession, unit_id: str):
+    stmt = text('''
+    SELECT
+        cu.unit_registration_number,
+        cu.last_update,
+        cu.unit_name,
+        cu.location_registration_number,
+        noa.name AS network_operator_audit,
+        cu.operator_registration_number,
+        ecm.name AS country,
+        usm.name AS state,
+        cu.district,
+        cu.municipality_name,
+        cu.municipality_key,
+        cu.postcode,
+        cu.street,
+        cu.street_not_found,
+        cu.house_number,
+        cu.house_number_not_available,
+        cu.house_number_not_found,
+        cu.location,
+        cu.registration_date,
+        cu.commissioning_date,
+        cu.unit_system_status_id,
+        osm.name AS unit_operational_status,
+        cu.not_present_in_migrated_units,
+        cu.weic_not_available,
+        cu.plant_number_not_available,
+        esm.name AS energy_source,
+        cu.gross_capacity,
+        cu.net_nominal_capacity,
+        cu.remote_control_nb,
+        ust.name AS supply_type,
+        cu.plant_name,
+        cu.plant_block_name,
+        pfm.name AS primary_fuel,
+        cu.emergency_power_generator,
+        cu.kwk_registration_number,
+        ptu.name AS technology,
+        ST_AsGeoJSON(cu.wkb_geometry, 15)::jsonb AS geojson
+    FROM
+        de_combustion_units AS cu
+    LEFT JOIN
+        de_energy_country_meta AS ecm ON ecm.id = cu.country_id
+    LEFT JOIN
+        de_energy_source_meta AS esm ON esm.id = cu.energy_source_id
+    LEFT JOIN
+        de_energy_state_meta AS usm ON usm.id = cu.state_id
+    LEFT JOIN
+        de_energy_supply_meta AS ust ON ust.id = cu.supply_type_id
+    LEFT JOIN
+        de_network_operator_audit_meta AS noa ON noa.id = cu.network_operator_audit_id
+    LEFT JOIN
+        de_operational_status_meta AS osm ON osm.id = cu.unit_operational_status_id
+    LEFT JOIN
+        de_power_technology_meta AS ptu ON ptu.id = cu.technology_id
+    LEFT JOIN
+        de_primary_fuel_meta AS pfm ON pfm.id = cu.primary_fuel_id
+    WHERE
+        LOWER(unit_registration_number) = :unit_id
+    ''')
+
+    sql = stmt.bindparams(unit_id=unit_id.lower())
+    result = await session.execute(sql)
+    rows = result.mappings().all()
+
+    return [dict(row) for row in rows]
+
+
+
 async def get_nuclear_unit_by_municipality_key(session: AsyncSession, key: str):
     stmt = text('''
     SELECT
