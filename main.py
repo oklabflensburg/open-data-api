@@ -77,6 +77,45 @@ async def swagger_ui_html(req: Request) -> HTMLResponse:
 
 
 @router6.get(
+    '/unit/nuclear/id',
+    response_model=list,
+    tags=['Marktstammdatenregister'],
+    description=('Retrieves details about a specific nuclear unit based on the provided 15 digit unit registration number.')
+)
+async def get_nuclear_unit_by_id(
+    unit_id: str = Query(None, min_length=15, max_length=15),
+    session: AsyncSession = Depends(get_session)
+):
+    rows = await service.get_nuclear_unit_by_id(session, unit_id)
+    response = jsonable_encoder(rows)
+
+    try:
+        return JSONResponse(content=response[0])
+    except IndexError as e:
+        raise HTTPException(status_code=404, detail=f'Nuclear unit with id "{unit_id}" not found')
+
+
+@router6.get(
+    '/unit/nuclear/key',
+    response_model=list,
+    tags=['Marktstammdatenregister'],
+    description=('Retrieves a list of nuclear units with each detail based on the provided German municipality key (AGS).')
+)
+async def get_nuclear_unit_by_municipality_key(
+    municipality_key: str = Query(None, min_length=8, max_length=8),
+    session: AsyncSession = Depends(get_session)
+):
+    rows = await service.get_nuclear_unit_by_municipality_key(session, municipality_key)
+    response = jsonable_encoder(rows)
+
+    if len(response) == 0:
+        raise HTTPException(status_code=404, detail=f'No water nuclear for municipality key {municipality_key} found')
+
+    return JSONResponse(content=response)
+
+
+
+@router6.get(
     '/unit/water/id',
     response_model=list,
     tags=['Marktstammdatenregister'],

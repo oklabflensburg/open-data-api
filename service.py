@@ -7,6 +7,137 @@ import models
 
 
 
+async def get_nuclear_unit_by_municipality_key(session: AsyncSession, key: str):
+    stmt = text('''
+    SELECT
+        unit_registration_number,
+        last_update,
+        unit_name,
+        location_registration_number,
+        noa.name AS network_operator_audit,
+        operator_registration_number,
+        ecm.name AS country,
+        usm.name AS state,
+        district,
+        municipality_name,
+        municipality_key,
+        postcode,
+        street,
+        street_not_found,
+        house_number_not_available,
+        house_number_not_found,
+        location,
+        registration_date,
+        commissioning_date,
+        decommissioning_date,
+        unit_system_status_id,
+        osm.name AS unit_operational_status,
+        not_present_in_migrated_units,
+        operator_change_date,
+        operator_change_registration_date,
+        weic_not_available,
+        plant_number_not_available,
+        esm.name AS energy_source,
+        gross_capacity,
+        net_nominal_capacity,
+        ust.name AS supply_type,
+        plant_name,
+        plant_block_name,
+        ptu.name AS technology,
+        ST_AsGeoJSON(wkb_geometry, 15)::jsonb AS geojson
+    FROM
+        de_nuclear_units AS nu
+    LEFT JOIN
+        de_energy_country_meta AS ecm ON ecm.id = nu.country_id
+    LEFT JOIN
+        de_energy_source_meta AS esm ON esm.id = nu.energy_source_id
+    LEFT JOIN
+        de_energy_state_meta AS usm ON usm.id = nu.state_id
+    LEFT JOIN
+        de_energy_supply_meta AS ust ON ust.id = nu.supply_type_id
+    LEFT JOIN
+        de_network_operator_audit_meta AS noa ON noa.id = nu.network_operator_audit_id
+    LEFT JOIN
+        de_operational_status_meta AS osm ON osm.id = nu.unit_operational_status_id
+    LEFT JOIN
+        de_power_technology_meta AS ptu ON ptu.id = nu.technology_id
+    WHERE
+        LOWER(municipality_key) = :key
+    ''')
+
+    sql = stmt.bindparams(key=key.lower())
+    result = await session.execute(sql)
+    rows = result.mappings().all()
+
+    return [dict(row) for row in rows]
+
+
+async def get_nuclear_unit_by_id(session: AsyncSession, unit_id: str):
+    stmt = text('''
+    SELECT
+        unit_registration_number,
+        last_update,
+        unit_name,
+        location_registration_number,
+        noa.name AS network_operator_audit,
+        operator_registration_number,
+        ecm.name AS country,
+        usm.name AS state,
+        district,
+        municipality_name,
+        municipality_key,
+        postcode,
+        street,
+        street_not_found,
+        house_number_not_available,
+        house_number_not_found,
+        location,
+        registration_date,
+        commissioning_date,
+        decommissioning_date,
+        unit_system_status_id,
+        osm.name AS unit_operational_status,
+        not_present_in_migrated_units,
+        operator_change_date,
+        operator_change_registration_date,
+        weic_not_available,
+        plant_number_not_available,
+        esm.name AS energy_source,
+        gross_capacity,
+        net_nominal_capacity,
+        ust.name AS supply_type,
+        plant_name,
+        plant_block_name,
+        ptu.name AS technology,
+        ST_AsGeoJSON(wkb_geometry, 15)::jsonb AS geojson
+    FROM
+        de_nuclear_units AS nu
+    LEFT JOIN
+        de_energy_country_meta AS ecm ON ecm.id = nu.country_id
+    LEFT JOIN
+        de_energy_source_meta AS esm ON esm.id = nu.energy_source_id
+    LEFT JOIN
+        de_energy_state_meta AS usm ON usm.id = nu.state_id
+    LEFT JOIN
+        de_energy_supply_meta AS ust ON ust.id = nu.supply_type_id
+    LEFT JOIN
+        de_network_operator_audit_meta AS noa ON noa.id = nu.network_operator_audit_id
+    LEFT JOIN
+        de_operational_status_meta AS osm ON osm.id = nu.unit_operational_status_id
+    LEFT JOIN
+        de_power_technology_meta AS ptu ON ptu.id = nu.technology_id
+    WHERE
+        LOWER(unit_registration_number) = :unit_id
+    ''')
+
+    sql = stmt.bindparams(unit_id=unit_id.lower())
+    result = await session.execute(sql)
+    rows = result.mappings().all()
+
+    return [dict(row) for row in rows]
+
+
+
 async def get_water_unit_by_municipality_key(session: AsyncSession, key: str):
     stmt = text('''
     SELECT
