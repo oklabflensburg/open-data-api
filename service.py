@@ -2,7 +2,126 @@ from sqlalchemy import select
 from sqlalchemy.sql import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+import json
 import models
+
+
+
+async def get_water_unit_by_municipality_key(session: AsyncSession, key: str):
+    stmt = text('''
+    SELECT
+        unit_registration_number,
+        last_update,
+        unit_name,
+        location_registration_number,
+        noa.name AS network_operator_audit,
+        operator_registration_number,
+        ecm.name AS country,
+        usm.name AS state,
+        district,
+        municipality_name,
+        municipality_key,
+        postcode,
+        cadastral_district,
+        field_parcel_numbers,
+        street_not_found,
+        house_number_not_available,
+        house_number_not_found,
+        location,
+        registration_date,
+        commissioning_date,
+        unit_system_status_id,
+        osm.name AS unit_operational_status,
+        inflow_type_id,
+        not_present_in_migrated_units,
+        operator_change_date,
+        operator_change_registration_date,
+        weic_not_available,
+        plant_number_not_available,
+        esm.name AS energy_source,
+        gross_capacity,
+        net_nominal_capacity,
+        remote_control_capability_nb,
+        ust.name AS supply_type,
+        plant_name,
+        hydropower_plant_type_id,
+        power_generation_reduction,
+        eeg_registration_number,
+        ST_AsGeoJSON(wkb_geometry, 15)::jsonb AS geojson
+    FROM de_water_units AS wu
+    LEFT JOIN de_energy_country_meta AS ecm ON ecm.id = wu.country_id
+    LEFT JOIN de_energy_source_meta AS esm ON esm.id = wu.energy_source_id
+    LEFT JOIN de_energy_state_meta AS usm ON usm.id = wu.state_id
+    LEFT JOIN de_energy_supply_meta AS ust ON ust.id = wu.supply_type_id
+    LEFT JOIN de_network_operator_audit_meta AS noa ON noa.id = wu.network_operator_audit_id
+    LEFT JOIN de_operational_status_meta AS osm ON osm.id = wu.unit_operational_status_id
+    WHERE LOWER(municipality_key) = :key
+    ''')
+
+    sql = stmt.bindparams(key=key.lower())
+    result = await session.execute(sql)
+    rows = result.mappings().all()
+
+    return [dict(row) for row in rows]
+
+
+
+async def get_water_unit_by_id(session: AsyncSession, unit_id: str):
+    stmt = text('''
+    SELECT
+        unit_registration_number,
+        last_update,
+        unit_name,
+        location_registration_number,
+        noa.name AS network_operator_audit,
+        operator_registration_number,
+        ecm.name AS country,
+        usm.name AS state,
+        district,
+        municipality_name,
+        municipality_key,
+        postcode,
+        cadastral_district,
+        field_parcel_numbers,
+        street_not_found,
+        house_number_not_available,
+        house_number_not_found,
+        location,
+        registration_date,
+        commissioning_date,
+        unit_system_status_id,
+        osm.name AS unit_operational_status,
+        inflow_type_id,
+        not_present_in_migrated_units,
+        operator_change_date,
+        operator_change_registration_date,
+        weic_not_available,
+        plant_number_not_available,
+        esm.name AS energy_source,
+        gross_capacity,
+        net_nominal_capacity,
+        remote_control_capability_nb,
+        ust.name AS supply_type,
+        plant_name,
+        hydropower_plant_type_id,
+        power_generation_reduction,
+        eeg_registration_number,
+        ST_AsGeoJSON(wkb_geometry, 15)::jsonb AS geojson
+    FROM de_water_units AS wu
+    LEFT JOIN de_energy_country_meta AS ecm ON ecm.id = wu.country_id
+    LEFT JOIN de_energy_source_meta AS esm ON esm.id = wu.energy_source_id
+    LEFT JOIN de_energy_state_meta AS usm ON usm.id = wu.state_id
+    LEFT JOIN de_energy_supply_meta AS ust ON ust.id = wu.supply_type_id
+    LEFT JOIN de_network_operator_audit_meta AS noa ON noa.id = wu.network_operator_audit_id
+    LEFT JOIN de_operational_status_meta AS osm ON osm.id = wu.unit_operational_status_id
+    WHERE LOWER(unit_registration_number) = :unit_id
+    ''')
+
+    sql = stmt.bindparams(unit_id=unit_id.lower())
+    result = await session.execute(sql)
+    rows = result.mappings().all()
+
+    return [dict(row) for row in rows]
 
 
 
@@ -168,7 +287,7 @@ async def get_wind_unit_by_municipality_key(session: AsyncSession, key: str):
             'not_present_migrated_units', not_present_migrated_units,
             'weic_not_available', weic_not_available, 'energy_source', esm.name,
             'power_plant_number_not_available', power_plant_number_not_available,
-            'gross_power', gross_power, 'net_rated_power', net_rated_power,
+            'gross_capacity', gross_capacity, 'net_nominal_capacity', net_nominal_capacity,
             'connection_high_voltage', connection_high_voltage,
             'remote_control_capability_nb', remote_control_capability_nb,
             'remote_control_capability_dv', remote_control_capability_dv,
@@ -240,7 +359,7 @@ async def get_wind_unit_by_id(session: AsyncSession, unit_id: str):
             'not_present_migrated_units', not_present_migrated_units,
             'weic_not_available', weic_not_available, 'energy_source', esm.name,
             'power_plant_number_not_available', power_plant_number_not_available,
-            'gross_power', gross_power, 'net_rated_power', net_rated_power,
+            'gross_capacity', gross_capacity, 'net_nominal_capacity', net_nominal_capacity,
             'connection_high_voltage', connection_high_voltage,
             'remote_control_capability_nb', remote_control_capability_nb,
             'remote_control_capability_dv', remote_control_capability_dv,
@@ -313,7 +432,7 @@ async def get_solar_unit_by_municipality_key(session: AsyncSession, key: str):
             'weic_not_available', weic_not_available,
             'power_plant_number_not_available', power_plant_number_not_available,
             'energy_source', esm.name, 'supply_type', ust.name,
-            'gross_power', gross_power, 'net_rated_power', net_rated_power,
+            'gross_capacity', gross_capacity, 'net_nominal_capacity', net_nominal_capacity,
             'remote_controllability', remote_controllability,
             'assigned_active_power_inverter', assigned_active_power_inverter,
             'amount_modules', amount_modules, 'power_limitation', plm.name,
@@ -386,7 +505,7 @@ async def get_solar_unit_by_id(session: AsyncSession, unit_id: str):
             'weic_not_available', weic_not_available,
             'power_plant_number_not_available', power_plant_number_not_available,
             'energy_source', esm.name, 'supply_type', ust.name,
-            'gross_power', gross_power, 'net_rated_power', net_rated_power,
+            'gross_capacity', gross_capacity, 'net_nominal_capacity', net_nominal_capacity,
             'remote_controllability', remote_controllability,
             'assigned_active_power_inverter', assigned_active_power_inverter,
             'amount_modules', amount_modules, 'power_limitation', plm.name,
