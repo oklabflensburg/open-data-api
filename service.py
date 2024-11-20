@@ -48,14 +48,22 @@ async def get_water_unit_by_municipality_key(session: AsyncSession, key: str):
         power_generation_reduction,
         eeg_registration_number,
         ST_AsGeoJSON(wkb_geometry, 15)::jsonb AS geojson
-    FROM de_water_units AS wu
-    LEFT JOIN de_energy_country_meta AS ecm ON ecm.id = wu.country_id
-    LEFT JOIN de_energy_source_meta AS esm ON esm.id = wu.energy_source_id
-    LEFT JOIN de_energy_state_meta AS usm ON usm.id = wu.state_id
-    LEFT JOIN de_energy_supply_meta AS ust ON ust.id = wu.supply_type_id
-    LEFT JOIN de_network_operator_audit_meta AS noa ON noa.id = wu.network_operator_audit_id
-    LEFT JOIN de_operational_status_meta AS osm ON osm.id = wu.unit_operational_status_id
-    WHERE LOWER(municipality_key) = :key
+    FROM
+        de_water_units AS wu
+    LEFT JOIN
+        de_energy_country_meta AS ecm ON ecm.id = wu.country_id
+    LEFT JOIN
+        de_energy_source_meta AS esm ON esm.id = wu.energy_source_id
+    LEFT JOIN
+        de_energy_state_meta AS usm ON usm.id = wu.state_id
+    LEFT JOIN
+        de_energy_supply_meta AS ust ON ust.id = wu.supply_type_id
+    LEFT JOIN
+        de_network_operator_audit_meta AS noa ON noa.id = wu.network_operator_audit_id
+    LEFT JOIN
+        de_operational_status_meta AS osm ON osm.id = wu.unit_operational_status_id
+    WHERE
+        LOWER(municipality_key) = :key
     ''')
 
     sql = stmt.bindparams(key=key.lower())
@@ -107,14 +115,22 @@ async def get_water_unit_by_id(session: AsyncSession, unit_id: str):
         power_generation_reduction,
         eeg_registration_number,
         ST_AsGeoJSON(wkb_geometry, 15)::jsonb AS geojson
-    FROM de_water_units AS wu
-    LEFT JOIN de_energy_country_meta AS ecm ON ecm.id = wu.country_id
-    LEFT JOIN de_energy_source_meta AS esm ON esm.id = wu.energy_source_id
-    LEFT JOIN de_energy_state_meta AS usm ON usm.id = wu.state_id
-    LEFT JOIN de_energy_supply_meta AS ust ON ust.id = wu.supply_type_id
-    LEFT JOIN de_network_operator_audit_meta AS noa ON noa.id = wu.network_operator_audit_id
-    LEFT JOIN de_operational_status_meta AS osm ON osm.id = wu.unit_operational_status_id
-    WHERE LOWER(unit_registration_number) = :unit_id
+    FROM
+        de_water_units AS wu
+    LEFT JOIN
+        de_energy_country_meta AS ecm ON ecm.id = wu.country_id
+    LEFT JOIN
+        de_energy_source_meta AS esm ON esm.id = wu.energy_source_id
+    LEFT JOIN
+        de_energy_state_meta AS usm ON usm.id = wu.state_id
+    LEFT JOIN
+        de_energy_supply_meta AS ust ON ust.id = wu.supply_type_id
+    LEFT JOIN
+        de_network_operator_audit_meta AS noa ON noa.id = wu.network_operator_audit_id
+    LEFT JOIN
+        de_operational_status_meta AS osm ON osm.id = wu.unit_operational_status_id
+    WHERE
+        LOWER(unit_registration_number) = :unit_id
     ''')
 
     sql = stmt.bindparams(unit_id=unit_id.lower())
@@ -127,434 +143,448 @@ async def get_water_unit_by_id(session: AsyncSession, unit_id: str):
 
 async def get_biomass_unit_by_municipality_key(session: AsyncSession, key: str):
     stmt = text('''
-    SELECT jsonb_build_object(
-        'unit_registration_number', unit_registration_number,
-        'last_update', last_update, 'unit_name', unit_name,
-        'location_registration_number', location_registration_number,
-        'network_operator_audit', noa.name,
-        'operator_registration_number', operator_registration_number,
-        'country', ecm.name, 'state', usm.name, 'district', district,
-        'municipality_name', municipality_name, 'municipality_key', municipality_key,
-        'postcode', postcode, 'street', street, 'house_number', house_number,
-        'street_not_found', street_not_found, 'location', location,
-        'house_number_not_available', house_number_not_available,
-        'house_number_not_found', house_number_not_found,
-        'registration_date', registration_date,
-        'commissioning_date', commissioning_date,
-        'unit_system_status_id', unit_system_status_id,
-        'unit_operational_status', osm.name,
-        'not_present_in_migrated_units', not_present_in_migrated_units,
-        'weic_not_available', weic_not_available,
-        'plant_number_not_available', plant_number_not_available,
-        'energy_source', esm.name, 'supply_type', ust.name,
-        'gross_capacity', gross_capacity, 'technology', ptu.name,
-        'net_nominal_capacity', net_nominal_capacity,
-        'remote_control_capability_nb', remote_control_capability_nb,
-        'remote_control_capability_dv', remote_control_capability_dv,
-        'generator_registration_number', generator_registration_number,
-        'primary_fuel', pfm.name, 'biomass_type', btm.name,
-        'eeg_registration_number', eeg_registration_number,
-        'kwk_registration_number', kwk_registration_number,
-        'geojson', ST_AsGeoJSON(wkb_geometry)::jsonb
-    )
-    FROM de_biomass_units AS bu
-
-    LEFT JOIN de_energy_country_meta AS ecm
-    ON ecm.id = bu.country_id
-
-    LEFT JOIN de_energy_source_meta AS esm
-    ON esm.id = bu.energy_source_id
-
-    LEFT JOIN de_energy_state_meta AS usm
-    ON usm.id = bu.state_id
-
-    LEFT JOIN de_energy_supply_meta AS ust
-    ON ust.id = bu.supply_type_id
-
-    LEFT JOIN de_network_operator_audit_meta AS noa
-    ON noa.id = bu.network_operator_audit_id
-
-    LEFT JOIN de_power_technology_meta AS ptu
-    ON ptu.id = bu.technology_id
-
-    LEFT JOIN de_operational_status_meta AS osm
-    ON osm.id = bu.unit_operational_status_id
-
-    LEFT JOIN de_biomass_type_meta AS btm
-    ON btm.id = bu.biomass_type_id
-
-    LEFT JOIN de_primary_fuel_meta AS pfm
-    ON pfm.id = bu.primary_fuel_id
-
-    WHERE LOWER(municipality_key) = :key
+    SELECT
+        bu.unit_registration_number,
+        bu.last_update,
+        bu.unit_name,
+        bu.location_registration_number,
+        noa.name AS network_operator_audit,
+        bu.operator_registration_number,
+        ecm.name AS country,
+        usm.name AS state,
+        bu.district,
+        bu.municipality_name,
+        bu.municipality_key,
+        bu.postcode,
+        bu.street,
+        bu.house_number,
+        bu.street_not_found,
+        bu.location,
+        bu.house_number_not_available,
+        bu.house_number_not_found,
+        bu.registration_date,
+        bu.commissioning_date,
+        bu.unit_system_status_id,
+        osm.name AS unit_operational_status,
+        bu.not_present_in_migrated_units,
+        bu.weic_not_available,
+        bu.plant_number_not_available,
+        esm.name AS energy_source,
+        ust.name AS supply_type,
+        bu.gross_capacity,
+        ptu.name AS technology,
+        bu.net_nominal_capacity,
+        bu.remote_control_capability_nb,
+        bu.remote_control_capability_dv,
+        bu.generator_registration_number,
+        pfm.name AS primary_fuel,
+        btm.name AS biomass_type,
+        bu.eeg_registration_number,
+        bu.kwk_registration_number,
+        ST_AsGeoJSON(bu.wkb_geometry)::jsonb AS geojson
+    FROM
+        de_biomass_units AS bu
+    LEFT JOIN
+        de_energy_country_meta AS ecm ON ecm.id = bu.country_id
+    LEFT JOIN
+        de_energy_source_meta AS esm ON esm.id = bu.energy_source_id
+    LEFT JOIN
+        de_energy_state_meta AS usm ON usm.id = bu.state_id
+    LEFT JOIN
+        de_energy_supply_meta AS ust ON ust.id = bu.supply_type_id
+    LEFT JOIN
+        de_network_operator_audit_meta AS noa ON noa.id = bu.network_operator_audit_id
+    LEFT JOIN
+        de_power_technology_meta AS ptu ON ptu.id = bu.technology_id
+    LEFT JOIN
+        de_operational_status_meta AS osm ON osm.id = bu.unit_operational_status_id
+    LEFT JOIN
+        de_biomass_type_meta AS btm ON btm.id = bu.biomass_type_id
+    LEFT JOIN
+        de_primary_fuel_meta AS pfm ON pfm.id = bu.primary_fuel_id
+    WHERE
+        LOWER(bu.municipality_key) = :key
     ''')
 
     sql = stmt.bindparams(key=key.lower())
     result = await session.execute(sql)
+    rows = result.mappings().all()
 
-    return result.mappings().all()
+    return [dict(row) for row in rows]
 
 
 async def get_biomass_unit_by_id(session: AsyncSession, unit_id: str):
     stmt = text('''
-    SELECT jsonb_build_object(
-        'unit_registration_number', unit_registration_number,
-        'last_update', last_update, 'unit_name', unit_name,
-        'location_registration_number', location_registration_number,
-        'network_operator_audit', noa.name,
-        'operator_registration_number', operator_registration_number,
-        'country', ecm.name, 'state', usm.name, 'district', district,
-        'municipality_name', municipality_name, 'municipality_key', municipality_key,
-        'postcode', postcode, 'street', street, 'house_number', house_number,
-        'street_not_found', street_not_found, 'location', location,
-        'house_number_not_available', house_number_not_available,
-        'house_number_not_found', house_number_not_found,
-        'registration_date', registration_date,
-        'commissioning_date', commissioning_date,
-        'unit_system_status_id', unit_system_status_id,
-        'unit_operational_status', osm.name,
-        'not_present_in_migrated_units', not_present_in_migrated_units,
-        'weic_not_available', weic_not_available,
-        'plant_number_not_available', plant_number_not_available,
-        'energy_source', esm.name, 'supply_type', ust.name,
-        'gross_capacity', gross_capacity, 'technology', ptu.name,
-        'net_nominal_capacity', net_nominal_capacity,
-        'remote_control_capability_nb', remote_control_capability_nb,
-        'remote_control_capability_dv', remote_control_capability_dv,
-        'generator_registration_number', generator_registration_number,
-        'primary_fuel', pfm.name, 'biomass_type', btm.name,
-        'eeg_registration_number', eeg_registration_number,
-        'kwk_registration_number', kwk_registration_number,
-        'geojson', ST_AsGeoJSON(wkb_geometry)::jsonb
-    )
-    FROM de_biomass_units AS bu
-
-    LEFT JOIN de_energy_country_meta AS ecm
-    ON ecm.id = bu.country_id
-
-    LEFT JOIN de_energy_source_meta AS esm
-    ON esm.id = bu.energy_source_id
-
-    LEFT JOIN de_energy_state_meta AS usm
-    ON usm.id = bu.state_id
-
-    LEFT JOIN de_energy_supply_meta AS ust
-    ON ust.id = bu.supply_type_id
-
-    LEFT JOIN de_network_operator_audit_meta AS noa
-    ON noa.id = bu.network_operator_audit_id
-
-    LEFT JOIN de_power_technology_meta AS ptu
-    ON ptu.id = bu.technology_id
-
-    LEFT JOIN de_operational_status_meta AS osm
-    ON osm.id = bu.unit_operational_status_id
-
-    LEFT JOIN de_biomass_type_meta AS btm
-    ON btm.id = bu.biomass_type_id
-
-    LEFT JOIN de_primary_fuel_meta AS pfm
-    ON pfm.id = bu.primary_fuel_id
-
-    WHERE LOWER(unit_registration_number) = :unit_id
+    SELECT
+        bu.unit_registration_number,
+        bu.last_update,
+        bu.unit_name,
+        bu.location_registration_number,
+        noa.name AS network_operator_audit,
+        bu.operator_registration_number,
+        ecm.name AS country,
+        usm.name AS state,
+        bu.district,
+        bu.municipality_name,
+        bu.municipality_key,
+        bu.postcode,
+        bu.street,
+        bu.house_number,
+        bu.street_not_found,
+        bu.location,
+        bu.house_number_not_available,
+        bu.house_number_not_found,
+        bu.registration_date,
+        bu.commissioning_date,
+        bu.unit_system_status_id,
+        osm.name AS unit_operational_status,
+        bu.not_present_in_migrated_units,
+        bu.weic_not_available,
+        bu.plant_number_not_available,
+        esm.name AS energy_source,
+        ust.name AS supply_type,
+        bu.gross_capacity,
+        ptu.name AS technology,
+        bu.net_nominal_capacity,
+        bu.remote_control_capability_nb,
+        bu.remote_control_capability_dv,
+        bu.generator_registration_number,
+        pfm.name AS primary_fuel,
+        btm.name AS biomass_type,
+        bu.eeg_registration_number,
+        bu.kwk_registration_number,
+        ST_AsGeoJSON(bu.wkb_geometry)::jsonb AS geojson
+    FROM
+        de_biomass_units AS bu
+    LEFT JOIN
+        de_energy_country_meta AS ecm ON ecm.id = bu.country_id
+    LEFT JOIN
+        de_energy_source_meta AS esm ON esm.id = bu.energy_source_id
+    LEFT JOIN
+        de_energy_state_meta AS usm ON usm.id = bu.state_id
+    LEFT JOIN
+        de_energy_supply_meta AS ust ON ust.id = bu.supply_type_id
+    LEFT JOIN
+        de_network_operator_audit_meta AS noa ON noa.id = bu.network_operator_audit_id
+    LEFT JOIN
+        de_power_technology_meta AS ptu ON ptu.id = bu.technology_id
+    LEFT JOIN
+        de_operational_status_meta AS osm ON osm.id = bu.unit_operational_status_id
+    LEFT JOIN
+        de_biomass_type_meta AS btm ON btm.id = bu.biomass_type_id
+    LEFT JOIN
+        de_primary_fuel_meta AS pfm ON pfm.id = bu.primary_fuel_id
+    WHERE
+        LOWER(unit_registration_number) = :unit_id
     ''')
 
     sql = stmt.bindparams(unit_id=unit_id.lower())
     result = await session.execute(sql)
+    rows = result.mappings().all()
 
-    return result.mappings().all()
+    return [dict(row) for row in rows]
 
 
 
 async def get_wind_unit_by_municipality_key(session: AsyncSession, key: str):
     stmt = text('''
     SELECT
-        jsonb_build_object(
-            'unit_registration_number', unit_registration_number,
-            'last_update', last_update, 'unit_name', unit_name,
-            'location_registration_number', location_registration_number,
-            'network_operator_audit', noa.name,
-            'operator_registration_number', operator_registration_number,
-            'country', ecm.name, 'state', usm.name, 'district', district, 'city', city,
-            'location', elm.name, 'postcode', postcode, 'municipality_name', municipality_name,
-            'municipality_key', municipality_key, 'cadastral_district', cadastral_district,
-            'field_parcel_numbers', field_parcel_numbers, 'street_not_found', street_not_found,
-            'house_number_not_available', house_number_not_available,
-            'house_number_not_found', house_number_not_found,
-            'registration_date', registration_date, 'commissioning_date', commissioning_date,
-            'unit_system_status_id', unit_system_status_id, 'supply_type', ust.name,
-            'unit_operational_status', osm.name,
-            'not_present_migrated_units', not_present_migrated_units,
-            'weic_not_available', weic_not_available, 'energy_source', esm.name,
-            'power_plant_number_not_available', power_plant_number_not_available,
-            'gross_capacity', gross_capacity, 'net_nominal_capacity', net_nominal_capacity,
-            'connection_high_voltage', connection_high_voltage,
-            'remote_control_capability_nb', remote_control_capability_nb,
-            'remote_control_capability_dv', remote_control_capability_dv,
-            'gen_registration_number', gen_registration_number,
-            'wind_park_name', wind_park_name, 'manufacturer', wtm.name,
-            'technology', ptu.name, 'model_designation', model_designation,
-            'hub_height', hub_height, 'rotor_diameter', rotor_diameter,
-            'rotor_blade_deicing_system', rotor_blade_deicing_system,
-            'shutdown_power_limitation', shutdown_power_limitation,
-            'eeg_registration_number', eeg_registration_number,
-            'geojson', ST_AsGeoJSON(wkb_geometry)::jsonb
-        )
-    FROM de_wind_units AS wu
-
-    LEFT JOIN de_energy_country_meta AS ecm
-    ON ecm.id = wu.country_id
-
-    LEFT JOIN de_energy_location_meta AS elm
-    ON elm.id = wu.location_id
-
-    LEFT JOIN de_energy_source_meta AS esm
-    ON esm.id = wu.energy_source_id
-
-    LEFT JOIN de_energy_state_meta AS usm
-    ON usm.id = wu.state_id
-
-    LEFT JOIN de_energy_supply_meta AS ust
-    ON ust.id = wu.supply_type_id
-
-    LEFT JOIN de_network_operator_audit_meta AS noa
-    ON noa.id = wu.network_operator_audit_id
-
-    LEFT JOIN de_power_technology_meta AS ptu
-    ON ptu.id = wu.technology_id
-
-    LEFT JOIN de_turbine_manufacturer_meta AS wtm
-    ON wtm.id = wu.manufacturer_id
-
-    LEFT JOIN de_operational_status_meta AS osm
-    ON osm.id = wu.unit_operational_status_id
-
-    WHERE LOWER(municipality_key) = :key
+        wu.unit_registration_number,
+        wu.last_update,
+        wu.unit_name,
+        wu.location_registration_number,
+        noa.name AS network_operator_audit,
+        wu.operator_registration_number,
+        ecm.name AS country,
+        usm.name AS state,
+        wu.district,
+        wu.city,
+        elm.name AS location,
+        wu.postcode,
+        wu.municipality_name,
+        wu.municipality_key,
+        wu.cadastral_district,
+        wu.field_parcel_numbers,
+        wu.street_not_found,
+        wu.house_number_not_available,
+        wu.house_number_not_found,
+        wu.registration_date,
+        wu.commissioning_date,
+        wu.unit_system_status_id,
+        ust.name AS supply_type,
+        osm.name AS unit_operational_status,
+        wu.not_present_migrated_units,
+        wu.weic_not_available,
+        esm.name AS energy_source,
+        wu.power_plant_number_not_available,
+        wu.gross_capacity,
+        wu.net_nominal_capacity,
+        wu.connection_high_voltage,
+        wu.remote_control_capability_nb,
+        wu.remote_control_capability_dv,
+        wu.gen_registration_number,
+        wu.wind_park_name,
+        wtm.name AS manufacturer,
+        ptu.name AS technology,
+        wu.model_designation,
+        wu.hub_height,
+        wu.rotor_diameter,
+        wu.rotor_blade_deicing_system,
+        wu.shutdown_power_limitation,
+        wu.eeg_registration_number,
+        ST_AsGeoJSON(wu.wkb_geometry)::jsonb AS geojson
+    FROM
+        de_wind_units AS wu
+    LEFT JOIN
+        de_energy_country_meta AS ecm ON ecm.id = wu.country_id
+    LEFT JOIN
+        de_energy_location_meta AS elm ON elm.id = wu.location_id
+    LEFT JOIN
+        de_energy_source_meta AS esm ON esm.id = wu.energy_source_id
+    LEFT JOIN
+        de_energy_state_meta AS usm ON usm.id = wu.state_id
+    LEFT JOIN
+        de_energy_supply_meta AS ust ON ust.id = wu.supply_type_id
+    LEFT JOIN
+        de_network_operator_audit_meta AS noa ON noa.id = wu.network_operator_audit_id
+    LEFT JOIN
+        de_power_technology_meta AS ptu ON ptu.id = wu.technology_id
+    LEFT JOIN
+        de_turbine_manufacturer_meta AS wtm ON wtm.id = wu.manufacturer_id
+    LEFT JOIN
+        de_operational_status_meta AS osm ON osm.id = wu.unit_operational_status_id
+    WHERE
+        LOWER(wu.municipality_key) = :key
     ''')
 
     sql = stmt.bindparams(key=key.lower())
     result = await session.execute(sql)
+    rows = result.mappings().all()
 
-    return result.mappings().all()
+    return [dict(row) for row in rows]
 
 
 async def get_wind_unit_by_id(session: AsyncSession, unit_id: str):
     stmt = text('''
     SELECT
-        jsonb_build_object(
-            'unit_registration_number', unit_registration_number,
-            'last_update', last_update, 'unit_name', unit_name,
-            'location_registration_number', location_registration_number,
-            'network_operator_audit', noa.name,
-            'operator_registration_number', operator_registration_number,
-            'country', ecm.name, 'state', usm.name, 'district', district, 'city', city,
-            'location', elm.name, 'postcode', postcode, 'municipality_name', municipality_name,
-            'municipality_key', municipality_key, 'cadastral_district', cadastral_district,
-            'field_parcel_numbers', field_parcel_numbers, 'street_not_found', street_not_found,
-            'house_number_not_available', house_number_not_available,
-            'house_number_not_found', house_number_not_found,
-            'registration_date', registration_date, 'commissioning_date', commissioning_date,
-            'unit_system_status_id', unit_system_status_id, 'supply_type', ust.name,
-            'unit_operational_status', osm.name,
-            'not_present_migrated_units', not_present_migrated_units,
-            'weic_not_available', weic_not_available, 'energy_source', esm.name,
-            'power_plant_number_not_available', power_plant_number_not_available,
-            'gross_capacity', gross_capacity, 'net_nominal_capacity', net_nominal_capacity,
-            'connection_high_voltage', connection_high_voltage,
-            'remote_control_capability_nb', remote_control_capability_nb,
-            'remote_control_capability_dv', remote_control_capability_dv,
-            'gen_registration_number', gen_registration_number,
-            'wind_park_name', wind_park_name, 'manufacturer', wtm.name,
-            'technology', ptu.name, 'model_designation', model_designation,
-            'hub_height', hub_height, 'rotor_diameter', rotor_diameter,
-            'rotor_blade_deicing_system', rotor_blade_deicing_system,
-            'shutdown_power_limitation', shutdown_power_limitation,
-            'eeg_registration_number', eeg_registration_number,
-            'geojson', ST_AsGeoJSON(wkb_geometry)::jsonb
-        )
-    FROM de_wind_units AS wu
-
-    LEFT JOIN de_energy_country_meta AS ecm
-    ON ecm.id = wu.country_id
-
-    LEFT JOIN de_energy_location_meta AS elm
-    ON elm.id = wu.location_id
-
-    LEFT JOIN de_energy_source_meta AS esm
-    ON esm.id = wu.energy_source_id
-
-    LEFT JOIN de_energy_state_meta AS usm
-    ON usm.id = wu.state_id
-
-    LEFT JOIN de_energy_supply_meta AS ust
-    ON ust.id = wu.supply_type_id
-
-    LEFT JOIN de_network_operator_audit_meta AS noa
-    ON noa.id = wu.network_operator_audit_id
-
-    LEFT JOIN de_power_technology_meta AS ptu
-    ON ptu.id = wu.technology_id
-
-    LEFT JOIN de_turbine_manufacturer_meta AS wtm
-    ON wtm.id = wu.manufacturer_id
-
-    LEFT JOIN de_operational_status_meta AS osm
-    ON osm.id = wu.unit_operational_status_id
-
-    WHERE LOWER(unit_registration_number) = :unit_id
+        wu.unit_registration_number,
+        wu.last_update,
+        wu.unit_name,
+        wu.location_registration_number,
+        noa.name AS network_operator_audit,
+        wu.operator_registration_number,
+        ecm.name AS country,
+        usm.name AS state,
+        wu.district,
+        wu.city,
+        elm.name AS location,
+        wu.postcode,
+        wu.municipality_name,
+        wu.municipality_key,
+        wu.cadastral_district,
+        wu.field_parcel_numbers,
+        wu.street_not_found,
+        wu.house_number_not_available,
+        wu.house_number_not_found,
+        wu.registration_date,
+        wu.commissioning_date,
+        wu.unit_system_status_id,
+        ust.name AS supply_type,
+        osm.name AS unit_operational_status,
+        wu.not_present_migrated_units,
+        wu.weic_not_available,
+        esm.name AS energy_source,
+        wu.power_plant_number_not_available,
+        wu.gross_capacity,
+        wu.net_nominal_capacity,
+        wu.connection_high_voltage,
+        wu.remote_control_capability_nb,
+        wu.remote_control_capability_dv,
+        wu.gen_registration_number,
+        wu.wind_park_name,
+        wtm.name AS manufacturer,
+        ptu.name AS technology,
+        wu.model_designation,
+        wu.hub_height,
+        wu.rotor_diameter,
+        wu.rotor_blade_deicing_system,
+        wu.shutdown_power_limitation,
+        wu.eeg_registration_number,
+        ST_AsGeoJSON(wu.wkb_geometry)::jsonb AS geojson
+    FROM
+        de_wind_units AS wu
+    LEFT JOIN
+        de_energy_country_meta AS ecm ON ecm.id = wu.country_id
+    LEFT JOIN
+        de_energy_location_meta AS elm ON elm.id = wu.location_id
+    LEFT JOIN
+        de_energy_source_meta AS esm ON esm.id = wu.energy_source_id
+    LEFT JOIN
+        de_energy_state_meta AS usm ON usm.id = wu.state_id
+    LEFT JOIN
+        de_energy_supply_meta AS ust ON ust.id = wu.supply_type_id
+    LEFT JOIN
+        de_network_operator_audit_meta AS noa ON noa.id = wu.network_operator_audit_id
+    LEFT JOIN
+        de_power_technology_meta AS ptu ON ptu.id = wu.technology_id
+    LEFT JOIN
+        de_turbine_manufacturer_meta AS wtm ON wtm.id = wu.manufacturer_id
+    LEFT JOIN
+        de_operational_status_meta AS osm ON osm.id = wu.unit_operational_status_id
+    WHERE
+        LOWER(unit_registration_number) = :unit_id
     ''')
 
     sql = stmt.bindparams(unit_id=unit_id.lower())
     result = await session.execute(sql)
+    rows = result.mappings().all()
 
-    return result.mappings().all()
+    return [dict(row) for row in rows]
 
 
 
 async def get_solar_unit_by_municipality_key(session: AsyncSession, key: str):
     stmt = text('''
     SELECT
-        jsonb_build_object(
-            'unit_registration_number', unit_registration_number,
-            'last_update', last_update, 'network_operator_audit', noa.name,
-            'location_registration_number', location_registration_number,
-            'operator_registration_number', operator_registration_number,
-            'country', ecm.name, 'state', usm.name, 'district', district,
-            'location', elm.name, 'postcode', postcode, 'city', city,
-            'municipality_name', municipality_name,
-            'municipality_key', municipality_key,
-            'registration_date', registration_date,
-            'commissioning_date', commissioning_date,
-            'unit_system_status_id', unit_system_status_id,
-            'unit_operational_status', osm.name,
-            'not_present_migrated_units', not_present_migrated_units,
-            'unit_name', unit_name, 'usage_area', uam.name,
-            'weic_not_available', weic_not_available,
-            'power_plant_number_not_available', power_plant_number_not_available,
-            'energy_source', esm.name, 'supply_type', ust.name,
-            'gross_capacity', gross_capacity, 'net_nominal_capacity', net_nominal_capacity,
-            'remote_controllability', remote_controllability,
-            'assigned_active_power_inverter', assigned_active_power_inverter,
-            'amount_modules', amount_modules, 'power_limitation', plm.name,
-            'uniform_orientation_tilt_angle_id', uniform_orientation_tilt_angle_id,
-            'main_orientation', smo.name, 'main_orientation_tilt_angle', ota.name,
-            'eeg_registration_number', eeg_registration_number
-        )
-    FROM de_solar_units AS su
-
-    LEFT JOIN de_energy_country_meta AS ecm
-    ON ecm.id = su.country_id
-
-    LEFT JOIN de_energy_location_meta AS elm
-    ON elm.id = su.location_id
-
-    LEFT JOIN de_energy_source_meta AS esm
-    ON esm.id = su.energy_source_id
-
-    LEFT JOIN de_energy_state_meta AS usm
-    ON usm.id = su.state_id
-
-    LEFT JOIN de_energy_supply_meta AS ust
-    ON ust.id = su.supply_type_id
-
-    LEFT JOIN de_network_operator_audit_meta AS noa
-    ON noa.id = su.network_operator_audit_id
-
-    LEFT JOIN de_main_orientation_meta AS smo
-    ON smo.id = su.main_orientation_id
-
-    LEFT JOIN de_orientation_tilt_angle_meta AS ota
-    ON ota.id = su.main_orientation_tilt_angle_id
-
-    LEFT JOIN de_usage_area_meta AS uam
-    ON uam.id = su.usage_area_id
-
-    LEFT JOIN de_power_limitation_meta AS plm
-    ON plm.id = su.power_limitation_id
-
-    LEFT JOIN de_operational_status_meta AS osm
-    ON osm.id = su.unit_operational_status_id
-
-    WHERE LOWER(municipality_key) = :key
+        su.unit_registration_number,
+        su.last_update,
+        noa.name AS network_operator_audit,
+        su.location_registration_number,
+        su.operator_registration_number,
+        ecm.name AS country,
+        usm.name AS state,
+        su.district,
+        elm.name AS location,
+        su.postcode,
+        su.city,
+        su.municipality_name,
+        su.municipality_key,
+        su.registration_date,
+        su.commissioning_date,
+        su.unit_system_status_id,
+        osm.name AS unit_operational_status,
+        su.not_present_migrated_units,
+        su.unit_name,
+        uam.name AS usage_area,
+        su.weic_not_available,
+        su.power_plant_number_not_available,
+        esm.name AS energy_source,
+        ust.name AS supply_type,
+        su.gross_capacity,
+        su.net_nominal_capacity,
+        su.remote_controllability,
+        su.assigned_active_power_inverter,
+        su.amount_modules,
+        plm.name AS power_limitation,
+        su.uniform_orientation_tilt_angle_id,
+        smo.name AS main_orientation,
+        ota.name AS main_orientation_tilt_angle,
+        su.eeg_registration_number
+    FROM
+        de_solar_units AS su
+    LEFT JOIN
+        de_energy_country_meta AS ecm ON ecm.id = su.country_id
+    LEFT JOIN
+        de_energy_location_meta AS elm ON elm.id = su.location_id
+    LEFT JOIN
+        de_energy_source_meta AS esm ON esm.id = su.energy_source_id
+    LEFT JOIN
+        de_energy_state_meta AS usm ON usm.id = su.state_id
+    LEFT JOIN
+        de_energy_supply_meta AS ust ON ust.id = su.supply_type_id
+    LEFT JOIN
+        de_network_operator_audit_meta AS noa ON noa.id = su.network_operator_audit_id
+    LEFT JOIN
+        de_main_orientation_meta AS smo ON smo.id = su.main_orientation_id
+    LEFT JOIN
+        de_orientation_tilt_angle_meta AS ota ON ota.id = su.main_orientation_tilt_angle_id
+    LEFT JOIN
+        de_usage_area_meta AS uam ON uam.id = su.usage_area_id
+    LEFT JOIN
+        de_power_limitation_meta AS plm ON plm.id = su.power_limitation_id
+    LEFT JOIN
+        de_operational_status_meta AS osm ON osm.id = su.unit_operational_status_id
+    WHERE
+        LOWER(su.municipality_key) = :key
     ''')
 
     sql = stmt.bindparams(key=key.lower())
     result = await session.execute(sql)
+    rows = result.mappings().all()
 
-    return result.mappings().all()
+    return [dict(row) for row in rows]
 
 
 async def get_solar_unit_by_id(session: AsyncSession, unit_id: str):
     stmt = text('''
     SELECT
-        jsonb_build_object(
-            'unit_registration_number', unit_registration_number,
-            'last_update', last_update, 'network_operator_audit', noa.name,
-            'location_registration_number', location_registration_number,
-            'operator_registration_number', operator_registration_number,
-            'country', ecm.name, 'state', usm.name, 'district', district,
-            'location', elm.name, 'postcode', postcode, 'city', city,
-            'municipality_name', municipality_name,
-            'municipality_key', municipality_key,
-            'registration_date', registration_date,
-            'commissioning_date', commissioning_date,
-            'unit_system_status_id', unit_system_status_id,
-            'unit_operational_status', osm.name,
-            'not_present_migrated_units', not_present_migrated_units,
-            'unit_name', unit_name, 'usage_area', uam.name,
-            'weic_not_available', weic_not_available,
-            'power_plant_number_not_available', power_plant_number_not_available,
-            'energy_source', esm.name, 'supply_type', ust.name,
-            'gross_capacity', gross_capacity, 'net_nominal_capacity', net_nominal_capacity,
-            'remote_controllability', remote_controllability,
-            'assigned_active_power_inverter', assigned_active_power_inverter,
-            'amount_modules', amount_modules, 'power_limitation', plm.name,
-            'uniform_orientation_tilt_angle_id', uniform_orientation_tilt_angle_id,
-            'main_orientation', smo.name, 'main_orientation_tilt_angle', ota.name,
-            'eeg_registration_number', eeg_registration_number
-        )
-    FROM de_solar_units AS su
-
-    LEFT JOIN de_energy_country_meta AS ecm
-    ON ecm.id = su.country_id
-
-    LEFT JOIN de_energy_location_meta AS elm
-    ON elm.id = su.location_id
-
-    LEFT JOIN de_energy_source_meta AS esm
-    ON esm.id = su.energy_source_id
-
-    LEFT JOIN de_energy_state_meta AS usm
-    ON usm.id = su.state_id
-
-    LEFT JOIN de_energy_supply_meta AS ust
-    ON ust.id = su.supply_type_id
-
-    LEFT JOIN de_network_operator_audit_meta AS noa
-    ON noa.id = su.network_operator_audit_id
-
-    LEFT JOIN de_main_orientation_meta AS smo
-    ON smo.id = su.main_orientation_id
-
-    LEFT JOIN de_orientation_tilt_angle_meta AS ota
-    ON ota.id = su.main_orientation_tilt_angle_id
-
-    LEFT JOIN de_usage_area_meta AS uam
-    ON uam.id = su.usage_area_id
-
-    LEFT JOIN de_power_limitation_meta AS plm
-    ON plm.id = su.power_limitation_id
-
-    LEFT JOIN de_operational_status_meta AS osm
-    ON osm.id = su.unit_operational_status_id
-
-    WHERE LOWER(unit_registration_number) = :unit_id
+        su.unit_registration_number,
+        su.last_update,
+        noa.name AS network_operator_audit,
+        su.location_registration_number,
+        su.operator_registration_number,
+        ecm.name AS country,
+        usm.name AS state,
+        su.district,
+        elm.name AS location,
+        su.postcode,
+        su.city,
+        su.municipality_name,
+        su.municipality_key,
+        su.registration_date,
+        su.commissioning_date,
+        su.unit_system_status_id,
+        osm.name AS unit_operational_status,
+        su.not_present_migrated_units,
+        su.unit_name,
+        uam.name AS usage_area,
+        su.weic_not_available,
+        su.power_plant_number_not_available,
+        esm.name AS energy_source,
+        ust.name AS supply_type,
+        su.gross_capacity,
+        su.net_nominal_capacity,
+        su.remote_controllability,
+        su.assigned_active_power_inverter,
+        su.amount_modules,
+        plm.name AS power_limitation,
+        su.uniform_orientation_tilt_angle_id,
+        smo.name AS main_orientation,
+        ota.name AS main_orientation_tilt_angle,
+        su.eeg_registration_number
+    FROM
+        de_solar_units AS su
+    LEFT JOIN
+        de_energy_country_meta AS ecm ON ecm.id = su.country_id
+    LEFT JOIN
+        de_energy_location_meta AS elm ON elm.id = su.location_id
+    LEFT JOIN
+        de_energy_source_meta AS esm ON esm.id = su.energy_source_id
+    LEFT JOIN
+        de_energy_state_meta AS usm ON usm.id = su.state_id
+    LEFT JOIN
+        de_energy_supply_meta AS ust ON ust.id = su.supply_type_id
+    LEFT JOIN
+        de_network_operator_audit_meta AS noa ON noa.id = su.network_operator_audit_id
+    LEFT JOIN
+        de_main_orientation_meta AS smo ON smo.id = su.main_orientation_id
+    LEFT JOIN
+        de_orientation_tilt_angle_meta AS ota ON ota.id = su.main_orientation_tilt_angle_id
+    LEFT JOIN
+        de_usage_area_meta AS uam ON uam.id = su.usage_area_id
+    LEFT JOIN
+        de_power_limitation_meta AS plm ON plm.id = su.power_limitation_id
+    LEFT JOIN
+        de_operational_status_meta AS osm ON osm.id = su.unit_operational_status_id
+    WHERE
+        LOWER(unit_registration_number) = :unit_id
     ''')
 
     sql = stmt.bindparams(unit_id=unit_id.lower())
     result = await session.execute(sql)
+    rows = result.mappings().all()
 
-    return result.mappings().all()
+    return [dict(row) for row in rows]
 
 
 
