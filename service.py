@@ -937,12 +937,12 @@ async def get_municipality_by_name(session: AsyncSession, name: str):
 
 
 
-async def get_biotop_origin(session: AsyncSession, code: str):
+async def get_biotope_origin(session: AsyncSession, code: str):
     stmt = text('''
     SELECT
         bo.description
     FROM
-        sh_biotop_origin AS bo
+        sh_biotope_origin AS bo
     WHERE
         LOWER(bo.code) = :code
     ''')
@@ -954,25 +954,26 @@ async def get_biotop_origin(session: AsyncSession, code: str):
 
 
 
-async def get_biotop_meta(session: AsyncSession, lat: float, lng: float):
+async def get_biotope_meta(session: AsyncSession, lat: float, lng: float):
     stmt = text('''
     SELECT
         bm.code,
         bm.designation,
+        b.kartierdatum AS mapping_date,
         b.biotopbez AS description,
         b.wertbiotop AS valuable_biotope,
         b.herkunft AS mapping_origin,
         b.ortnr AS place_number,
         b.gemeindename AS place_name,
-        ST_Area(ST_Transform(b.shape, 3587)) AS shape_area,
-        ST_AsGeoJSON(b.shape) AS geojson
+        ST_Area(ST_Transform(b.wkb_geometry, 3587)) AS shape_area,
+        ST_AsGeoJSON(b.wkb_geometry, 15)::jsonb AS geojson
     FROM
-        sh4_bksh_belangflaechen AS b
+        sh_biotope AS b
     JOIN
-        sh_biotop_meta AS bm
+        sh_biotope_meta AS bm
         ON b.hauptcode = bm.code
     WHERE
-        ST_Contains(b.shape, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326))
+        ST_Contains(b.wkb_geometry, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326))
     ''')
 
     sql = stmt.bindparams(lat=lat, lng=lng)

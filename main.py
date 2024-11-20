@@ -354,8 +354,8 @@ async def get_municipality(
 
 
 @router4.get('/point', response_model=list, tags=['Biotopkartierung'])
-async def get_biotop_meta(lat: float, lng: float, session: AsyncSession = Depends(get_session)):
-    rows = await service.get_biotop_meta(session, lat, lng)
+async def get_biotope_meta(lat: float, lng: float, session: AsyncSession = Depends(get_session)):
+    rows = await service.get_biotope_meta(session, lat, lng)
     response = jsonable_encoder(rows)
 
     try:
@@ -365,8 +365,8 @@ async def get_biotop_meta(lat: float, lng: float, session: AsyncSession = Depend
 
 
 @router4.get('/origin', response_model=list, tags=['Biotopkartierung'])
-async def get_biotop_origin(code: str, session: AsyncSession = Depends(get_session)):
-    rows = await service.get_biotop_origin(session, code)
+async def get_biotope_origin(code: str, session: AsyncSession = Depends(get_session)):
+    rows = await service.get_biotope_origin(session, code)
     response = jsonable_encoder(rows)
 
     try:
