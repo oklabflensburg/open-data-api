@@ -11,6 +11,11 @@
 
 
 
+## Retrieve and insert API data
+
+To retrieve and insert API data into your PostgreSQL database follow the steps in [SETUP.md](SETUP.md).
+
+
 ## Usage examples
 
 ### Vebrenner Einheiten/Anlagen
@@ -605,107 +610,14 @@ sudo systemctl enable nginx.service
 ```
 
 
-## Insert municipality keys
+## How to Contribute
 
-Tool to fetch and insert offical german municipality keys
-
-```sh
-psql -U oklab -h localhost -d oklab -p 5432 < data/de_official_municipality_keys_schema.sql
-```
-
-```sh
-cd tools
-python3 -m venv venv
-source venv/bin/activate
-pip3 install -r requirements.txt
-python3 insert_municipality_key.py --env ../.env --target ../data --url https://www.xrepository.de/api/xrepository/urn:de:bund:destatis:bevoelkerungsstatistik:schluessel:ags_2024-10-31/download/AGS_2024-10-31.json --verbose
-deactivate
-```
+Contributions are welcome! Please refer to the [CONTRIBUTING.md](CONTRIBUTING.md) guide for details on how to get involved.
 
 
-## Insert energy meta
-
-Tool to fetch and insert wind turbine and solar energy meta data.
-
-```sh
-psql -U oklab -h localhost -d oklab -p 5432 < data/de_energy_meta_schema.sql
-```
-
-```sh
-cd tools
-python3 -m venv venv
-source venv/bin/activate
-pip3 install -r requirements.txt
-python3 insert_energy_meta.py --env ../.env --target ~ --url https://www.marktstammdatenregister.de/MaStR/Einheit/EinheitJson/GetFilterColumnsErweiterteOeffentlicheEinheitStromerzeugung --verbose
-deactivate
-```
+---
 
 
-## Insert wind turbine units
+## License
 
-Tool to insert wind turbine units from local file system.
-
-```sh
-psql -U oklab -h localhost -d oklab -p 5432 < data/de_wind_units_schema.sql
-```
-
-```sh
-cd tools
-python3 -m venv venv
-source venv/bin/activate
-pip3 install -r requirements.txt
-python3 insert_wind_units.py --env ../.env --src ~/EinheitenWind.xml --verbose
-deactivate
-```
-
-
-## Insert solar engery units
-
-Tool to insert solar energy units from local file system.
-
-```sh
-psql -U oklab -h localhost -d oklab -p 5432 < data/de_solar_units_schema.sql
-```
-
-```sh
-cd tools
-python3 -m venv venv
-source venv/bin/activate
-pip3 install -r requirements.txt
-python3 insert_solar_units.py --env ../.env --src ~/EinheitenSolar_1.xml --verbose
-deactivate
-```
-
-
-## Retrieve administrative areas
-
-Download latest administrative areas 1:250,000 with population figures (VG250-EW) from the [Federal Agency for Cartography and Geodesy](https://gdz.bkg.bund.de/index.php/default/verwaltungsgebiete-1-250-000-mit-einwohnerzahlen-stand-31-12-vg250-ew-31-12.html).
-
-```sh
-wget https://daten.gdz.bkg.bund.de/produkte/vg/vg250-ew_ebenen_1231/aktuell/vg250-ew_12-31.utm32s.shape.ebenen.zip
-unzip vg250-ew_12-31.utm32s.shape.ebenen.zip
-cd vg250-ew_12-31.utm32s.shape.ebenen/vg250-ew_ebenen_1231
-```
-
-```sh
-ogr2ogr -f "PostgreSQL" PG:"host=localhost port=5432 dbname=oklab user=oklab" -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=YES -nlt POLYGON -s_srs VG250_GEM.prj -t_srs EPSG:4326 VG250_GEM.shp
-ogr2ogr -f "PostgreSQL" PG:"host=localhost port=5432 dbname=oklab user=oklab" -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=YES -nlt POLYGON -s_srs VG250_KRS.prj -t_srs EPSG:4326 VG250_KRS.shp
-ogr2ogr -f "PostgreSQL" PG:"host=localhost port=5432 dbname=oklab user=oklab" -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=YES -nlt POLYGON -s_srs VG250_LAN.prj -t_srs EPSG:4326 VG250_LAN.shp
-ogr2ogr -f "PostgreSQL" PG:"host=localhost port=5432 dbname=oklab user=oklab" -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=YES -nlt POLYGON -s_srs VG250_RBZ.prj -t_srs EPSG:4326 VG250_RBZ.shp
-ogr2ogr -f "PostgreSQL" PG:"host=localhost port=5432 dbname=oklab user=oklab" -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=YES -nlt POLYGON -s_srs VG250_STA.prj -t_srs EPSG:4326 VG250_STA.shp
-ogr2ogr -f "PostgreSQL" PG:"host=localhost port=5432 dbname=oklab user=oklab" -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=YES -nlt POLYGON -s_srs VG250_VWG.prj -t_srs EPSG:4326 VG250_VWG.shp
-ogr2ogr -f "PostgreSQL" PG:"host=localhost port=5432 dbname=oklab user=oklab" -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=YES -nlt LINESTRING -s_srs VG250_LI.prj -t_srs EPSG:4326 VG250_LI.shp
-ogr2ogr -f "PostgreSQL" PG:"host=localhost port=5432 dbname=oklab user=oklab" -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=YES -nlt POINT -s_srs VG250_PK.prj -t_srs EPSG:4326 VG250_PK.shp
-```
-
-
-
-## How to contribute
-
-You are welcome to contribute to the open data API. You may have a look in our [CONTRIBUTING.md](CONTRIBUTING.md) guide.
-
-
-
-## LICENSE
-
-[CC0-1.0](LICENSE)
+This repository is licensed under [CC0-1.0](LICENSE).
