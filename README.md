@@ -7,115 +7,23 @@
 
 ## API host
 
-[https://api.oklabflensburg.de](https://api.oklabflensburg.de/docs)
+[https://api.oklabflensburg.de](https://api.oklabflensburg.de)
 
 
-
-## Retrieve and insert API data
-
-To retrieve and insert API data into your PostgreSQL database follow the steps in [SETUP.md](SETUP.md).
+---
 
 
-## Usage examples
+## Retrieving and Inserting API Data
 
-### Vebrenner Einheiten/Anlagen
-
-Retrieves details about a specific combustion unit based on the provided 15 digit unit registration number
-
-```sh
-wget https://api.oklabflensburg.de/energy/v1/unit/combustion/id?unit_id=SEE951839779134
-```
-
-Retrieves a list of combustion units with each detail based on the provided German municipality key (AGS)
-
-```sh
-wget https://api.oklabflensburg.de/energy/v1/unit/combustion/key?municipality_key=01002000
-```
+Follow the instructions in [SETUP.md](SETUP.md) to retrieve and insert API data into your PostgreSQL database.
 
 
-### Solarkraft Einheiten/Anlagen
+## How to Use
 
-Retrieves the solar unit details based on the provided 15 digit unit registration number
-
-```sh
-wget https://api.oklabflensburg.de/energy/v1/unit/solar/id?unit_id=SEE987254504556
-```
-
-Retrieves a list of solar units with each details based on the provided german municipality key (AGS)
-
-```sh
-wget https://api.oklabflensburg.de/energy/v1/unit/solar/key?municipality_key=01059113
-```
+For detailed usage instructions and examples, refer to [USAGE.md](USAGE.md).
 
 
-### Windkraft Einheiten/Anlagen
-
-Retrieves details about a specific wind turbine unit based on the provided 15 digit unit registration number.
-
-```sh
-wget https://api.oklabflensburg.de/energy/v1/unit/wind/id?unit_id=SEE959176892240
-```
-
-Retrieves a list of wind turbine units with each details based on the provided german municipality key (AGS)
-
-```sh
-wget https://api.oklabflensburg.de/energy/v1/unit/wind/key?municipality_key=01059113
-```
-
-
-### Biomasse Einheiten/Anlagen
-
-Retrieves details about a specific biomass unit based on the provided 15 digit unit registration number.
-
-```sh
-wget https://api.oklabflensburg.de/energy/v1/unit/biomass/id?unit_id=SEE902321614457
-```
-
-Retrieves a list of biomass units with each details based on the provided german municipality key (AGS)
-
-```sh
-wget https://api.oklabflensburg.de/energy/v1/unit/biomass/key?municipality_key=01001000
-```
-
-
-### Kernkraft Einheiten/Anlagen
-
-Retrieves details about a specific nuclear unit based on the provided 15 digit unit registration number
-
-```sh
-wget https://api.oklabflensburg.de/energy/v1/unit/nuclear/id?unit_id=SEE951462745445
-```
-
-Retrieves a list of nuclear units with each detail based on the provided German municipality key (AGS)
-
-```sh
-wget https://api.oklabflensburg.de/energy/v1/unit/nuclear/key?municipality_key=01061018
-```
-
-
-### Wasserkraft Einheiten/Anlagen
-
-Retrieves details about a specific water unit based on the provided 15 digit unit registration number
-
-```sh
-wget https://api.oklabflensburg.de/energy/v1/unit/water/id?unit_id=SEE993329981764
-```
-
-Retrieves a list of water units with each detail based on the provided German municipality key (AGS)
-
-```sh
-wget https://api.oklabflensburg.de/energy/v1/unit/water/key?municipality_key=01001000
-```
-
-
-### AGS (Amtlicher Gemeindeschlüssel für jede Gemeinde in DE)
-
-Retrieves the geometry, bounding box, shape area, and statistical information of a municipality based on the provided municipality key (AGS) or the municipality name
-
-```sh
-wget https://api.oklabflensburg.de/administrative/v1/municipality?municipality_name=flensburg
-```
-
+---
 
 
 ## Prerequisites
