@@ -43,24 +43,6 @@ async def get_session() -> AsyncSession:
         yield session
 
 
-def process_rows(rows):
-    result_list = []
-
-    for row in rows:
-        row_dict = dict(row)
-
-        if 'geojson' in row_dict and isinstance(row_dict['geojson'], str):
-            try:
-                row_dict['geojson'] = json.loads(row_dict['geojson'])
-            except json.JSONDecodeError:
-                raise HTTPException(status_code=500, detail='Invalid GeoJSON format')
-
-        result_list.append(row_dict)
-
-    return jsonable_encoder(result_list)
-
-
-
 @app.get('/', include_in_schema=False)
 def home_redirect():
     return RedirectResponse('/docs')
@@ -311,8 +293,8 @@ async def get_solar_unit_by_municipality_key(
 
 
 @router5.get('/parcel', response_model=list, tags=['Verwaltungsgebiete'])
-async def get_parcel_meta(lat: float, lng: float, session: AsyncSession = Depends(get_session)):
-    rows = await service.get_parcel_meta(session, lat, lng)
+async def get_parcel_meta_by_lat_lng(lat: float, lng: float, session: AsyncSession = Depends(get_session)):
+    rows = await service.get_parcel_meta_by_lat_lng(session, lat, lng)
     response = jsonable_encoder(rows)
 
     try:
@@ -334,20 +316,20 @@ async def get_municipality(
 ):
     if municipality_key:
         rows = await service.get_municipality_by_key(session, municipality_key)
-        processed_rows = process_rows(rows)
+        response = jsonable_encoder(rows)
 
-        if len(processed_rows) == 0:
+        if len(response) == 0:
             raise HTTPException(status_code=404, detail='No municipality was found')
 
-        return JSONResponse(content=processed_rows)
+        return JSONResponse(content=response)
     elif municipality_name:
         rows = await service.get_municipality_by_name(session, municipality_name)
-        processed_rows = process_rows(rows)
+        response = jsonable_encoder(rows)
 
-        if len(processed_rows) == 0:
+        if len(response) == 0:
             raise HTTPException(status_code=404, detail='No municipality was found')
 
-        return JSONResponse(content=processed_rows)
+        return JSONResponse(content=response)
     else:
         raise HTTPException(status_code=400, detail='Either "key" or "name" parameter must be provided')
 

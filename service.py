@@ -861,21 +861,19 @@ async def get_solar_unit_by_id(session: AsyncSession, unit_id: str):
 async def get_municipality_by_key(session: AsyncSession, key: str):
     stmt = text('''
     SELECT
+        mk.municipality_key AS municipality_key,
+        mk.municipality_name AS municipality_name,
+        vg.gen AS geographical_name,
+        vg.ewz AS population,
+        TO_CHAR(vg.beginn, 'DD.MM.YYYY') AS date_of_entry,
+        ST_Area(ST_Transform(vg.geom, 3587)) AS shape_area,
         jsonb_build_object(
-            'municipality_key', mk.municipality_key,
-            'municipality_name', mk.municipality_name,
-            'geographical_name', vg.gen,
-            'population', vg.ewz,
-            'date_of_entry', TO_CHAR(vg.beginn, 'DD.MM.YYYY'),
-            'shape_area', ST_Area(ST_Transform(vg.geom, 3587)),
-            'bbox', jsonb_build_object(
-                'xmin', ST_XMin(agg.bbox),
-                'ymin', ST_YMin(agg.bbox),
-                'xmax', ST_XMax(agg.bbox),
-                'ymax', ST_YMax(agg.bbox)
-            ),
-            'geojson', ST_AsGeoJSON(vg.geom)::jsonb
-        ) as municipality
+            'xmin', ST_XMin(agg.bbox),
+            'ymin', ST_YMin(agg.bbox),
+            'xmax', ST_XMax(agg.bbox),
+            'ymax', ST_YMax(agg.bbox)
+        ) AS bbox,
+        ST_AsGeoJSON(vg.geom, 15)::jsonb AS geojson
     FROM
         de_municipality_keys AS mk
     LEFT JOIN vg250_gem AS vg
@@ -904,21 +902,19 @@ async def get_municipality_by_key(session: AsyncSession, key: str):
 async def get_municipality_by_name(session: AsyncSession, name: str):
     stmt = text('''
     SELECT
+        mk.municipality_key AS municipality_key,
+        mk.municipality_name AS municipality_name,
+        vg.gen AS geographical_name,
+        vg.ewz AS population,
+        TO_CHAR(vg.beginn, 'DD.MM.YYYY') AS date_of_entry,
+        ST_Area(ST_Transform(vg.geom, 3587)) AS shape_area,
         jsonb_build_object(
-            'municipality_key', mk.municipality_key,
-            'municipality_name', mk.municipality_name,
-            'geographical_name', vg.gen,
-            'population', vg.ewz,
-            'date_of_entry', TO_CHAR(vg.beginn, 'DD.MM.YYYY'),
-            'shape_area', ST_Area(ST_Transform(vg.geom, 3587)),
-            'bbox', jsonb_build_object(
-                'xmin', ST_XMin(vg.geom),
-                'ymin', ST_YMin(vg.geom),
-                'xmax', ST_XMax(vg.geom),
-                'ymax', ST_YMax(vg.geom)
-            ),
-            'geojson', ST_AsGeoJSON(vg.geom)::jsonb
-        ) as municipality
+            'xmin', ST_XMin(vg.geom),
+            'ymin', ST_YMin(vg.geom),
+            'xmax', ST_XMax(vg.geom),
+            'ymax', ST_YMax(vg.geom)
+        ) AS bbox,
+        ST_AsGeoJSON(vg.geom, 15)::jsonb AS geojson
     FROM
         vg250_gem AS vg
     JOIN
@@ -982,7 +978,7 @@ async def get_biotope_meta(session: AsyncSession, lat: float, lng: float):
     return result.mappings().all()
 
 
-async def get_parcel_meta(session: AsyncSession, lat: float, lng: float):
+async def get_parcel_meta_by_lat_lng(session: AsyncSession, lat: float, lng: float):
     stmt = text('''
     SELECT
         p.adv_id,
@@ -993,8 +989,8 @@ async def get_parcel_meta(session: AsyncSession, lat: float, lng: float):
         p.cadastral_district_number,
         lp.cadastral_district_name,
         lp.municipality_name,
-        ST_Area(ST_Transform(wkb_geometry, 3587)) AS shape_area,
-        ST_AsGeoJSON(wkb_geometry) AS geojson
+        ST_Area(ST_Transform(p.wkb_geometry, 3587)) AS shape_area,
+        ST_AsGeoJSON(p.wkb_geometry, 15)::jsonb AS geojson
     FROM
         sh_alkis_parcel AS p
     JOIN
