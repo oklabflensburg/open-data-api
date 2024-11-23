@@ -960,6 +960,7 @@ async def get_biotope_meta_by_lat_lng(session: AsyncSession, lat: float, lng: fl
         b.wertbiotop AS valuable_biotope,
         b.herkunft AS mapping_origin,
         bo.description AS mapping_origin_description,
+        bo.remark AS mapping_origin_remark,
         b.ortnr AS place_number,
         b.gemeindename AS place_name,
         ST_Area(ST_Transform(b.wkb_geometry, 3587)) AS shape_area,
