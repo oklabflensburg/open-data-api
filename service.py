@@ -950,7 +950,7 @@ async def get_biotope_origin(session: AsyncSession, code: str):
 
 
 
-async def get_biotope_meta(session: AsyncSession, lat: float, lng: float):
+async def get_biotope_meta_by_lat_lng(session: AsyncSession, lat: float, lng: float):
     stmt = text('''
     SELECT
         bm.code,
@@ -966,7 +966,7 @@ async def get_biotope_meta(session: AsyncSession, lat: float, lng: float):
     FROM
         sh_biotope AS b
     JOIN
-        sh_biotope_meta AS bm
+        sh_biotope_key AS bm
         ON b.hauptcode = bm.code
     WHERE
         ST_Contains(b.wkb_geometry, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326))

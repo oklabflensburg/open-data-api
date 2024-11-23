@@ -336,8 +336,8 @@ async def get_municipality(
 
 
 @router4.get('/point', response_model=list, tags=['Biotopkartierung'])
-async def get_biotope_meta(lat: float, lng: float, session: AsyncSession = Depends(get_session)):
-    rows = await service.get_biotope_meta(session, lat, lng)
+async def get_biotope_meta_by_lat_lng(lat: float, lng: float, session: AsyncSession = Depends(get_session)):
+    rows = await service.get_biotope_meta_by_lat_lng(session, lat, lng)
     response = jsonable_encoder(rows)
 
     try:
