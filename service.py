@@ -959,6 +959,7 @@ async def get_biotope_meta_by_lat_lng(session: AsyncSession, lat: float, lng: fl
         b.biotopbez AS description,
         b.wertbiotop AS valuable_biotope,
         b.herkunft AS mapping_origin,
+        bo.description AS mapping_origin_description,
         b.ortnr AS place_number,
         b.gemeindename AS place_name,
         ST_Area(ST_Transform(b.wkb_geometry, 3587)) AS shape_area,
@@ -968,6 +969,8 @@ async def get_biotope_meta_by_lat_lng(session: AsyncSession, lat: float, lng: fl
     JOIN
         sh_biotope_key AS bm
         ON b.hauptcode = bm.code
+    LEFT JOIN sh_biotope_origin AS bo
+        ON b.herkunft = bo.code
     WHERE
         ST_Contains(b.wkb_geometry, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326))
     ''')
