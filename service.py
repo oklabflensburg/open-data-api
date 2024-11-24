@@ -962,6 +962,12 @@ async def get_biotope_meta_by_lat_lng(session: AsyncSession, lat: float, lng: fl
         bo.description AS mapping_origin_description,
         bo.remark AS mapping_origin_remark,
         b.ortnr AS place_number,
+        CASE
+            WHEN b.btschutz_1 IS NOT NULL AND b.btschutz_2 IS NOT NULL THEN b.btschutz_1 || ', ' || b.btschutz_2
+            WHEN b.btschutz_1 IS NOT NULL THEN b.btschutz_1
+            WHEN b.btschutz_2 IS NOT NULL THEN b.btschutz_2
+            ELSE NULL
+        END AS protection_reason,
         b.lrt_typ_1 AS habitat_type_1,
         b.lrt_typ_2 AS habitat_type_2,
         ht1.label AS habitat_label_1,
