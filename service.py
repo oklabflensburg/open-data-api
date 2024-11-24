@@ -962,6 +962,10 @@ async def get_biotope_meta_by_lat_lng(session: AsyncSession, lat: float, lng: fl
         bo.description AS mapping_origin_description,
         bo.remark AS mapping_origin_remark,
         b.ortnr AS place_number,
+        b.lrt_typ_1 AS habitat_type_1,
+        b.lrt_typ_2 AS habitat_type_2,
+        ht1.label AS habitat_label_1,
+        ht2.label AS habitat_label_2,
         b.gemeindename AS place_name,
         ST_Area(ST_Transform(b.wkb_geometry, 3587)) AS shape_area,
         ST_AsGeoJSON(b.wkb_geometry, 15)::jsonb AS geojson
@@ -972,6 +976,10 @@ async def get_biotope_meta_by_lat_lng(session: AsyncSession, lat: float, lng: fl
         ON b.hauptcode = bm.code
     LEFT JOIN sh_biotope_origin AS bo
         ON b.herkunft = bo.code
+    LEFT JOIN de_habitat_types AS ht1
+        ON b.lrt_typ_1 = ht1.code
+    LEFT JOIN de_habitat_types AS ht2
+        ON b.lrt_typ_2 = ht2.code
     WHERE
         ST_Contains(b.wkb_geometry, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326))
     ''')
