@@ -7,6 +7,45 @@ import models
 
 
 
+async def get_municipality_by_query(session: AsyncSession, query: str):
+    stmt = text('''
+    SELECT
+        gem.ags AS municipality_key,
+        gem.gen AS geographical_name,
+        CASE
+            WHEN gem.ibz != 60 THEN krs.bez || ' ' || krs.gen
+            ELSE lan.gen
+        END AS region_name
+    FROM
+        vg250_gem AS gem
+    JOIN
+        vg250_krs AS krs
+    ON
+        gem.sn_l = krs.sn_l AND gem.sn_r = krs.sn_r AND gem.sn_k = krs.sn_k
+    JOIN
+        vg250_lan AS lan
+    ON
+        krs.sn_l = lan.sn_l
+    WHERE
+        (LOWER(gem.gen) % :q OR LOWER(gem.gen) ILIKE '%' || :q || '%')
+        AND gem.gf = 4
+        AND krs.gf = 4
+        AND lan.gf = 4
+    ORDER BY
+        (LOWER(gem.gen) ILIKE :q || '%') DESC,
+        (LOWER(gem.gen) ILIKE '%' || :q || '%') DESC,
+        similarity(LOWER(gem.gen), :q) DESC
+    LIMIT 10
+    ''')
+
+    sql = stmt.bindparams(q=query.lower())
+    result = await session.execute(sql)
+    rows = result.mappings().all()
+
+    return [dict(row) for row in rows]
+
+
+
 async def get_combustion_unit_by_municipality_key(session: AsyncSession, key: str):
     stmt = text('''
     SELECT

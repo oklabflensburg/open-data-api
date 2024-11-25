@@ -304,6 +304,25 @@ async def get_parcel_meta_by_lat_lng(lat: float, lng: float, session: AsyncSessi
 
 
 @router5.get(
+    '/municipality/search',
+    response_model=list,
+    tags=['Verwaltungsgebiete'],
+    description=('Retrieves municipality name and key as well as the region name based on the provided query.')
+)
+async def get_municipality_by_query(
+    query: str = Query(None, min_length=2),
+    session: AsyncSession = Depends(get_session)
+):
+    rows = await service.get_municipality_by_query(session, query)
+    response = jsonable_encoder(rows)
+
+    try:
+        return JSONResponse(content=response)
+    except IndexError as e:
+        raise HTTPException(status_code=404, detail=f'no results found')
+
+
+@router5.get(
     '/municipality',
     response_model=list,
     tags=['Verwaltungsgebiete'],
