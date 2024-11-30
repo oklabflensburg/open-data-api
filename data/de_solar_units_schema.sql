@@ -5,22 +5,22 @@ CREATE TABLE IF NOT EXISTS de_solar_units (
     id SERIAL PRIMARY KEY,
 
     -- MaStR-Nummer der Einheit
-    unit_registration_number VARCHAR,
+    unit_registration_number VARCHAR NOT NULL,
 
     -- Datum der letzten Aktualisierung an diesem Objekt
-    last_update TIMESTAMP,
+    last_update TIMESTAMP NOT NULL,
 
     -- MaStR-Nummer der Lokation
     location_registration_number VARCHAR,
 
     -- Der Status der letzten Netzbetreiberprüfung, insofern eine durchgeführt wurde
-    network_operator_audit_id INT,
+    network_operator_audit_id INT NOT NULL,
 
     -- MaStR-Nummer des Betreibers der Einheit
     operator_registration_number VARCHAR,
 
     -- Standort der Einheit: Land
-    country_id INT,
+    country_id INT NOT NULL,
 
     -- Standort der Einheit: Bundesland
     state_id INT,
@@ -35,10 +35,10 @@ CREATE TABLE IF NOT EXISTS de_solar_units (
     municipality_key VARCHAR,
 
     -- Standort der Einheit: Postleitzahl
-    postcode VARCHAR,
+    postcode VARCHAR NOT NULL,
 
     -- Standort der Einheit: Ort
-    city VARCHAR,
+    city VARCHAR NOT NULL,
 
     -- Bürgerenergieeigenschaft der Einheit
     citizen_energy BOOLEAN,
@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS de_solar_units (
     high_voltage_connection VARCHAR,
 
     -- Fernsteuerbarkeit der Einheit durch einen Direktvermarkter
-    remote_control_direct_marketer VARCHAR,
+    remote_control_direct_marketer BOOLEAN,
 
     -- Standort der Einheit: Gemarkung
     cadastral_district VARCHAR,
@@ -95,13 +95,13 @@ CREATE TABLE IF NOT EXISTS de_solar_units (
     street VARCHAR,
 
     -- Angabe, dass die angegebene Strasse nicht aus dem BKG-Adressdatenbestand stammt
-    street_not_found VARCHAR,
+    street_not_found BOOLEAN,
 
     -- Standort der Einheit: Hausnummer
     housenumber VARCHAR,
 
     -- Angabe, dass die angegebene Hausnummer nicht aus dem BKG-Adressdatenbestand stammt
-    housenumber_not_found VARCHAR,
+    housenumber_not_found BOOLEAN,
 
     -- Standort der Einheit: Adresszusatz
     address_addition VARCHAR,
@@ -152,20 +152,20 @@ CREATE TABLE IF NOT EXISTS de_solar_units (
     not_present_migrated_units BOOLEAN,
 
     -- Vom Betreiber frei wählbare Bezeichnung der Stromerzeugungseinheit
-    unit_name VARCHAR,
+    unit_name VARCHAR NOT NULL,
 
     weic_not_available BOOLEAN,
 
     power_plant_number_not_available BOOLEAN,
 
     -- Energieträger der Einheit
-    energy_source_id INT,
+    energy_source_id INT NOT NULL,
 
     -- Bruttoleistung in kW
-    gross_capacity NUMERIC,
+    gross_capacity NUMERIC NOT NULL,
 
     -- Nettonennleistung in kW
-    net_nominal_capacity NUMERIC,
+    net_nominal_capacity NUMERIC NOT NULL,
 
     -- Fernsteuerbarkeit der Einheit durch einen Netzbetreiber
     remote_controllability BOOLEAN,

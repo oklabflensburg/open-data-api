@@ -204,7 +204,7 @@ def read_solar_units(conn, src):
             'high_voltage_connection': parse_value(elem, 'AnschlussAnHoechstOderHochSpannung'),
 
             # Fernsteuerbarkeit der Einheit durch einen Direktvermarkter
-            'remote_control_direct_marketer': parse_value(elem, 'FernsteuerbarkeitDv'),
+            'remote_control_direct_marketer': parse_value(elem, 'FernsteuerbarkeitDv', parse_bool),
 
             # Standort der Einheit: Gemarkung
             'cadastral_district': parse_value(elem, 'Gemarkung'),
@@ -216,13 +216,13 @@ def read_solar_units(conn, src):
             'street': parse_value(elem, 'Straße'),
 
             # Angabe, dass die angegebene Strasse nicht aus dem BKG-Adressdatenbestand stammt
-            'street_not_found': parse_value(elem, 'StrasseNichtGefunden'),
+            'street_not_found': parse_value(elem, 'StrasseNichtGefunden', parse_bool),
 
             # Standort der Einheit: Hausnummer
             'housenumber': parse_value(elem, 'Hausnummer'),
 
             # Angabe, dass die angegebene Hausnummer nicht aus dem BKG-Adressdatenbestand stammt
-            'housenumber_not_found': parse_value(elem, 'HausnummerNichtGefunden'),
+            'housenumber_not_found': parse_value(elem, 'HausnummerNichtGefunden', parse_bool),
 
             # Standort der Einheit: Adresszusatz
             'address_addition': parse_value(elem, 'Adresszusatz'),
