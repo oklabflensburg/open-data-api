@@ -15,7 +15,7 @@ import schemas
 import service
 
 
-app = FastAPI(docs_url=None, redoc_url=None, version='1.15.2', title='Opendata API', summary='Some endpoints are not yet implemented')
+app = FastAPI(docs_url=None, redoc_url=None, version='1.17', title='Opendata API', summary='Some endpoints are not yet implemented')
 Base = declarative_base()
 
 router1 = APIRouter(prefix='/demographics/v1')
@@ -59,9 +59,280 @@ async def swagger_ui_html(req: Request) -> HTMLResponse:
 
 
 @router6.get(
+    '/meta/state',
+    response_model=list,
+    tags=['Marktstammdatenregister Meta'],
+    description=('Retrieves a list of German states with corresponding ids.')
+)
+async def get_energy_state_meta(
+    session: AsyncSession = Depends(get_session)
+):
+    rows = await service.get_energy_state_meta(session)
+    response = jsonable_encoder(rows)
+
+    try:
+        return JSONResponse(content=response)
+    except IndexError as e:
+        raise HTTPException(status_code=404, detail='Could not retrieve list of German state codes')
+
+
+@router6.get(
+    '/meta/country',
+    response_model=list,
+    tags=['Marktstammdatenregister Meta'],
+    description=('Retrieves a list of countries provided by the German market master data register.')
+)
+async def get_energy_country_meta(
+    session: AsyncSession = Depends(get_session)
+):
+    rows = await service.get_energy_country_meta(session)
+    response = jsonable_encoder(rows)
+
+    try:
+        return JSONResponse(content=response)
+    except IndexError as e:
+        raise HTTPException(status_code=404, detail='Could not retrieve list of country codes')
+
+
+@router6.get(
+    '/meta/audit',
+    response_model=list,
+    tags=['Marktstammdatenregister Meta'],
+    description=('Retrieves a list of network operator audit codes provided by the German market master data register')
+)
+async def get_network_operator_audit_meta(
+    session: AsyncSession = Depends(get_session)
+):
+    rows = await service.get_network_operator_audit_meta(session)
+    response = jsonable_encoder(rows)
+
+    try:
+        return JSONResponse(content=response)
+    except IndexError as e:
+        raise HTTPException(status_code=404, detail='Could not retrieves list of network operator audit codes')
+
+
+@router6.get(
+    '/meta/location',
+    response_model=list,
+    tags=['Marktstammdatenregister Meta'],
+    description=('Retrieves a list of energy location codes')
+)
+async def get_energy_location_meta(
+    session: AsyncSession = Depends(get_session)
+):
+    rows = await service.get_energy_location_meta(session)
+    response = jsonable_encoder(rows)
+
+    try:
+        return JSONResponse(content=response)
+    except IndexError as e:
+        raise HTTPException(status_code=404, detail='Could not retrieve list of energy location codes')
+
+
+@router6.get(
+    '/meta/supply/type',
+    response_model=list,
+    tags=['Marktstammdatenregister Meta'],
+    description=('Retrieves a list of energy supply types')
+)
+async def get_energy_supply_meta(
+    session: AsyncSession = Depends(get_session)
+):
+    rows = await service.get_energy_supply_meta(session)
+    response = jsonable_encoder(rows)
+
+    try:
+        return JSONResponse(content=response)
+    except IndexError as e:
+        raise HTTPException(status_code=404, detail='Could not retrieves a list of energy supply types')
+
+
+@router6.get(
+    '/meta/source/type',
+    response_model=list,
+    tags=['Marktstammdatenregister Meta'],
+    description=('Retrieves a list of energy source types')
+)
+async def get_energy_source_meta(
+    session: AsyncSession = Depends(get_session)
+):
+    rows = await service.get_energy_source_meta(session)
+    response = jsonable_encoder(rows)
+
+    try:
+        return JSONResponse(content=response)
+    except IndexError as e:
+        raise HTTPException(status_code=404, detail='Could not retrieves list of energy source types')
+
+
+@router6.get(
+    '/meta/manufacturer',
+    response_model=list,
+    tags=['Marktstammdatenregister Meta'],
+    description=('Retrieves a list of turbine manufacturers.')
+)
+async def get_turbine_manufacturer_meta(
+    session: AsyncSession = Depends(get_session)
+):
+    rows = await service.get_turbine_manufacturer_meta(session)
+    response = jsonable_encoder(rows)
+
+    try:
+        return JSONResponse(content=response)
+    except IndexError as e:
+        raise HTTPException(status_code=404, detail='Turbine manufacturer not found')
+
+
+@router6.get(
+    '/meta/power/limitation',
+    response_model=list,
+    tags=['Marktstammdatenregister Meta'],
+    description=('Retrieves a list of power limitations.')
+)
+async def get_power_limitation_meta(
+    session: AsyncSession = Depends(get_session)
+):
+    rows = await service.get_power_limitation_meta(session)
+    response = jsonable_encoder(rows)
+
+    try:
+        return JSONResponse(content=response)
+    except IndexError as e:
+        raise HTTPException(status_code=404, detail='Power limitation not found')
+
+
+@router6.get(
+    '/meta/power/technology',
+    response_model=list,
+    tags=['Marktstammdatenregister Meta'],
+    description=('Retrieves a list of power technologies.')
+)
+async def get_power_technology_meta(
+    session: AsyncSession = Depends(get_session)
+):
+    rows = await service.get_power_technology_meta(session)
+    response = jsonable_encoder(rows)
+
+    try:
+        return JSONResponse(content=response)
+    except IndexError as e:
+        raise HTTPException(status_code=404, detail='Power technology not found')
+
+
+@router6.get(
+    '/meta/orientation',
+    response_model=list,
+    tags=['Marktstammdatenregister Meta'],
+    description=('Retrieves a list of main orientations.')
+)
+async def get_main_orientation_meta(
+    session: AsyncSession = Depends(get_session)
+):
+    rows = await service.get_main_orientation_meta(session)
+    response = jsonable_encoder(rows)
+
+    try:
+        return JSONResponse(content=response)
+    except IndexError as e:
+        raise HTTPException(status_code=404, detail='Main orientation not found')
+
+
+@router6.get(
+    '/meta/orientation/angle',
+    response_model=list,
+    tags=['Marktstammdatenregister Meta'],
+    description=('Retrieves a list of orientation tilt angles.')
+)
+async def get_orientation_tilt_angle_meta(
+    session: AsyncSession = Depends(get_session)
+):
+    rows = await service.get_orientation_tilt_angle_meta(session)
+    response = jsonable_encoder(rows)
+
+    try:
+        return JSONResponse(content=response)
+    except IndexError as e:
+        raise HTTPException(status_code=404, detail='Orientation tilt angle not found')
+
+
+@router6.get(
+    '/meta/usage/area',
+    response_model=list,
+    tags=['Marktstammdatenregister Meta'],
+    description=('Retrieves a list of usage areas.')
+)
+async def get_usage_area_meta(
+    session: AsyncSession = Depends(get_session)
+):
+    rows = await service.get_usage_area_meta(session)
+    response = jsonable_encoder(rows)
+
+    try:
+        return JSONResponse(content=response)
+    except IndexError as e:
+        raise HTTPException(status_code=404, detail='Usage area not found')
+
+
+@router6.get(
+    '/meta/operational/status',
+    response_model=list,
+    tags=['Marktstammdatenregister Meta'],
+    description=('Retrieves a list of operational statuses.')
+)
+async def get_operational_status_meta(
+    session: AsyncSession = Depends(get_session)
+):
+    rows = await service.get_operational_status_meta(session)
+    response = jsonable_encoder(rows)
+
+    try:
+        return JSONResponse(content=response)
+    except IndexError as e:
+        raise HTTPException(status_code=404, detail='Operational status not found')
+
+
+@router6.get(
+    '/meta/biomass/type',
+    response_model=list,
+    tags=['Marktstammdatenregister Meta'],
+    description=('Retrieves a list of biomass types.')
+)
+async def get_biomass_type_meta(
+    session: AsyncSession = Depends(get_session)
+):
+    rows = await service.get_biomass_type_meta(session)
+    response = jsonable_encoder(rows)
+
+    try:
+        return JSONResponse(content=response)
+    except IndexError as e:
+        raise HTTPException(status_code=404, detail='Biomass type not found')
+
+
+@router6.get(
+    '/meta/primary/fuel',
+    response_model=list,
+    tags=['Marktstammdatenregister Meta'],
+    description=('Retrieves a list of primary fuels.')
+)
+async def get_primary_fuel_meta(
+    session: AsyncSession = Depends(get_session)
+):
+    rows = await service.get_primary_fuel_meta(session)
+    response = jsonable_encoder(rows)
+
+    try:
+        return JSONResponse(content=response)
+    except IndexError as e:
+        raise HTTPException(status_code=404, detail='Primary fuel not found')
+
+
+
+@router6.get(
     '/unit/combustion/id',
     response_model=list,
-    tags=['Marktstammdatenregister'],
+    tags=['Marktstammdatenregister Combustion'],
     description=('Retrieves details about a specific combustion unit based on the provided 15 digit unit registration number.')
 )
 async def get_combustion_unit_by_id(
@@ -80,7 +351,7 @@ async def get_combustion_unit_by_id(
 @router6.get(
     '/unit/combustion/key',
     response_model=list,
-    tags=['Marktstammdatenregister'],
+    tags=['Marktstammdatenregister Combustion'],
     description=('Retrieves a list of combustion units with each detail based on the provided German municipality key (AGS).')
 )
 async def get_combustion_unit_by_municipality_key(
@@ -100,7 +371,7 @@ async def get_combustion_unit_by_municipality_key(
 @router6.get(
     '/unit/nuclear/id',
     response_model=list,
-    tags=['Marktstammdatenregister'],
+    tags=['Marktstammdatenregister Nuclear'],
     description=('Retrieves details about a specific nuclear unit based on the provided 15 digit unit registration number.')
 )
 async def get_nuclear_unit_by_id(
@@ -119,7 +390,7 @@ async def get_nuclear_unit_by_id(
 @router6.get(
     '/unit/nuclear/key',
     response_model=list,
-    tags=['Marktstammdatenregister'],
+    tags=['Marktstammdatenregister Nuclear'],
     description=('Retrieves a list of nuclear units with each detail based on the provided German municipality key (AGS).')
 )
 async def get_nuclear_unit_by_municipality_key(
@@ -139,7 +410,7 @@ async def get_nuclear_unit_by_municipality_key(
 @router6.get(
     '/unit/water/id',
     response_model=list,
-    tags=['Marktstammdatenregister'],
+    tags=['Marktstammdatenregister Water'],
     description=('Retrieves details about a specific water unit based on the provided 15 digit unit registration number.')
 )
 async def get_water_unit_by_id(
@@ -158,7 +429,7 @@ async def get_water_unit_by_id(
 @router6.get(
     '/unit/water/key',
     response_model=list,
-    tags=['Marktstammdatenregister'],
+    tags=['Marktstammdatenregister Water'],
     description=('Retrieves a list of water units with each detail based on the provided German municipality key (AGS).')
 )
 async def get_water_unit_by_municipality_key(
@@ -178,7 +449,7 @@ async def get_water_unit_by_municipality_key(
 @router6.get(
     '/unit/biomass/id',
     response_model=list,
-    tags=['Marktstammdatenregister'],
+    tags=['Marktstammdatenregister Biomass'],
     description=('Retrieves details about a specific biomass unit based on the provided 15 digit unit registration number.')
 )
 async def get_biomass_unit_by_id(
@@ -197,7 +468,7 @@ async def get_biomass_unit_by_id(
 @router6.get(
     '/unit/biomass/key',
     response_model=list,
-    tags=['Marktstammdatenregister'],
+    tags=['Marktstammdatenregister Biomass'],
     description=('Retrieves a list of biomass units with each details based on the provided german municipality key (AGS).')
 )
 async def get_biomass_by_municipality_key(
@@ -217,7 +488,7 @@ async def get_biomass_by_municipality_key(
 @router6.get(
     '/unit/wind/id',
     response_model=list,
-    tags=['Marktstammdatenregister'],
+    tags=['Marktstammdatenregister Wind'],
     description=('Retrieves details about a specific wind turbine unit based on the provided 15 digit unit registration number.')
 )
 async def get_wind_unit_by_id(
@@ -236,7 +507,7 @@ async def get_wind_unit_by_id(
 @router6.get(
     '/unit/wind/key',
     response_model=list,
-    tags=['Marktstammdatenregister'],
+    tags=['Marktstammdatenregister Wind'],
     description=('Retrieves a list of wind turbine units with each details based on the provided german municipality key (AGS).')
 )
 async def get_wind_unit_by_municipality_key(
@@ -256,7 +527,7 @@ async def get_wind_unit_by_municipality_key(
 @router6.get(
     '/unit/solar/id',
     response_model=list,
-    tags=['Marktstammdatenregister'],
+    tags=['Marktstammdatenregister Solar'],
     description=('Retrieves the solar unit details based on the provided 15 digit unit registration number.')
 )
 async def get_solar_unit_by_id(
@@ -275,7 +546,7 @@ async def get_solar_unit_by_id(
 @router6.get(
     '/unit/solar/key',
     response_model=list,
-    tags=['Marktstammdatenregister'],
+    tags=['Marktstammdatenregister Solar'],
     description=('Retrieves a list of solar units with each details based on the provided german municipality key (AGS).')
 )
 async def get_solar_unit_by_municipality_key(

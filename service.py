@@ -7,6 +7,97 @@ import models
 
 
 
+async def get_energy_source_meta(session: AsyncSession):
+    model = models.EnergySourceMeta
+    result = await session.execute(select(model))
+    return result.scalars().all()
+
+
+async def get_energy_state_meta(session: AsyncSession):
+    model = models.EnergyStateMeta
+    result = await session.execute(select(model))
+    return result.scalars().all()
+
+
+async def get_energy_country_meta(session: AsyncSession):
+    model = models.EnergyCountryMeta
+    result = await session.execute(select(model))
+    return result.scalars().all()
+
+
+async def get_network_operator_audit_meta(session: AsyncSession):
+    model = models.NetworkOperatorAuditMeta
+    result = await session.execute(select(model))
+    return result.scalars().all()
+
+
+async def get_energy_location_meta(session: AsyncSession):
+    model = models.EnergyLocationMeta
+    result = await session.execute(select(model))
+    return result.scalars().all()
+
+
+async def get_energy_supply_meta(session: AsyncSession):
+    model = models.EnergySupplyMeta
+    result = await session.execute(select(model))
+    return result.scalars().all()
+
+
+async def get_turbine_manufacturer_meta(session: AsyncSession):
+    model = models.TurbineManufacturerMeta
+    result = await session.execute(select(model))
+    return result.scalars().all()
+
+
+async def get_power_limitation_meta(session: AsyncSession):
+    model = models.PowerLimitationMeta
+    result = await session.execute(select(model))
+    return result.scalars().all()
+
+
+async def get_power_technology_meta(session: AsyncSession):
+    model = models.PowerTechnologyMeta
+    result = await session.execute(select(model))
+    return result.scalars().all()
+
+
+async def get_main_orientation_meta(session: AsyncSession):
+    model = models.MainOrientationMeta
+    result = await session.execute(select(model))
+    return result.scalars().all()
+
+
+async def get_orientation_tilt_angle_meta(session: AsyncSession):
+    model = models.OrientationTiltAngleMeta
+    result = await session.execute(select(model))
+    return result.scalars().all()
+
+
+async def get_usage_area_meta(session: AsyncSession):
+    model = models.UsageAreaMeta
+    result = await session.execute(select(model))
+    return result.scalars().all()
+
+
+async def get_operational_status_meta(session: AsyncSession):
+    model = models.OperationalStatusMeta
+    result = await session.execute(select(model))
+    return result.scalars().all()
+
+
+async def get_biomass_type_meta(session: AsyncSession):
+    model = models.BiomassTypeMeta
+    result = await session.execute(select(model))
+    return result.scalars().all()
+
+
+async def get_primary_fuel_meta(session: AsyncSession):
+    model = models.PrimaryFuelMeta
+    result = await session.execute(select(model))
+    return result.scalars().all()
+
+
+
 async def get_municipality_by_query(session: AsyncSession, query: str):
     stmt = text('''
     SELECT
