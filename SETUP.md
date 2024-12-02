@@ -241,3 +241,19 @@ ogr2ogr -f "PostgreSQL" PG:"host=localhost port=5432 dbname=oklab user=oklab" \
     -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=YES \
     -nlt POINT -s_srs VG250_PK.prj -t_srs EPSG:4326 VG250_PK.shp
 ```
+
+
+3. Next it is recommanded to create indecies using `psql`:
+
+```sql
+CREATE INDEX IF NOT EXISTS idx_lan_sn_l ON vg250_lan (sn_l);
+CREATE INDEX IF NOT EXISTS idx_krs_sn_l ON vg250_krs (sn_l);
+CREATE INDEX IF NOT EXISTS idx_krs_sn_r ON vg250_krs (sn_r);
+CREATE INDEX IF NOT EXISTS idx_krs_sn_k ON vg250_krs (sn_k);
+CREATE INDEX IF NOT EXISTS idx_gem_sn_k ON vg250_gem (sn_k);
+CREATE INDEX IF NOT EXISTS idx_gem_sn_r ON vg250_gem (sn_r);
+CREATE INDEX IF NOT EXISTS idx_gem_sn_l ON vg250_gem (sn_l);
+
+-- index for the municipality key
+CREATE INDEX IF NOT EXISTS idx_vg250_gem_ags ON vg250_gem (ags);
+```
