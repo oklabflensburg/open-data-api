@@ -106,7 +106,13 @@ async def get_municipality_by_query(session: AsyncSession, query: str):
         CASE
             WHEN gem.ibz != 60 THEN krs.bez || ' ' || krs.gen
             ELSE lan.gen
-        END AS region_name
+        END AS region_name,
+        jsonb_build_object(
+            'xmin', ST_XMin(gem.geom),
+            'ymin', ST_YMin(gem.geom),
+            'xmax', ST_XMax(gem.geom),
+            'ymax', ST_YMax(gem.geom)
+        ) AS bbox
     FROM
         vg250_gem AS gem
     JOIN
