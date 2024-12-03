@@ -14,9 +14,31 @@ async def get_energy_source_meta(session: AsyncSession):
 
 
 async def get_energy_state_meta(session: AsyncSession):
-    model = models.EnergyStateMeta
-    result = await session.execute(select(model))
-    return result.scalars().all()
+    stmt = text('''
+    SELECT
+        esm.id, esm.name, lan.sn_l AS state_id,
+        CASE WHEN lan.geom IS NOT NULL THEN
+            jsonb_build_object(
+            'xmin', ST_XMin(lan.geom),
+            'ymin', ST_YMin(lan.geom),
+            'xmax', ST_XMax(lan.geom),
+            'ymax', ST_YMax(lan.geom))
+        ELSE NULL END AS bbox
+    FROM de_energy_state_meta AS esm
+    LEFT JOIN
+        vg250_lan AS lan
+    ON
+        lan.gen = esm.name
+    AND
+        lan.gf = 4
+    ORDER BY
+        lan.sn_l
+    ''')
+
+    result = await session.execute(stmt)
+    rows = result.mappings().all()
+
+    return [dict(row) for row in rows]
 
 
 async def get_energy_country_meta(session: AsyncSession):

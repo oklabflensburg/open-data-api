@@ -256,4 +256,7 @@ CREATE INDEX IF NOT EXISTS idx_gem_sn_l ON vg250_gem (sn_l);
 
 -- index for the municipality key
 CREATE INDEX IF NOT EXISTS idx_vg250_gem_ags ON vg250_gem (ags);
+
+-- index state names
+CREATE INDEX IF NOT EXISTS idx_vg250_lan_gen ON vg250_lan (gen);
 ```

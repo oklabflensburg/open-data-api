@@ -16,12 +16,6 @@ class EnergySourceMeta(Base):
     name = Column(String)
 
 
-class EnergyStateMeta(Base):
-    __tablename__ = 'de_energy_state_meta'
-    id = Column(Integer, primary_key=True, unique=True, nullable=False)
-    name = Column(String)
-
-
 class EnergyCountryMeta(Base):
     __tablename__ = 'de_energy_country_meta'
     id = Column(Integer, primary_key=True, unique=True, nullable=False)
