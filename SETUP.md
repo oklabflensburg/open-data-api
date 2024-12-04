@@ -274,8 +274,22 @@ CREATE INDEX IF NOT EXISTS idx_osm_polygon_admin_level ON planet_osm_polygon (ad
 
 4. Create a materialized view for faster search
 
+> Note that materialized views need to be refreshed to update their content if the underlying data changes. After restoring, you may need to run:
+
 ```sql
-CREATE MATERIALIZED VIEW mv_de_geographical_regions AS
+REFRESH MATERIALIZED VIEW your_materialized_view_name;
+```
+
+> In case you want to drop an existing materialized view run:
+
+```sql
+DROP MATERIALIZED VIEW IF EXISTS mv_de_geographical_regions CASCADE;
+```
+
+> To create the materialized view run:
+
+```sql
+CREATE MATERIALIZED VIEW IF NOT EXISTS mv_de_geographical_regions AS
 SELECT DISTINCT ON (point.name, gem.ags)
     REPLACE(point.name, 'Sankt ', 'St. ') AS geographical_name,
     CASE
@@ -330,7 +344,7 @@ CREATE INDEX IF NOT EXISTS idx_gin_mv_gr_region_name_lower ON mv_de_geographical
 
 ```bash
 psql -U oklab -h localhost -d oklab -p 5432 -c "DROP TABLE IF EXISTS de_geographical_regions"
-psql -U oklab -h localhost -d oklab -p 5432 -c "CREATE TABLE de_geographical_regions AS TABLE mv_de_geographical_regions"
+psql -U oklab -h localhost -d oklab -p 5432 -c "CREATE TABLE IF NOT EXISTS de_geographical_regions AS TABLE mv_de_geographical_regions"
 pg_dump -U oklab -d oklab -t de_geographical_regions --inserts > ~/de_geographical_regions.sql
 psql -U oklab -h localhost -d oklab -p 5432 -c "DROP TABLE IF EXISTS de_geographical_regions"
 ```
