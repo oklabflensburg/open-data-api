@@ -276,11 +276,12 @@ CREATE INDEX IF NOT EXISTS idx_gin_osm_point_name_lower ON planet_osm_point USIN
 4. Create a materialized view for faster search
 
 ```sql
+CREATE MATERIALIZED VIEW mv_de_geographical_regions AS
 SELECT DISTINCT ON (point.name, gem.ags)
     REPLACE(point.name, 'Sankt ', 'St. ') AS geographical_name,
     CASE
-        WHEN point.name != gem.gen AND point.place IN ('suburb', 'village', 'isolated_dwelling', 'hamlet', 'island', 'neighbourhood', 'quarter')  THEN gem.bez || ' ' || REPLACE(gem.gen, 'Sankt ', 'St. ')
-        WHEN point.name = gem.gen AND point.place IN ('suburb', 'village', 'isolated_dwelling', 'hamlet', 'island', 'neighbourhood', 'quarter')  THEN krs.bez || ' ' || krs.gen
+        WHEN point.name != gem.gen AND point.place IN ('suburb', 'village', 'isolated_dwelling', 'hamlet', 'island', 'neighbourhood', 'quarter') THEN gem.bez || ' ' || REPLACE(gem.gen, 'Sankt ', 'St. ')
+        WHEN point.name = gem.gen AND point.place IN ('suburb', 'village', 'isolated_dwelling', 'hamlet', 'island', 'neighbourhood', 'quarter') THEN krs.bez || ' ' || krs.gen
         WHEN point.place IN ('municipality', 'city', 'town') AND gem.ibz != 60 AND gem.ibz != 61 THEN krs.bez || ' ' || krs.gen
         ELSE lan.gen
     END AS region_name,
@@ -314,11 +315,29 @@ WHERE
 
 ```sql
 -- index for comparison based on column
-CREATE INDEX IF NOT EXISTS idx_mv_geographical_name ON mv_geographical_regions (geographical_name);
-CREATE INDEX IF NOT EXISTS idx_mv_municipality_key ON mv_geographical_regions (municipality_key);
-CREATE INDEX IF NOT EXISTS idx_mv_region_name ON mv_geographical_regions (region_name);
+CREATE INDEX IF NOT EXISTS idx_mv_geographical_name ON mv_de_geographical_regions (geographical_name);
+CREATE INDEX IF NOT EXISTS idx_mv_municipality_key ON mv_de_geographical_regions (municipality_key);
+CREATE INDEX IF NOT EXISTS idx_mv_region_name ON mv_de_geographical_regions (region_name);
 
 -- index for search based on ngram
-CREATE INDEX IF NOT EXISTS idx_gin_mv_gr_geographical_name_lower ON mv_geographical_regions USING gin (LOWER(geographical_name) gin_trgm_ops);
-CREATE INDEX IF NOT EXISTS idx_gin_mv_gr_region_name_lower ON mv_geographical_regions USING gin (LOWER(region_name) gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS idx_gin_mv_gr_geographical_name_lower ON mv_de_geographical_regions USING gin (LOWER(geographical_name) gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS idx_gin_mv_gr_region_name_lower ON mv_de_geographical_regions USING gin (LOWER(region_name) gin_trgm_ops);
+```
+
+
+6. To dump the materialized view
+
+```bash
+psql -U oklab -h localhost -d oklab -p 5432 -c "CREATE TABLE de_geographical_regions AS TABLE mv_de_geographical_regions"
+pg_dump -U oklab -d oklab -t de_geographical_regions --inserts > ~/de_geographical_regions.sql
+psql -U oklab -h localhost -d oklab -p 5432 -c "DROP TABLE geographical_regions"
+```
+
+
+7. To restore the dumped materialized view
+
+```bash
+psql -U oklab -h localhost -d oklab -p 5432 -f ~/geographical_regions.sql
+psql -U oklab -h localhost -d oklab -p 5432 -c "CREATE INDEX IF NOT EXISTS idx_gin_geographical_name_lower ON de_geographical_regions USING gin (LOWER(geographical_name) gin_trgm_ops);"
+psql -U oklab -h localhost -d oklab -p 5432 -c "CREATE INDEX IF NOT EXISTS idx_gin_region_name_lower ON de_geographical_regions USING gin (LOWER(region_name) gin_trgm_ops);"
 ```
