@@ -246,6 +246,7 @@ ogr2ogr -f "PostgreSQL" PG:"host=localhost port=5432 dbname=oklab user=oklab" \
 3. Next it is recommanded to create indecies using `psql`:
 
 ```sql
+-- index state, county and municipality ids
 CREATE INDEX IF NOT EXISTS idx_lan_sn_l ON vg250_lan (sn_l);
 CREATE INDEX IF NOT EXISTS idx_krs_sn_l ON vg250_krs (sn_l);
 CREATE INDEX IF NOT EXISTS idx_krs_sn_r ON vg250_krs (sn_r);
@@ -265,11 +266,9 @@ CREATE INDEX IF NOT EXISTS idx_vg250_gem_gf ON vg250_gem (gf);
 CREATE INDEX IF NOT EXISTS idx_vg250_krs_gf ON vg250_krs (gf);
 CREATE INDEX IF NOT EXISTS idx_vg250_lan_gf ON vg250_lan (gf);
 
--- index for gin ngram
+-- index place and admin level
 CREATE INDEX IF NOT EXISTS idx_osm_point_place ON planet_osm_point (place);
 CREATE INDEX IF NOT EXISTS idx_osm_polygon_admin_level ON planet_osm_polygon (admin_level);
-CREATE INDEX IF NOT EXISTS idx_gin_osm_polygon_name_lower ON planet_osm_polygon USING gin (LOWER(name) gin_trgm_ops);
-CREATE INDEX IF NOT EXISTS idx_gin_osm_point_name_lower ON planet_osm_point USING gin (LOWER(name) gin_trgm_ops);
 ```
 
 
@@ -312,6 +311,8 @@ WHERE
 
 
 5. Create indecies for this view
+
+> The indexing only need to be done if you want to work on the materialized view
 
 ```sql
 -- index for comparison based on column
