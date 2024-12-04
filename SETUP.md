@@ -259,4 +259,15 @@ CREATE INDEX IF NOT EXISTS idx_vg250_gem_ags ON vg250_gem (ags);
 
 -- index state names
 CREATE INDEX IF NOT EXISTS idx_vg250_lan_gen ON vg250_lan (gen);
+
+-- index on geofactor
+CREATE INDEX IF NOT EXISTS idx_vg250_gem_gf ON vg250_gem (gf);
+CREATE INDEX IF NOT EXISTS idx_vg250_krs_gf ON vg250_krs (gf);
+CREATE INDEX IF NOT EXISTS idx_vg250_lan_gf ON vg250_lan (gf);
+
+-- index for gin ngram
+CREATE INDEX IF NOT EXISTS idx_osm_point_place ON planet_osm_point (place);
+CREATE INDEX IF NOT EXISTS idx_osm_polygon_admin_level ON planet_osm_polygon (admin_level);
+CREATE INDEX idx_gin_osm_polygon_name_lower ON planet_osm_polygon USING gin (LOWER(name) gin_trgm_ops);
+CREATE INDEX idx_gin_osm_point_name_lower ON planet_osm_point USING gin (LOWER(name) gin_trgm_ops);
 ```
