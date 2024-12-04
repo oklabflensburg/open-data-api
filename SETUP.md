@@ -268,6 +268,57 @@ CREATE INDEX IF NOT EXISTS idx_vg250_lan_gf ON vg250_lan (gf);
 -- index for gin ngram
 CREATE INDEX IF NOT EXISTS idx_osm_point_place ON planet_osm_point (place);
 CREATE INDEX IF NOT EXISTS idx_osm_polygon_admin_level ON planet_osm_polygon (admin_level);
-CREATE INDEX idx_gin_osm_polygon_name_lower ON planet_osm_polygon USING gin (LOWER(name) gin_trgm_ops);
-CREATE INDEX idx_gin_osm_point_name_lower ON planet_osm_point USING gin (LOWER(name) gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS idx_gin_osm_polygon_name_lower ON planet_osm_polygon USING gin (LOWER(name) gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS idx_gin_osm_point_name_lower ON planet_osm_point USING gin (LOWER(name) gin_trgm_ops);
+```
+
+
+4. Create a materialized view for faster search
+
+```sql
+SELECT DISTINCT ON (point.name, gem.ags)
+    REPLACE(point.name, 'Sankt ', 'St. ') AS geographical_name,
+    CASE
+        WHEN point.name != gem.gen AND point.place IN ('suburb', 'village', 'isolated_dwelling', 'hamlet', 'island', 'neighbourhood', 'quarter')  THEN gem.bez || ' ' || REPLACE(gem.gen, 'Sankt ', 'St. ')
+        WHEN point.name = gem.gen AND point.place IN ('suburb', 'village', 'isolated_dwelling', 'hamlet', 'island', 'neighbourhood', 'quarter')  THEN krs.bez || ' ' || krs.gen
+        WHEN point.place IN ('municipality', 'city', 'town') AND gem.ibz != 60 AND gem.ibz != 61 THEN krs.bez || ' ' || krs.gen
+        ELSE lan.gen
+    END AS region_name,
+    gem.ags AS municipality_key
+FROM
+    planet_osm_point AS point
+JOIN
+    planet_osm_polygon AS poly
+ON
+    ST_Contains(poly.way, point.way)
+JOIN
+    vg250_gem AS gem
+ON
+    ST_Contains(gem.geom, ST_Transform(point.way, 4326)) AND gem.gf = 4
+JOIN
+    vg250_krs AS krs
+ON
+    gem.sn_l = krs.sn_l AND gem.sn_r = krs.sn_r AND gem.sn_k = krs.sn_k AND krs.gf = 4
+JOIN
+    vg250_lan AS lan
+ON
+    krs.sn_l = lan.sn_l
+WHERE
+    point.place IN ('municipality', 'suburb', 'city', 'town', 'village', 'isolated_dwelling', 'hamlet', 'island', 'neighbourhood', 'quarter')
+    AND point.name IS NOT NULL
+    AND poly.admin_level = '6';
+```
+
+
+5. Create indecies for this view
+
+```sql
+-- index for comparison based on column
+CREATE INDEX IF NOT EXISTS idx_mv_geographical_name ON mv_geographical_regions (geographical_name);
+CREATE INDEX IF NOT EXISTS idx_mv_municipality_key ON mv_geographical_regions (municipality_key);
+CREATE INDEX IF NOT EXISTS idx_mv_region_name ON mv_geographical_regions (region_name);
+
+-- index for search based on ngram
+CREATE INDEX IF NOT EXISTS idx_gin_mv_gr_geographical_name_lower ON mv_geographical_regions USING gin (LOWER(geographical_name) gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS idx_gin_mv_gr_region_name_lower ON mv_geographical_regions USING gin (LOWER(region_name) gin_trgm_ops);
 ```
