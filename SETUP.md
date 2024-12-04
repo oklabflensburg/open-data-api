@@ -328,15 +328,17 @@ CREATE INDEX IF NOT EXISTS idx_gin_mv_gr_region_name_lower ON mv_de_geographical
 6. To dump the materialized view
 
 ```bash
+psql -U oklab -h localhost -d oklab -p 5432 -c "DROP TABLE IF EXISTS de_geographical_regions"
 psql -U oklab -h localhost -d oklab -p 5432 -c "CREATE TABLE de_geographical_regions AS TABLE mv_de_geographical_regions"
 pg_dump -U oklab -d oklab -t de_geographical_regions --inserts > ~/de_geographical_regions.sql
-psql -U oklab -h localhost -d oklab -p 5432 -c "DROP TABLE geographical_regions"
+psql -U oklab -h localhost -d oklab -p 5432 -c "DROP TABLE IF EXISTS de_geographical_regions"
 ```
 
 
 7. To restore the dumped materialized view
 
 ```bash
+psql -U oklab -h localhost -d oklab -p 5432 -c "DROP TABLE IF EXISTS de_geographical_regions"
 psql -U oklab -h localhost -d oklab -p 5432 -f ~/de_geographical_regions.sql
 psql -U oklab -h localhost -d oklab -p 5432 -c "CREATE INDEX IF NOT EXISTS idx_gin_geographical_name_lower ON de_geographical_regions USING gin (LOWER(geographical_name) gin_trgm_ops);"
 psql -U oklab -h localhost -d oklab -p 5432 -c "CREATE INDEX IF NOT EXISTS idx_gin_region_name_lower ON de_geographical_regions USING gin (LOWER(region_name) gin_trgm_ops);"
