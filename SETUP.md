@@ -337,7 +337,7 @@ psql -U oklab -h localhost -d oklab -p 5432 -c "DROP TABLE geographical_regions"
 7. To restore the dumped materialized view
 
 ```bash
-psql -U oklab -h localhost -d oklab -p 5432 -f ~/geographical_regions.sql
+psql -U oklab -h localhost -d oklab -p 5432 -f ~/de_geographical_regions.sql
 psql -U oklab -h localhost -d oklab -p 5432 -c "CREATE INDEX IF NOT EXISTS idx_gin_geographical_name_lower ON de_geographical_regions USING gin (LOWER(geographical_name) gin_trgm_ops);"
 psql -U oklab -h localhost -d oklab -p 5432 -c "CREATE INDEX IF NOT EXISTS idx_gin_region_name_lower ON de_geographical_regions USING gin (LOWER(region_name) gin_trgm_ops);"
 ```
