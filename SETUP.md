@@ -326,7 +326,12 @@ WHERE
 
 5. Create indecies for this view
 
-> The indexing only need to be done if you want to work on the materialized view
+> The indexing only need to be done if you want to work on the materialized view. Make sure to create extionsion before creating indecies.
+
+```sql
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+```
+
 
 ```sql
 -- index for comparison based on column
