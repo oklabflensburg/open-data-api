@@ -47,7 +47,7 @@ DB_PORT=5432
 1. Set up the database schema:
 
 ```sh
-psql -U oklab -h localhost -d oklab -p 5432 < data/de_official_municipality_keys_schema.sql
+psql -U oklab -h localhost -d oklab -p 5432 < data/de_municipality_keys_schema.sql
 ```
 
 2. Activate a Python virtual environment and install dependencies:
