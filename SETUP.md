@@ -187,59 +187,59 @@ Download administrative area data with population figures from the [Federal Agen
 1. Download and unpack the administrative area dataset:
 
 ```sh
-wget https://daten.gdz.bkg.bund.de/produkte/vg/vg250-ew_ebenen_1231/aktuell/vg250-ew_12-31.utm32s.shape.ebenen.zip
-unzip vg250-ew_12-31.utm32s.shape.ebenen.zip
-cd vg250-ew_12-31.utm32s.shape.ebenen/vg250-ew_ebenen_1231
+wget https://daten.gdz.bkg.bund.de/produkte/vg/vg250-ew_ebenen_1231/aktuell/vg250-ew_12-31.utm32s.gpkg.ebenen.zip
+unzip vg250-ew_12-31.utm32s.gpkg.ebenen.zip
+cd vg250-ew_12-31.utm32s.gpkg.ebenen/vg250-ew_ebenen_1231
 ```
 
 2. Insert data into your database using `ogr2ogr`:
 
 ```sh
-ogr2ogr -f "PostgreSQL" PG:"host=localhost port=5432 dbname=oklab user=oklab" \
-    -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=YES \
-    -nlt POLYGON -s_srs VG250_GEM.prj -t_srs EPSG:4326 VG250_GEM.shp
+ogr2ogr -f "PostgreSQL" PG:"dbname=oklab user=oklab port=5432 host=localhost" \
+    -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=NO \
+    -t_srs EPSG:4326 -nlt MULTIPOLYGON -overwrite -update DE_VG250.gpkg vg250_gem
 ```
 
 ```sh
-ogr2ogr -f "PostgreSQL" PG:"host=localhost port=5432 dbname=oklab user=oklab" \
-    -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=YES \
-    -nlt POLYGON -s_srs VG250_KRS.prj -t_srs EPSG:4326 VG250_KRS.shp
+ogr2ogr -f "PostgreSQL" PG:"dbname=oklab user=oklab port=5432 host=localhost" \
+    -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=NO \
+    -t_srs EPSG:4326 -nlt MULTIPOLYGON -overwrite -update DE_VG250.gpkg vg250_krs
 ```
 
 ```sh
-ogr2ogr -f "PostgreSQL" PG:"host=localhost port=5432 dbname=oklab user=oklab" \
-    -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=YES \
-    -nlt POLYGON -s_srs VG250_LAN.prj -t_srs EPSG:4326 VG250_LAN.shp
+ogr2ogr -f "PostgreSQL" PG:"dbname=oklab user=oklab port=5432 host=localhost" \
+    -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=NO \
+    -t_srs EPSG:4326 -nlt MULTIPOLYGON -overwrite -update DE_VG250.gpkg vg250_lan
 ```
 
 ```sh
-ogr2ogr -f "PostgreSQL" PG:"host=localhost port=5432 dbname=oklab user=oklab" \
-    -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=YES \
-    -nlt POLYGON -s_srs VG250_RBZ.prj -t_srs EPSG:4326 VG250_RBZ.shp
+ogr2ogr -f "PostgreSQL" PG:"dbname=oklab user=oklab port=5432 host=localhost" \
+    -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=NO \
+    -t_srs EPSG:4326 -nlt MULTIPOLYGON -overwrite -update DE_VG250.gpkg vg250_rbz
 ```
 
 ```sh
-ogr2ogr -f "PostgreSQL" PG:"host=localhost port=5432 dbname=oklab user=oklab" \
-    -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=YES \
-    -nlt POLYGON -s_srs VG250_STA.prj -t_srs EPSG:4326 VG250_STA.shp
+ogr2ogr -f "PostgreSQL" PG:"dbname=oklab user=oklab port=5432 host=localhost" \
+    -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=NO \
+    -t_srs EPSG:4326 -nlt MULTIPOLYGON -overwrite -update DE_VG250.gpkg vg250_sta
 ```
 
 ```sh
-ogr2ogr -f "PostgreSQL" PG:"host=localhost port=5432 dbname=oklab user=oklab" \
-    -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=YES \
-    -nlt POLYGON -s_srs VG250_VWG.prj -t_srs EPSG:4326 VG250_VWG.shp
+ogr2ogr -f "PostgreSQL" PG:"dbname=oklab user=oklab port=5432 host=localhost" \
+    -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=NO \
+    -t_srs EPSG:4326 -nlt MULTIPOLYGON -overwrite -update DE_VG250.gpkg vg250_vwg
 ```
 
 ```sh
-ogr2ogr -f "PostgreSQL" PG:"host=localhost port=5432 dbname=oklab user=oklab" \
-    -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=YES \
-    -nlt LINESTRING -s_srs VG250_LI.prj -t_srs EPSG:4326 VG250_LI.shp
+ogr2ogr -f "PostgreSQL" PG:"dbname=oklab user=oklab port=5432 host=localhost" \
+    -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=NO \
+    -t_srs EPSG:4326 -nlt LINESTRING -overwrite -update DE_VG250.gpkg vg250_li
 ```
 
 ```sh
-ogr2ogr -f "PostgreSQL" PG:"host=localhost port=5432 dbname=oklab user=oklab" \
-    -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=YES \
-    -nlt POINT -s_srs VG250_PK.prj -t_srs EPSG:4326 VG250_PK.shp
+ogr2ogr -f "PostgreSQL" PG:"dbname=oklab user=oklab port=5432 host=localhost" \
+    -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=NO \
+    -t_srs EPSG:4326 -nlt POINT -overwrite -update DE_VG250.gpkg vg250_pk
 ```
 
 
