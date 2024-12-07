@@ -648,12 +648,15 @@ async def get_biotope_origin(code: str, session: AsyncSession = Depends(get_sess
 
 
 
-@router3.get('/details', response_model=list, tags=['Denkmalschutzliste'])
-async def get_monuments(object_id: int, session: AsyncSession = Depends(get_session)):
-    rows = await service.get_monuments(session, object_id)
-    monuments = jsonable_encoder(rows)
+@router3.get('/details', response_model=list, tags=['Denkmalliste'])
+async def get_monument_by_object_id(object_id: int, session: AsyncSession = Depends(get_session)):
+    rows = await service.get_monument_by_object_id(session, object_id)
+    response = jsonable_encoder(rows)
 
-    return JSONResponse(content=monuments[0])
+    if len(response) == 0:
+        raise HTTPException(status_code=404, detail=f'No matches found for object id {object_id}')
+
+    return JSONResponse(content=response)
 
 
 
