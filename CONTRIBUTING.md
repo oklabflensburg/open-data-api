@@ -1,98 +1,154 @@
-# Contributing
+# Contributing to OK Lab Flensburg Projects
 
-> Thank you for your interest in contributing to this OK Lab Flensburg project! We welcome contributions from the community to help improve #opendata #civictech and #opengovernment applications and prototypes. By contributing to this project, you are helping to make social demographic government data more accessible and usable for everyone.
+Thank you for your interest in contributing to this OK Lab Flensburg project! We welcome contributions that help improve #opendata, #civictech, and #opengovernment applications and prototypes. By contributing, you are making social demographic government data more accessible and usable for everyone.
+
+
+---
 
 
 ## How to Contribute
 
-We appreciate all types of contributions, including bug fixes, code improvements, documentation enhancements, and new features. To get started, follow these steps
+We appreciate all types of contributions, including:
+
+- Bug fixes.
+- Code improvements.
+- Documentation enhancements.
+- New features or ideas.
+
+Follow these steps to get started:
 
 
-#### Fork the Repository
+### 1. Fork the Repository
 
-Click the "Fork" button on the top right corner of this repository's page to create your own copy.
+Click the **Fork** button at the top-right corner of this repository’s page to create your own copy.
 
 
-#### Clone the Repository
+### 2. Clone the Repository
 
-Clone your forked repository to your local machine using Git
+Clone your forked repository to your local machine:
 
 ```bash
 git clone https://github.com/your-username/your-project.git
 ```
 
 
-#### Create a Branch: 
+### 3. Create a Branch
 
-Create a new branch for your contribution. Choose a descriptive branch name
+Create a new branch for your contribution. Use a descriptive branch name:
 
 ```bash
 git checkout -b feature/your-feature-name
 ```
 
 
-#### Make Changes
+### 4. Make Changes
 
-Make your desired changes to the codebase, documentation, or any other project files.
+- Implement your changes in the codebase, documentation, or other project files.
+- Write clear and concise comments to explain your code.
+- Update any relevant documentation if needed.
 
-Test Your Changes: Test your changes to ensure they work as expected. If you're adding new features, make sure to document them properly.
+
+### 5. Test Your Changes
+
+- Verify that your changes work as expected.
+- Add tests if your changes introduce new functionality or fix a bug.
 
 
-#### Commit Your Changes
+### 6. Commit Your Changes
 
-Commit your changes with a clear and concise commit message
+Write a clear and descriptive commit message:
 
 ```bash
-git commit -m "Add your commit message here"
+git commit -m "Add [feature/bugfix] - Description of your changes"
 ```
 
 
-#### Push to Your Fork
+### 7. Push Your Changes
 
-Push your changes to your forked repository
+Push the changes to your forked repository:
 
 ```bash
 git push origin feature/your-feature-name
 ```
 
 
-#### Create a Pull Request
+### 8. Create a Pull Request
 
-Go to the original repository and create a Pull Request (PR) from your forked branch to the main branch. Please provide a detailed description of your changes in the PR.
+Submit a Pull Request (PR) to the original repository. Include:
+
+- A detailed description of your changes.
+- Links to any related issues (e.g., `Fixes #123`).
+- Screenshots, logs, or other supporting information if applicable.
+
+
+---
 
 
 ## Code Style and Guidelines
 
-We follow specific code style and guidelines to maintain consistency in our codebase. Before submitting your contribution, please make sure to
+To maintain consistency and readability, we follow specific code style guidelines. Please ensure your contributions adhere to the following:
 
-- Write clear and concise code comments.
-- Keep your PRs focused on addressing a single issue or implementing a specific feature.
+- Write clear and concise comments.
+- Follow the project's existing code patterns and structure.
+- Ensure that each Pull Request addresses a single issue or implements a specific feature.
+- Run `pnpm run lint` (or the equivalent for this project) to check for formatting or style issues.
 
-By running `pnpm run lint`, you can ensure that your code complies with the project's style and formatting standards, making it easier for reviewers to evaluate your contributions.
+
+### Checklist Before Submitting Your PR:
+
+- [ ] Code is properly formatted.
+- [ ] Tests are included and passing.
+- [ ] Documentation is updated, if applicable.
+- [ ] Changes are scoped and focused.
+
+
+---
 
 
 ## Reporting Issues
 
-If you encounter any bugs, issues, or have suggestions for improvements, please report them on our Issue Tracker. When reporting issues, be sure to provide detailed information, including
+Found a bug or have an idea? Let us know! Use the Issue Tracker to report issues or suggest improvements.
 
-- A clear description of the problem.
-- Steps to reproduce the issue.
-- Expected and actual behavior.
-- Environment details (e.g., operating system, browser version, etc.).
+
+### Include the Following When Reporting Issues:
+
+1. **Description**: Clearly describe the issue or feature request.
+2. **Steps to Reproduce**: Provide step-by-step instructions to replicate the issue.
+3. **Expected Behavior**: Explain what you expected to happen.
+4. **Actual Behavior**: Describe what actually happened.
+5. **Environment Details**: Include operating system, browser version, or other relevant details.
+
+
+---
 
 
 ## Community and Communication
 
-We value open and respectful communication within our community. If you have questions or need assistance, you can
+We value open, respectful, and inclusive communication. If you need help or have questions:
 
-- Join our community in [slack](https://openknowledgegermany.slack.com) to discuss ideas or seek help.
-- Reach out to the project maintainers via [email](oklabflensburg@grain.one).
+- Join our [Slack community](https://openknowledgegermany.slack.com) for discussions and support.
+- Email the project maintainers at [oklabflensburg@grain.one](mailto:oklabflensburg@grain.one).
+
+
+---
 
 
 ## License
 
-By contributing to this project, you agree that your contributions will be licensed under the project's license.
+By contributing to this project, you agree that your contributions will be licensed under the same license as the project. Refer to the [LICENSE](LICENSE) file for details.
 
-Thank you for contributing! Your efforts help make government data more transparent, accessible, and useful to citizens.
 
-Happy coding!
+---
+
+
+## Additional Resources
+
+- [GitHub Guides: Forking Projects](https://guides.github.com/activities/forking/)
+- [How to Write a Good Commit Message](https://chris.beams.io/posts/git-commit/)
+
+
+---
+
+
+Thank you for contributing! Your efforts make government data more transparent, accessible, and valuable to all citizens. 🚀
+**Happy coding!**
