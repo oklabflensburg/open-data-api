@@ -24,6 +24,7 @@ router3 = APIRouter(prefix='/monuments/v1')
 router4 = APIRouter(prefix='/biotope/v1')
 router5 = APIRouter(prefix='/administrative/v1')
 router6 = APIRouter(prefix='/energy/v1')
+router7 = APIRouter(prefix='/weather/v1')
 
 
 app.mount('/static', StaticFiles(directory='static'), name='static')
@@ -55,6 +56,22 @@ async def swagger_ui_html(req: Request) -> HTMLResponse:
         openapi_url='/openapi.json',
         swagger_favicon_url='/static/favicon.ico'
     )
+
+
+
+@router7.get(
+    '/list',
+    response_model=List[schemas.WeatherStationResponse],
+    tags=['Deutscher Wetterdienst'],
+    description=('Retrieves a list of German weather service stations with corresponding ids.')
+)
+async def fetch_weather_stations(session: AsyncSession = Depends(get_session)):
+    rows = await service.get_weather_service_stations(session)
+
+    if len(rows) == 0:
+        raise HTTPException(status_code=404, detail='Could not retrieve list of of German weather service stations')
+
+    return rows
 
 
 
@@ -1205,6 +1222,7 @@ async def get_residents_risk_homelessness_by_district(district_id: int, session:
 
 
 
+app.include_router(router7)
 app.include_router(router6)
 app.include_router(router5)
 app.include_router(router4)

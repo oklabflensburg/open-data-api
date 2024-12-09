@@ -1,9 +1,33 @@
 from sqlalchemy import select
-from sqlalchemy.sql import text
+from sqlalchemy.sql import func, text
+from sqlalchemy.types import JSON
+from sqlalchemy.sql.expression import cast
 from sqlalchemy.ext.asyncio import AsyncSession
 
 import json
 import models
+
+
+
+async def get_weather_service_stations(session: AsyncSession):
+    model = models.WeatherStation
+
+    geojson = cast(func.ST_AsGeoJSON(model.wkb_geometry, 15), JSON).label('geojson')
+
+    query = select(
+        model.station_id,
+        func.to_char(model.start_date, 'DD.MM.YYYY').label('start_date'),
+        func.to_char(model.end_date, 'DD.MM.YYYY').label('end_date'),
+        model.station_elevation,
+        model.station_name,
+        model.state_name,
+        model.submission,
+        geojson
+    )
+
+    result = await session.execute(query)
+
+    return result.mappings().all()
 
 
 

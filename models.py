@@ -1,4 +1,4 @@
-from sqlalchemy import CheckConstraint, Column, ForeignKey, Index, Integer, Numeric, String, Table, Text, text
+from sqlalchemy import CheckConstraint, Column, ForeignKey, Index, Integer, Numeric, String, TIMESTAMP, Table, Text, text
 from sqlalchemy.sql.sqltypes import NullType
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
@@ -7,6 +7,23 @@ from geoalchemy2 import Geometry
 
 Base = declarative_base()
 metadata = Base.metadata
+
+
+
+class WeatherStation(Base):
+    __tablename__ = 'de_weather_stations'
+
+    id = Column(Integer, primary_key=True)
+    station_id = Column(String, nullable=False, unique=True)
+    start_date = Column(TIMESTAMP, nullable=False)
+    end_date = Column(TIMESTAMP, nullable=False)
+    station_elevation = Column(Integer)
+    latitude = Column(Numeric, nullable=False)
+    longitude = Column(Numeric, nullable=False)
+    station_name = Column(String)
+    state_name = Column(String)
+    submission = Column(String)
+    wkb_geometry = Column(Geometry("POINT", srid=4326))
 
 
 

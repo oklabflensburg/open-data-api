@@ -3,6 +3,18 @@ from pydantic import BaseModel
 
 
 
+class WeatherStationResponse(BaseModel):
+    station_id: str
+    start_date: str
+    end_date: str
+    station_elevation: Optional[int]
+    station_name: Optional[str]
+    state_name: Optional[str]
+    submission: Optional[str]
+    geojson: dict
+
+
+
 class DistrictDetails(BaseModel):
     district_name: str
     residents: Optional[int]
