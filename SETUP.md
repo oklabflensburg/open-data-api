@@ -363,3 +363,73 @@ psql -U oklab -h localhost -d oklab -p 5432 -f ~/de_geographical_regions.sql
 psql -U oklab -h localhost -d oklab -p 5432 -c "CREATE INDEX IF NOT EXISTS idx_gin_geographical_name_lower ON de_geographical_regions USING gin (LOWER(geographical_name) gin_trgm_ops);"
 psql -U oklab -h localhost -d oklab -p 5432 -c "CREATE INDEX IF NOT EXISTS idx_gin_region_name_lower ON de_geographical_regions USING gin (LOWER(region_name) gin_trgm_ops);"
 ```
+
+
+
+## Retrieve German Weather Stations
+
+This tool downloads and processes data about German weather stations and inserts it into a PostgreSQL database.
+
+
+### Prerequisites
+
+1. Environment Variables:
+   Ensure that you have created the `.env` file as described in previous sections.
+
+2. Python:
+   Install Python 3 with `venv` and `pip`, if not already done.
+
+3. Wget:
+   Install `wget` to download the source file.
+
+
+---
+
+
+### Steps
+
+
+1. Download Weather Station Data:
+
+Use the following command to download the list of German weather stations:
+
+```sh
+wget https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/historical/KL_Tageswerte_Beschreibung_Stationen.txt
+```
+
+This will download a file named `KL_Tageswerte_Beschreibung_Stationen.txt` to your current working directory.
+
+
+2. Activate Virtual Environment and Install Dependencies:
+
+If you haven’t done so already, activate your Python virtual environment and install the required dependencies:
+
+```sh
+cd tools
+python3 -m venv venv
+source venv/bin/activate
+pip3 install -r requirements.txt
+```
+
+
+3. **Insert Data into PostgreSQL Database**:
+
+Run the following command to insert the weather station data into the database:
+
+```sh
+python3 insert_weather_stations.py --env ../.env --src ~/KL_Tageswerte_Beschreibung_Stationen.txt --verbose
+```
+
+**Parameters:**
+- `--env ../.env`: Path to the environment variable file.
+- `--src ~/KL_Tageswerte_Beschreibung_Stationen.txt`: Path to the downloaded file.
+- `--verbose`: Optional flag to enable detailed logging output.
+
+
+4. Deactivate Virtual Environment:
+
+Deactivate the Python environment when you're finished:
+
+```sh
+deactivate
+```
