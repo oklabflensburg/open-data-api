@@ -433,3 +433,89 @@ Deactivate the Python environment when you're finished:
 ```sh
 deactivate
 ```
+
+---
+
+
+## Insert EU Country Codes
+
+This tool fetches and inserts EU country code data into your PostgreSQL database.
+
+
+### Prerequisites
+
+1. Database Setup
+
+- Ensure PostgreSQL is installed and running on `localhost` (default port: `5432`).
+- Create a database named `oklab`, owned by a user with the same name.
+- Ensure the database is accessible from `localhost`.
+
+
+2. **Environment Variables**
+
+- Create a `.env` file in the root directory of this repository and add the following environment variables with your specific values:
+
+```sh
+DB_PASS=YOUR_PASSWORD_HERE
+DB_HOST=localhost
+DB_USER=oklab
+DB_NAME=oklab
+DB_PORT=5432
+```
+
+
+3. Python
+
+- Ensure Python 3 is installed with `venv` and `pip` available.
+
+
+---
+
+
+### Steps
+
+1. Set up the database schema:
+
+Use the following command to create the necessary schema for EU country codes in the database:
+
+```sh
+psql -U oklab -h localhost -d oklab -p 5432 < data/eu_country_codes_schema.sql
+```
+
+This will execute the `eu_country_codes_schema.sql` script to create the necessary tables and schema in the PostgreSQL database.
+
+
+2. Set up a Python virtual environment and install dependencies:
+
+Navigate to the `tools` directory and create a virtual environment. Then, activate it and install the required Python dependencies:
+
+```sh
+cd tools
+python3 -m venv venv
+source venv/bin/activate
+pip3 install -r requirements.txt
+```
+
+
+3. Insert EU country codes into the database:
+
+Run the script to insert the country codes from the `eu_country_codes.csv` file into the PostgreSQL database:
+
+```sh
+python3 insert_country_codes.py --env ../.env --src ../data/eu_country_codes.csv --verbose
+```
+
+**Parameters:**
+
+- `--env ../.env`: Path to the environment variable file.
+- `--src ../data/eu_country_codes.csv`: Path to the CSV file containing the country codes.
+- `--verbose`: Optional flag to enable detailed logging output.
+
+
+4. Deactivate the virtual environment:
+
+Once the script has run successfully, deactivate the Python virtual environment:
+
+```sh
+deactivate
+```
