@@ -581,6 +581,8 @@ pip3 install -r requirements.txt
 
 Run the following command to insert weather station reference data from the provided URL into your database:
 
+> Note you may find the lates url at [DWD Stationslexikon](https://www.dwd.de/DE/leistungen/klimadatendeutschland/stationsliste.html) under the section `Stationslexikon im HTML-Format`.
+
 ```sh
 python3 insert_weather_reference.py --env ../.env --url https://www.dwd.de/DE/leistungen/klimadatendeutschland/statliste/statlex_html.html\?view\=nasPublication\&nn\=16102 --verbose
 ```
