@@ -519,3 +519,83 @@ Once the script has run successfully, deactivate the Python virtual environment:
 ```sh
 deactivate
 ```
+
+---
+
+
+## Insert Weather Station References
+
+This section describes how to set up and insert weather station reference data into your PostgreSQL database.
+
+
+---
+
+
+### Prerequisites
+
+1. **Database Schema Setup**:
+
+Ensure that the PostgreSQL database schema for weather station references is set up. Use the following command:
+
+```sh
+psql -U oklab -h localhost -d oklab -p 5432 < data/dwd_station_references_schema.sql
+```
+
+
+2. **Environment Variables**:
+
+Create a `.env` file in the root directory with the following content:
+
+```sh
+DB_PASS=YOUR_PASSWORD_HERE
+DB_HOST=localhost
+DB_USER=oklab
+DB_NAME=oklab
+DB_PORT=5432
+```
+
+
+3. **Python Setup**:
+
+Ensure Python 3 is installed with `venv` and `pip`.
+
+
+---
+
+
+### Steps
+
+1. **Set Up the Python Environment**:
+
+Navigate to the `tools` directory and set up a Python virtual environment:
+
+```sh
+cd tools
+python3 -m venv venv
+source venv/bin/activate
+pip3 install -r requirements.txt
+```
+
+
+2. **Insert Weather Station References**:
+
+Run the following command to insert weather station reference data from the provided URL into your database:
+
+```sh
+python3 insert_weather_reference.py --env ../.env --url https://www.dwd.de/DE/leistungen/klimadatendeutschland/statliste/statlex_html.html\?view\=nasPublication\&nn\=16102 --verbose
+```
+
+**Parameters:**
+
+- `--env ../.env`: Path to the `.env` file with database credentials.
+- `--url`: URL to the data source.
+- `--verbose`: Optional flag for detailed logging output.
+
+
+3. **Deactivate the Python Environment**:
+
+Once the script has completed, deactivate the Python environment:
+
+```sh
+deactivate
+```
