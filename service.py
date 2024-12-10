@@ -9,6 +9,29 @@ import models
 
 
 
+async def get_dwd_stations_reference(session: AsyncSession):
+    model = models.DwdStationReference
+
+    geojson = cast(func.ST_AsGeoJSON(model.wkb_geometry, 15), JSON).label('geojson')
+
+    query = select(
+        model.station_name,
+        model.station_id,
+        model.identifier,
+        model.station_code,
+        model.station_elevation,
+        model.river_basin_id,
+        model.state_name,
+        func.to_char(model.recording_start, 'DD.MM.YYYY').label('recording_start'),
+        func.to_char(model.recording_end, 'DD.MM.YYYY').label('recording_end'),
+        geojson
+    )
+
+    result = await session.execute(query)
+
+    return result.mappings().all()
+
+
 async def get_weather_service_stations(session: AsyncSession):
     model = models.WeatherStation
 

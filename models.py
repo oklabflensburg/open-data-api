@@ -1,4 +1,4 @@
-from sqlalchemy import CheckConstraint, Column, ForeignKey, Index, Integer, Numeric, String, TIMESTAMP, Table, Text, text
+from sqlalchemy import CheckConstraint, Column, ForeignKey, Index, Integer, Numeric, String, TIMESTAMP, Date, Table, Text, text
 from sqlalchemy.sql.sqltypes import NullType
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
@@ -7,6 +7,25 @@ from geoalchemy2 import Geometry
 
 Base = declarative_base()
 metadata = Base.metadata
+
+
+
+class DwdStationReference(Base):
+    __tablename__ = 'dwd_station_reference'
+
+    id = Column(Integer, primary_key=True)
+    station_name = Column(String, nullable=False)
+    station_id = Column(String, nullable=False, unique=True)
+    identifier = Column(String, nullable=False)
+    station_code = Column(String, nullable=False)
+    station_latitude = Column(Numeric)
+    station_longitude = Column(Numeric)
+    station_elevation = Column(Integer)
+    river_basin_id = Column(Integer)
+    state_name = Column(String, nullable=False)
+    recording_start = Column(Date)
+    recording_end = Column(Date)
+    wkb_geometry = Column(Geometry('POINT', srid=4326))
 
 
 
@@ -23,7 +42,7 @@ class WeatherStation(Base):
     station_name = Column(String)
     state_name = Column(String)
     submission = Column(String)
-    wkb_geometry = Column(Geometry("POINT", srid=4326))
+    wkb_geometry = Column(Geometry('POINT', srid=4326))
 
 
 
