@@ -103,6 +103,7 @@ Log into the `oklab` database and enable the necessary extensions:
 psql -U postgres
 \c oklab
 
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
 CREATE EXTENSION IF NOT EXISTS postgis;
 CREATE EXTENSION IF NOT EXISTS hstore;
 
