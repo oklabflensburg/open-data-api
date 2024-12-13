@@ -65,13 +65,16 @@ async def swagger_ui_html(req: Request) -> HTMLResponse:
     tags=['Deutscher Wetterdienst'],
     description=('Retrieves a list of German weather service stations reference with corresponding ids.')
 )
-async def fetch_dwd_stations_reference(session: AsyncSession = Depends(get_session)):
-    rows = await service.get_dwd_stations_reference(session)
+async def fetch_dwd_stations_by_municipality_key(
+    municipality_key: str = Query(None, min_length=8, max_length=8),
+    session: AsyncSession = Depends(get_session)):
+    rows = await service.get_dwd_stations_by_municipality_key(session, municipality_key)
 
     if len(rows) == 0:
         raise HTTPException(status_code=404, detail='Could not retrieve list of of German weather service stations reference')
 
     return rows
+
 
 
 @router7.get(
