@@ -34,7 +34,7 @@ source venv/bin/activate
 # Run the Python script to insert data into the temporary table
 log "Running Python script for data insertion"
 pip3 install -r requirements.txt
-python3 insert_weather_reference.py --env ../.env --url https://www.dwd.de/DE/leistungen/klimadatendeutschland/statliste/statlex_html.html\?view\=nasPublication\&nn\=16102 --verbose || log "Python script failed"
+python3 insert_weather_reference.py --env ../.env --url https://www.dwd.de/DE/leistungen/klimadatendeutschland/statliste/statlex_html.html\?view\=nasPublication\&nn\=16102 --temp --verbose || log "Python script failed"
 
 # Deactivate the Python environment
 deactivate

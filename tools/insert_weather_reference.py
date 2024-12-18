@@ -60,7 +60,8 @@ def parse_value(value, conversion_func=None):
         return None
 
 
-def insert_row(cur, row):
+def insert_row(cur, row, temp):
+    table_name = 'dwd_station_reference'
     station_name = parse_value(row[0])
     station_id = parse_value(row[1])
     identifier = parse_value(row[2])
@@ -81,8 +82,11 @@ def insert_row(cur, row):
         point = Point(station_longitude, station_latitude)
         wkb_geometry = point.wkb
 
-    sql = '''
-        INSERT INTO dwd_station_reference (station_name, station_id, identifier,
+    if temp:
+        table_name = 'temp_dwd_station_reference'
+
+    sql = f'''
+        INSERT INTO {table_name} (station_name, station_id, identifier,
             station_code, station_latitude, station_longitude, station_elevation,
             river_basin_id, state_name, recording_start, recording_end, wkb_geometry)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id
@@ -117,28 +121,28 @@ def request_content(url):
         return None
 
 
-def parse_result(conn, content):
+def parse_result(conn, content, temp):
     cur = conn.cursor()
 
     doc = html.document_fromstring(content)
 
     rows = doc.xpath('//table/tr')
-    # rows = rows[2:]
 
     for idx, row in enumerate(rows):
         if idx in [0, 1]:
             continue
 
         row_list = row.xpath('./td/text()')
-        insert_row(cur, row_list)
+        insert_row(cur, row_list, temp)
 
 
 @click.command()
-@click.option('--env', '-e', type=str, required=True, help='Set your local dot env path')
-@click.option('--url', '-u', type=str, required=True, help='Set url you wish to download')
-@click.option('--verbose', '-v', is_flag=True, help='Print more verbose output')
-@click.option('--debug', '-d', is_flag=True, help='Print detailed debug output')
-def main(env, url, verbose, debug):
+@click.option('--env', '-e', type=str, required=True, help='Path to your local .env file')
+@click.option('--url', '-u', type=str, required=True, help='URL to download from')
+@click.option('--temp', '-t', is_flag=True, default=False, help='Use a temporary table for updates')
+@click.option('--verbose', '-v', is_flag=True, help='Enable verbose logging')
+@click.option('--debug', '-d', is_flag=True, help='Enable debug logging')
+def main(env, url, temp, verbose, debug):
     if debug:
         log.basicConfig(format='%(levelname)s: %(message)s', level=log.DEBUG)
     if verbose:
@@ -152,7 +156,7 @@ def main(env, url, verbose, debug):
 
     conn = connect_database(env)
     content = request_content(url)
-    parse_result(conn, content)
+    parse_result(conn, content, temp)
 
 
 if __name__ == '__main__':
