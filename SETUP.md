@@ -523,7 +523,7 @@ deactivate
 ---
 
 
-## Insert Weather Station References
+## Insert Weather Station Reference
 
 This section describes how to set up and insert weather station reference data into your PostgreSQL database.
 
@@ -535,10 +535,10 @@ This section describes how to set up and insert weather station reference data i
 
 1. **Database Schema Setup**:
 
-Ensure that the PostgreSQL database schema for weather station references is set up. Use the following command:
+Ensure that the PostgreSQL database schema for weather station reference is set up. Use the following command:
 
 ```sh
-psql -U oklab -h localhost -d oklab -p 5432 < data/dwd_station_references_schema.sql
+psql -U oklab -h localhost -d oklab -p 5432 < data/dwd_station_reference_schema.sql
 ```
 
 
@@ -577,7 +577,7 @@ pip3 install -r requirements.txt
 ```
 
 
-2. **Insert Weather Station References**:
+2. **Insert Weather Station Reference**:
 
 Run the following command to insert weather station reference data from the provided URL into your database:
 

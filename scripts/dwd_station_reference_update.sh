@@ -18,7 +18,7 @@ BEGIN;
 CREATE TABLE IF NOT EXISTS temp_dwd_station_reference AS SELECT * FROM dwd_station_reference WHERE false;
 
 -- Execute schema modifications
-\i $BASE_PATH/../data/dwd_station_references_schema.sql;
+\i $BASE_PATH/../data/dwd_station_reference_schema.sql;
 COMMIT;
 EOF
 log "Temporary table created and schema updated"
@@ -46,8 +46,8 @@ psql -U oklab -h localhost -d oklab -p 5432 <<EOF
 BEGIN;
 
 -- Swap the temporary table with the original table
-DROP TABLE IF EXISTS dwd_station_references;
-ALTER TABLE temp_dwd_station_reference RENAME TO dwd_station_references;
+DROP TABLE IF EXISTS dwd_station_reference;
+ALTER TABLE temp_dwd_station_reference RENAME TO dwd_station_reference;
 
 COMMIT;
 EOF
