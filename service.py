@@ -1342,7 +1342,7 @@ async def get_monument_by_object_id(session: AsyncSession, object_id: int):
     FROM
         sh_monuments AS m
     LEFT JOIN
-        monument_reasons AS r
+        sh_monument_reasons AS r
     ON
         m.id = r.monument_id
     WHERE
@@ -1365,9 +1365,9 @@ async def get_demographics_meta(session: AsyncSession):
         )
     ) AS column_meta_data
 
-    FROM column_meta_data cmd
+    FROM fl_column_meta_data cmd
 
-    JOIN i18n AS i
+    JOIN fl_i18n AS i
     ON cmd.i18n_id = i.id
 
     GROUP BY cmd.table_name
@@ -1491,9 +1491,9 @@ async def get_district_details(session: AsyncSession):
                 'sum_districts_area', ROUND(SUM(CAST( ST_Area(ST_Transform(d.geom, 3587)) / 1000000 AS numeric)), 2)
             ) AS summary
         FROM
-            districts AS d
+            fl_districts AS d
         LEFT JOIN
-            residents_by_districts AS rd
+            fl_residents_by_districts AS rd
         ON d.id = rd.district_id
         WHERE
             rd.year = 2021
@@ -1572,80 +1572,80 @@ async def get_district_details(session: AsyncSession):
                 )
             ) AS district
         FROM
-            districts AS d
+            fl_districts AS d
         LEFT JOIN
-            residents_by_districts AS rd
+            fl_residents_by_districts AS rd
         ON d.id = rd.district_id
         LEFT JOIN
-            births_by_districts AS bd
+            fl_births_by_districts AS bd
         ON d.id = bd.district_id
         AND bd.year = rd.year
         LEFT JOIN
-            age_ratio_by_districts AS ard
+            fl_age_ratio_by_districts AS ard
         ON d.id = ard.district_id
         AND ard.year = rd.year
         LEFT JOIN
-            children_age_under_18_by_districts AS cad
+            fl_children_age_under_18_by_districts AS cad
         ON d.id = cad.district_id
         AND cad.year = rd.year
         LEFT JOIN
-            age_groups_of_residents_by_districts AS agrd
+            fl_age_groups_of_residents_by_districts AS agrd
         ON d.id = agrd.district_id
         AND agrd.year = rd.year
         LEFT JOIN
-            residents_age_18_to_under_65_by_districts AS ra1865d
+            fl_residents_age_18_to_under_65_by_districts AS ra1865d
         ON d.id = ra1865d.district_id
         AND rd.year = ra1865d.year
         LEFT JOIN
-            residents_age_65_and_above_by_districts AS ra65ad
+            fl_residents_age_65_and_above_by_districts AS ra65ad
         ON d.id = ra65ad.district_id
         AND ra65ad.year = rd.year
         LEFT JOIN
-            migration_background_by_districts AS mbd
+            fl_migration_background_by_districts AS mbd
         ON d.id = mbd.district_id
         AND mbd.year = rd.year
         LEFT JOIN
-            employed_with_pension_insurance_by_districts AS epid
+            fl_employed_with_pension_insurance_by_districts AS epid
         ON d.id = epid.district_id
         AND rd.year = epid.year
         LEFT JOIN
-            unemployed_residents_by_districts AS ued
+            fl_unemployed_residents_by_districts AS ued
         ON d.id = ued.district_id
         AND rd.year = ued.year
         LEFT JOIN
-            unemployed_residents_by_districts_categorized AS uecd
+            fl_unemployed_residents_by_districts_categorized AS uecd
         ON d.id = uecd.district_id
         AND rd.year = uecd.year
         LEFT JOIN
-            housing_benefit_by_districts AS hbd
+            fl_housing_benefit_by_districts AS hbd
         ON d.id = hbd.district_id
         AND rd.year = hbd.year
         LEFT JOIN
-            housing_assistance_cases_by_districts AS hacd
+            fl_housing_assistance_cases_by_districts AS hacd
         ON d.id = hacd.district_id
         AND rd.year = hacd.year
         LEFT JOIN
-            households_at_risk_of_homelessness_by_districts AS hrhd
+            fl_households_at_risk_of_homelessness_by_districts AS hrhd
         ON d.id = hrhd.district_id
         AND rd.year = hrhd.year
         LEFT JOIN
-            beneficiaries_age_15_to_under_65_by_districts AS ba1565d
+            fl_beneficiaries_age_15_to_under_65_by_districts AS ba1565d
         ON d.id = ba1565d.district_id
         AND rd.year = ba1565d.year
         LEFT JOIN
-            beneficiaries_by_districts AS bfd
+            fl_beneficiaries_by_districts AS bfd
         ON d.id = bfd.district_id
         AND rd.year = bfd.year
         LEFT JOIN
-            beneficiaries_characteristics_by_districts AS bcd
+            fl_beneficiaries_characteristics_by_districts AS bcd
         ON d.id = bcd.district_id
         AND rd.year = bcd.year
         LEFT JOIN
-            inactive_beneficiaries_in_households_by_districts AS iad
+            fl_inactive_beneficiaries_in_households_by_districts AS iad
         ON d.id = iad.district_id
         AND rd.year = iad.year
         LEFT JOIN
-            basic_benefits_income_by_districts AS bbid
+            fl_basic_benefits_income_by_districts AS bbid
         ON d.id = bbid.district_id
         AND rd.year = bbid.year
         WHERE
@@ -1704,14 +1704,14 @@ async def get_household_type(session: AsyncSession, household_type_id: int):
 
 
 async def get_residents_by_age_groups(session: AsyncSession):
-    model = models.AgeGroupsOfResident
+    model = models.AgeGroupsOfResidents
     result = await session.execute(select(model))
 
     return result.scalars().all()
 
 
 async def get_residents_by_age_group(session: AsyncSession, age_group_id: int):
-    model = models.AgeGroupsOfResident
+    model = models.AgeGroupsOfResidents
     result = await session.execute(select(model).filter(model.id==age_group_id))
 
     return result.scalars().all()
@@ -1742,7 +1742,7 @@ async def get_residents_education_support(session: AsyncSession):
 
 
 
-async def get_residents_by_districts(session: AsyncSession):
+async def get_residents(session: AsyncSession):
     model = models.ResidentsByDistrict
     result = await session.execute(select(model))
 
@@ -1757,7 +1757,7 @@ async def get_residents_by_district(session: AsyncSession, district_id: int):
 
 
 
-async def get_residents_births_by_districts(session: AsyncSession):
+async def get_residents_births(session: AsyncSession):
     model = models.BirthsByDistrict
     result = await session.execute(select(model))
 
@@ -1772,7 +1772,7 @@ async def get_residents_births_by_district(session: AsyncSession, district_id: i
 
 
 
-async def get_residents_employed_by_districts(session: AsyncSession):
+async def get_residents_employed(session: AsyncSession):
     model = models.EmployedWithPensionInsuranceByDistrict
     result = await session.execute(select(model))
 
@@ -1787,7 +1787,7 @@ async def get_residents_employed_by_district(session: AsyncSession, district_id:
 
 
 
-async def get_residents_ageratio_by_districts(session: AsyncSession):
+async def get_residents_ageratio(session: AsyncSession):
     model = models.AgeRatioByDistrict
     result = await session.execute(select(model))
 
@@ -1802,7 +1802,7 @@ async def get_residents_ageratio_by_district(session: AsyncSession, district_id:
 
 
 
-async def get_residents_basicbenefits_by_districts(session: AsyncSession):
+async def get_residents_basicbenefits(session: AsyncSession):
     model = models.BasicBenefitsIncomeByDistrict
     result = await session.execute(select(model))
 
@@ -1817,7 +1817,7 @@ async def get_residents_basicbenefits_by_district(session: AsyncSession, distric
 
 
 
-async def get_residents_ageunder18_by_districts(session: AsyncSession):
+async def get_residents_ageunder18(session: AsyncSession):
     model = models.ChildrenAgeUnder18ByDistrict
     result = await session.execute(select(model))
 
@@ -1832,7 +1832,7 @@ async def get_residents_ageunder18_by_district(session: AsyncSession, district_i
 
 
 
-async def get_residents_age18tounder65_by_districts(session: AsyncSession):
+async def get_residents_age18tounder65(session: AsyncSession):
     model = models.ResidentsAge18ToUnder65ByDistrict
     result = await session.execute(select(model))
 
@@ -1847,7 +1847,7 @@ async def get_residents_age18tounder65_by_district(session: AsyncSession, distri
 
 
 
-async def get_residents_age65andabove_by_districts(session: AsyncSession):
+async def get_residents_age65andabove(session: AsyncSession):
     model = models.ResidentsAge65AndAboveByDistrict
     result = await session.execute(select(model))
 
@@ -1862,7 +1862,7 @@ async def get_residents_age65andabove_by_district(session: AsyncSession, distric
 
 
 
-async def get_residents_agegroups_by_districts(session: AsyncSession):
+async def get_residents_agegroups(session: AsyncSession):
     model = models.AgeGroupsOfResidentsByDistrict
     result = await session.execute(select(model))
 
@@ -1877,7 +1877,7 @@ async def get_residents_agegroups_by_district(session: AsyncSession, district_id
 
 
 
-async def get_residents_beneficiaries_by_districts(session: AsyncSession):
+async def get_residents_beneficiaries(session: AsyncSession):
     model = models.BeneficiariesByDistrict
     result = await session.execute(select(model))
 
@@ -1885,7 +1885,7 @@ async def get_residents_beneficiaries_by_districts(session: AsyncSession):
 
 
 
-async def get_residents_unemployed_by_districts(session: AsyncSession):
+async def get_residents_unemployed(session: AsyncSession):
     model = models.UnemployedResidentsByDistrict
     result = await session.execute(select(model))
 
@@ -1900,7 +1900,7 @@ async def get_residents_unemployed_by_district(session: AsyncSession, district_i
 
 
 
-async def get_residents_unemployed_by_categories_by_districts(session: AsyncSession):
+async def get_residents_unemployed_by_categories(session: AsyncSession):
     model = models.UnemployedCategorizedResidentsByDistrict
     result = await session.execute(select(model))
 
@@ -1915,7 +1915,7 @@ async def get_residents_unemployed_by_categories_by_district(session: AsyncSessi
 
 
 
-async def get_residents_beneficiaries_inactive_by_districts(session: AsyncSession):
+async def get_residents_beneficiaries_inactive(session: AsyncSession):
     model = models.InactiveBeneficiariesInHouseholdsByDistrict
     result = await session.execute(select(model))
 
@@ -1930,7 +1930,7 @@ async def get_residents_beneficiaries_by_district(session: AsyncSession, distric
 
 
 
-async def get_residents_beneficiaries_characteristics_by_districts(session: AsyncSession):
+async def get_residents_beneficiaries_characteristics(session: AsyncSession):
     model = models.BeneficiariesCharacteristicsByDistrict
     result = await session.execute(select(model))
 
@@ -1945,7 +1945,7 @@ async def get_residents_beneficiaries_inactive_by_district(session: AsyncSession
 
 
 
-async def get_residents_beneficiaries_age15tounder65_by_districts(session: AsyncSession):
+async def get_residents_beneficiaries_age15tounder65(session: AsyncSession):
     model = models.BeneficiariesAge15ToUnder65ByDistrict
     result = await session.execute(select(model))
 
@@ -1968,7 +1968,7 @@ async def get_residents_beneficiaries_characteristics_by_district(session: Async
 
 
 
-async def get_residents_migration_background_by_districts(session: AsyncSession):
+async def get_residents_migration_background(session: AsyncSession):
     model = models.MigrationBackgroundByDistrict
     result = await session.execute(select(model))
 
@@ -1983,7 +1983,7 @@ async def get_residents_migration_background_by_district(session: AsyncSession, 
 
 
 
-async def get_residents_housing_assistance_by_districts(session: AsyncSession):
+async def get_residents_housing_assistance(session: AsyncSession):
     model = models.HousingAssistanceCasesByDistrict
     result = await session.execute(select(model))
 
@@ -1998,7 +1998,7 @@ async def get_residents_housing_assistance_by_district(session: AsyncSession, di
 
 
 
-async def get_residents_housing_benefit_by_districts(session: AsyncSession):
+async def get_residents_housing_benefit(session: AsyncSession):
     model = models.HousingBenefitByDistrict
     result = await session.execute(select(model))
 
@@ -2013,15 +2013,15 @@ async def get_residents_housing_benefit_by_district(session: AsyncSession, distr
 
 
 
-async def get_residents_risk_homelessness_by_districts(session: AsyncSession):
-    model = models.HouseholdsAtRiskOfHomelessnessByDistrict
+async def get_residents_risk_homelessness(session: AsyncSession):
+    model = models.HouseholdsRiskOfHomelessnessByDistrict
     result = await session.execute(select(model))
 
     return result.scalars().all()
 
 
 async def get_residents_risk_homelessness_by_district(session: AsyncSession, district_id: int):
-    model = models.HouseholdsAtRiskOfHomelessnessByDistrict
+    model = models.HouseholdsRiskOfHomelessnessByDistrict
     result = await session.execute(select(model).filter(model.district_id==district_id))
 
     return result.scalars().all()

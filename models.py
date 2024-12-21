@@ -166,7 +166,7 @@ class PrimaryFuelMeta(Base):
 
 
 class Monument(Base):
-    __tablename__ = 'monuments'
+    __tablename__ = 'sh_monuments'
 
     id = Column(Integer, primary_key=True)
     object_id = Column(String)
@@ -182,11 +182,102 @@ class Monument(Base):
 
 
 
-class AgeGroupsOfResident(Base):
-    __tablename__ = 'age_groups_of_residents'
+# District Model
+class District(Base):
+    __tablename__ = 'fl_districts'
 
     id = Column(Integer, primary_key=True)
-    year = Column(Integer, nullable=False, index=True)
+    name = Column(String, nullable=False)
+    wkb_geometry = Column(Geometry('POLYGON', srid=4326))
+
+    # Relationships
+    residents_by_districts = relationship('ResidentsByDistrict', back_populates='district')
+    basic_benefits_income_by_districts = relationship('BasicBenefitsIncomeByDistrict', back_populates='district')
+    births_by_districts = relationship('BirthsByDistrict', back_populates='district')
+    age_ratios_by_districts = relationship('AgeRatioByDistrict', back_populates='district')
+    children_age_under_18_by_districts = relationship('ChildrenAgeUnder18ByDistrict', back_populates='district')
+    risk_homelessness_by_districts = relationship('HouseholdsRiskOfHomelessnessByDistrict', back_populates='district')
+    housing_benefit_by_districts = relationship('HousingBenefitByDistrict', back_populates='district')
+
+
+# Household Type Model
+class HouseholdType(Base):
+    __tablename__ = 'fl_household_type'
+
+    id = Column(Integer, primary_key=True)
+    label = Column(String, nullable=False)
+
+
+# Residents by District Model
+class ResidentsByDistrict(Base):
+    __tablename__ = 'fl_residents_by_districts'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    year = Column(Integer, nullable=False)
+    district_id = Column(Integer, ForeignKey('fl_districts.id'))
+    residents = Column(Integer)
+
+    district = relationship('District', back_populates='residents_by_districts')
+
+
+# Basic Benefits Income by Districts Model
+class BasicBenefitsIncomeByDistrict(Base):
+    __tablename__ = 'fl_basic_benefits_income_by_districts'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    year = Column(Integer, nullable=False)
+    district_id = Column(Integer, ForeignKey('fl_districts.id'))
+    male = Column(Integer)
+    female = Column(Integer)
+    age_18_to_under_65 = Column(Integer)
+    age_65_and_above = Column(Integer)
+
+    district = relationship('District', back_populates='basic_benefits_income_by_districts')
+
+
+# Children Age Under 18 by Districts Model
+class ChildrenAgeUnder18ByDistrict(Base):
+    __tablename__ = 'fl_children_age_under_18_by_districts'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    year = Column(Integer, nullable=False)
+    district_id = Column(Integer, ForeignKey('fl_districts.id'))
+    residents = Column(Integer)
+
+    district = relationship('District', back_populates='children_age_under_18_by_districts')
+
+
+# Births by District Model
+class BirthsByDistrict(Base):
+    __tablename__ = 'fl_births_by_districts'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    year = Column(Integer, nullable=False)
+    district_id = Column(Integer, ForeignKey('fl_districts.id'))
+    births = Column(Integer)
+    birth_rate = Column(Numeric)
+
+    district = relationship('District', back_populates='births_by_districts')
+
+
+# Housing Benefit by Districts Model
+class HousingBenefitByDistrict(Base):
+    __tablename__ = 'fl_housing_benefit_by_districts'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    year = Column(Integer, nullable=False)
+    district_id = Column(Integer, ForeignKey('fl_districts.id'))
+    residents = Column(Integer)
+
+    district = relationship('District', back_populates='housing_benefit_by_districts')
+
+
+# Age Groups of Residents Model
+class AgeGroupsOfResidents(Base):
+    __tablename__ = 'fl_age_groups_of_residents'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    year = Column(Integer, nullable=False)
     age_under_18 = Column(Integer)
     age_18_to_under_30 = Column(Integer)
     age_30_to_under_45 = Column(Integer)
@@ -195,72 +286,37 @@ class AgeGroupsOfResident(Base):
     age_80_and_above = Column(Integer)
 
 
-class ChildEducationSupport(Base):
-    __tablename__ = 'child_education_support'
+# Age Ratio by District Model
+class AgeRatioByDistrict(Base):
+    __tablename__ = 'fl_age_ratio_by_districts'
 
-    id = Column(Integer, primary_key=True)
-    year = Column(Integer, index=True)
-    educational_assistance = Column(Integer)
-    parenting_counselor = Column(Integer)
-    pedagogical_family_assistance = Column(Integer)
-    child_day_care_facility = Column(Integer)
-    full_time_care = Column(Integer)
-    residential_education = Column(Integer)
-    integration_assistance = Column(Integer)
-    additional_support = Column(Integer)
-
-
-class District(Base):
-    __tablename__ = 'districts'
-
-    id = Column(Integer, primary_key=True, unique=True)
-    name = Column(String)
-    wkb_geometry = Column(Geometry)
-
-
-
-class HouseholdType(Base):
-    __tablename__ = 'household_type'
-
-    id = Column(Integer, primary_key=True, unique=True)
-    label = Column(String)
-
-
-class NonGermanNationalsResidenceStatus(Base):
-    __tablename__ = 'non_german_nationals_residence_status'
-
-    id = Column(Integer, primary_key=True)
-    year = Column(Integer, index=True)
-    permanent_residency = Column(Integer)
-    permanent_residency_according_eu_freedom_movement_act = Column(Integer)
-    permanent_residency_third_country_nationality = Column(Integer)
-    without_permanent_residency = Column(Integer)
-    asylum_seeker = Column(Integer)
-    suspension_of_deportation = Column(Integer)
-
-
-class SpatialRefSy(Base):
-    __tablename__ = 'spatial_ref_sys'
-    __table_args__ = (
-        CheckConstraint('(srid > 0) AND (srid <= 998999)'),
-    )
-
-    srid = Column(Integer, primary_key=True)
-    auth_name = Column(String(256))
-    auth_srid = Column(Integer)
-    srtext = Column(String(2048))
-    proj4text = Column(String(2048))
-
-
-class AgeGroupsOfResidentsByDistrict(Base):
-    __tablename__ = 'age_groups_of_residents_by_districts'
-    __table_args__ = (
-        Index('age_groups_of_residents_by_districts_year_district_id_idx', 'year', 'district_id'),
-    )
-
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     year = Column(Integer, nullable=False)
-    district_id = Column(ForeignKey('districts.id'))
+    district_id = Column(Integer, ForeignKey('fl_districts.id'), nullable=True)
+    quotient = Column(Numeric)
+
+    district = relationship('District', back_populates='age_ratios_by_districts')
+
+
+# Households at Risk of Homelessness by Districts Model
+class HouseholdsRiskOfHomelessnessByDistrict(Base):
+    __tablename__ = 'fl_risk_homelessness_by_districts'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    year = Column(Integer, nullable=False)
+    district_id = Column(Integer, ForeignKey('fl_districts.id'))
+    residents = Column(Integer)
+
+    district = relationship('District', back_populates='risk_homelessness_by_districts')
+
+
+# Age Groups of Residents by District Model
+class AgeGroupsOfResidentsByDistrict(Base):
+    __tablename__ = 'fl_age_groups_of_residents_by_district'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    year = Column(Integer, nullable=False)
+    district_id = Column(Integer, ForeignKey('fl_districts.id'))
     age_under_18 = Column(Integer)
     age_18_to_under_30 = Column(Integer)
     age_30_to_under_45 = Column(Integer)
@@ -273,168 +329,65 @@ class AgeGroupsOfResidentsByDistrict(Base):
     district = relationship('District')
 
 
-class AgeRatioByDistrict(Base):
-    __tablename__ = 'age_ratio_by_districts'
-    __table_args__ = (
-        Index('age_ratio_by_districts_year_district_id_idx', 'year', 'district_id'),
-    )
+# Migration Background by District Model
+class MigrationBackgroundByDistrict(Base):
+    __tablename__ = 'fl_migration_background_by_districts'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     year = Column(Integer, nullable=False)
-    district_id = Column(ForeignKey('districts.id'))
-    quotient = Column(Integer)
+    district_id = Column(Integer, ForeignKey('fl_districts.id'))
+    foreign_citizenship = Column(Integer)
+    german_citizenship = Column(Integer)
 
     district = relationship('District')
 
 
-class BasicBenefitsIncomeByDistrict(Base):
-    __tablename__ = 'basic_benefits_income_by_districts'
-    __table_args__ = (
-        Index('basic_benefits_income_by_districts_year_district_id_idx', 'year', 'district_id'),
-    )
+# Non-German Nationals Residence Status Model
+class NonGermanNationalsResidenceStatus(Base):
+    __tablename__ = 'fl_non_german_nationals_residence_status'
 
-    id = Column(Integer, primary_key=True)
-    year = Column(Integer)
-    district_id = Column(ForeignKey('districts.id'))
-    male = Column(Integer)
-    female = Column(Integer)
-    age_18_to_under_65 = Column(Integer)
-    age_65_and_above = Column(Integer)
-
-    district = relationship('District')
-
-
-class BeneficiariesAge15ToUnder65ByDistrict(Base):
-    __tablename__ = 'beneficiaries_age_15_to_under_65_by_districts'
-    __table_args__ = (
-        Index('beneficiaries_age_15_to_under_65_by_districts_year_district_id_', 'year', 'district_id'),
-    )
-
-    id = Column(Integer, primary_key=True)
-    year = Column(Integer)
-    district_id = Column(ForeignKey('districts.id'))
-    percentage_of_total_residents = Column(Numeric)
-    employable_with_benefits = Column(Integer)
-    unemployment_benefits = Column(Integer)
-    basic_income = Column(Integer)
-    assisting_benefits = Column(Integer)
-
-    district = relationship('District')
-
-
-class BeneficiariesByDistrict(Base):
-    __tablename__ = 'beneficiaries_by_districts'
-    __table_args__ = (
-        Index('beneficiaries_by_districts_year_district_id_idx', 'year', 'district_id'),
-    )
-
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     year = Column(Integer, nullable=False)
-    district_id = Column(ForeignKey('districts.id'))
-    residents = Column(Integer)
-
-    district = relationship('District')
-
-
-class BeneficiariesCharacteristicsByDistrict(Base):
-    __tablename__ = 'beneficiaries_characteristics_by_districts'
-    __table_args__ = (
-        Index('beneficiaries_characteristics_by_districts_year_district_id_idx', 'year', 'district_id'),
-    )
-
-    id = Column(Integer, primary_key=True)
-    district_id = Column(ForeignKey('districts.id'))
-    year = Column(Integer)
-    unemployability = Column(Integer)
-    employability = Column(Integer)
-    percentage_females = Column(Numeric)
-    percentage_single_parents = Column(Numeric)
-    percentage_foreign_citizenship = Column(Numeric)
-
-    district = relationship('District')
+    permanent_residency = Column(Integer)
+    permanent_residency_according_eu_freedom_movement_act = Column(Integer)
+    permanent_residency_third_country_nationality = Column(Integer)
+    without_permanent_residency = Column(Integer)
+    asylum_seeker = Column(Integer)
+    suspension_of_deportation = Column(Integer)
 
 
-class BirthsByDistrict(Base):
-    __tablename__ = 'births_by_districts'
-    __table_args__ = (
-        Index('births_by_districts_year_district_id_idx', 'year', 'district_id'),
-    )
-
-    id = Column(Integer, primary_key=True)
-    year = Column(Integer, nullable=False)
-    district_id = Column(ForeignKey('districts.id'))
-    births = Column(Integer)
-    birth_rate = Column(Numeric)
-
-    district = relationship('District')
-
-
-class ChildrenAgeUnder18ByDistrict(Base):
-    __tablename__ = 'children_age_under_18_by_districts'
-    __table_args__ = (
-        Index('children_age_under_18_by_districts_year_district_id_idx', 'year', 'district_id'),
-    )
-
-    id = Column(Integer, primary_key=True)
-    year = Column(Integer, nullable=False)
-    district_id = Column(ForeignKey('districts.id'))
-    residents = Column(Integer)
-
-    district = relationship('District')
-
-
-class DebtCounselingOfResidents(Base):
-    __tablename__ = 'debt_counseling_residents'
-    __table_args__ = (
-        Index('debt_counseling_residents_year_household_type_id_idx', 'year', 'household_type_id'),
-    )
-
-    id = Column(Integer, primary_key=True)
-    year = Column(Integer)
-    household_type_id = Column(ForeignKey('household_type.id'))
-    residents = Column(Integer)
-
-    household_type = relationship('HouseholdType')
-
-
+# Employed with Pension Insurance by District Model
 class EmployedWithPensionInsuranceByDistrict(Base):
-    __tablename__ = 'employed_with_pension_insurance_by_districts'
-    __table_args__ = (
-        Index('employed_with_pension_insurance_by_districts_year_district_id_i', 'year', 'district_id'),
-    )
+    __tablename__ = 'fl_employed_with_pension_insurance_by_districts'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     year = Column(Integer, nullable=False)
-    district_id = Column(ForeignKey('districts.id'))
+    district_id = Column(Integer, ForeignKey('fl_districts.id'))
     residents = Column(Integer)
     employment_rate = Column(Numeric)
 
     district = relationship('District')
 
 
-class HouseholdsAtRiskOfHomelessnessByDistrict(Base):
-    __tablename__ = 'households_at_risk_of_homelessness_by_districts'
-    __table_args__ = (
-        Index('households_at_risk_of_homelessness_by_districts_year_district_i', 'year', 'district_id'),
-    )
+# Unemployed Residents by District Model
+class UnemployedResidentsByDistrict(Base):
+    __tablename__ = 'fl_unemployed_residents_by_districts'
 
-    id = Column(Integer, primary_key=True)
-    year = Column(Integer)
-    district_id = Column(ForeignKey('districts.id'))
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    year = Column(Integer, nullable=False)
+    district_id = Column(Integer, ForeignKey('fl_districts.id'))
     residents = Column(Integer)
 
     district = relationship('District')
 
 
+# Housing Assistance Cases by Districts Model
 class HousingAssistanceCasesByDistrict(Base):
-    __tablename__ = 'housing_assistance_cases_by_districts'
-    __table_args__ = (
-        Index('housing_assistance_cases_by_districts_year_district_id_idx', 'year', 'district_id'),
-    )
+    __tablename__ = 'fl_housing_assistance_cases_by_districts'
 
-    id = Column(Integer, primary_key=True)
-    year = Column(Integer)
-    district_id = Column(ForeignKey('districts.id'))
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    year = Column(Integer, nullable=False)
+    district_id = Column(Integer, ForeignKey('fl_districts.id'))
     general_consulting = Column(Integer)
     notices_of_rent_arrears = Column(Integer)
     termination_rent_arrears = Column(Integer)
@@ -446,120 +399,29 @@ class HousingAssistanceCasesByDistrict(Base):
     district = relationship('District')
 
 
-class HousingBenefitByDistrict(Base):
-    __tablename__ = 'housing_benefit_by_districts'
-    __table_args__ = (
-        Index('housing_benefit_by_districts_year_district_id_idx', 'year', 'district_id'),
-    )
+# Debt Counseling Residents Model
+class DebtCounselingOfResidents(Base):
+    __tablename__ = 'fl_debt_counseling_residents'
 
-    id = Column(Integer, primary_key=True)
-    year = Column(Integer)
-    district_id = Column(ForeignKey('districts.id'))
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    year = Column(Integer, nullable=False)
+    household_type_id = Column(Integer, ForeignKey('fl_household_type.id'))
     residents = Column(Integer)
 
-    district = relationship('District')
+    household_type = relationship('HouseholdType')
 
 
-class InactiveBeneficiariesInHouseholdsByDistrict(Base):
-    __tablename__ = 'inactive_beneficiaries_in_households_by_districts'
-    __table_args__ = (
-        Index('inactive_beneficiaries_in_households_by_districts_year_district', 'year', 'district_id'),
-    )
+# Child Education Support Model
+class ChildEducationSupport(Base):
+    __tablename__ = 'fl_child_education_support'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     year = Column(Integer, nullable=False)
-    district_id = Column(ForeignKey('districts.id'))
-    residents = Column(Integer)
-
-    district = relationship('District')
-
-
-class MigrationBackgroundByDistrict(Base):
-    __tablename__ = 'migration_background_by_districts'
-    __table_args__ = (
-        Index('migration_background_by_districts_year_district_id_idx', 'year', 'district_id'),
-    )
-
-    id = Column(Integer, primary_key=True)
-    year = Column(Integer, nullable=False)
-    district_id = Column(ForeignKey('districts.id'))
-    foreign_citizenship = Column(Integer)
-    german_citizenship = Column(Integer)
-
-    district = relationship('District')
-
-
-class ResidentsAge18ToUnder65ByDistrict(Base):
-    __tablename__ = 'residents_age_18_to_under_65_by_districts'
-    __table_args__ = (
-        Index('residents_age_18_to_under_65_by_districts_year_district_id_idx', 'year', 'district_id'),
-    )
-
-    id = Column(Integer, primary_key=True)
-    year = Column(Integer, nullable=False)
-    district_id = Column(ForeignKey('districts.id'))
-    residents = Column(Integer)
-
-    district = relationship('District')
-
-
-class ResidentsAge65AndAboveByDistrict(Base):
-    __tablename__ = 'residents_age_65_and_above_by_districts'
-    __table_args__ = (
-        Index('residents_age_65_and_above_by_districts_year_district_id_idx', 'year', 'district_id'),
-    )
-
-    id = Column(Integer, primary_key=True)
-    year = Column(Integer, nullable=False)
-    district_id = Column(ForeignKey('districts.id'))
-    residents = Column(Integer)
-
-    district = relationship('District')
-
-
-class ResidentsByDistrict(Base):
-    __tablename__ = 'residents_by_districts'
-    __table_args__ = (
-        Index('residents_by_districts_year_district_id_idx', 'year', 'district_id'),
-    )
-
-    id = Column(Integer, primary_key=True)
-    year = Column(Integer, nullable=False)
-    district_id = Column(ForeignKey('districts.id'))
-    residents = Column(Integer)
-
-    district = relationship('District')
-
-
-class UnemployedResidentsByDistrict(Base):
-    __tablename__ = 'unemployed_residents_by_districts'
-    __table_args__ = (
-        Index('unemployed_residents_by_districts_year_district_id_idx', 'year', 'district_id'),
-    )
-
-    id = Column(Integer, primary_key=True)
-    year = Column(Integer, nullable=False)
-    district_id = Column(ForeignKey('districts.id'))
-    residents = Column(Integer)
-
-    district = relationship('District')
-
-
-class UnemployedCategorizedResidentsByDistrict(Base):
-    __tablename__ = 'unemployed_residents_by_districts_categorized'
-    __table_args__ = (
-        Index('unemployed_residents_by_districts_categorized_year_district_id_', 'year', 'district_id'),
-    )
-
-    id = Column(Integer, primary_key=True)
-    year = Column(Integer)
-    district_id = Column(ForeignKey('districts.id'))
-    unemployed_total = Column(Integer)
-    percentage_of_total = Column(Numeric)
-    percentage_sgb_iii = Column(Numeric)
-    percentage_sgb_ii = Column(Numeric)
-    percentage_foreign_citizenship = Column(Numeric)
-    percentage_female = Column(Numeric)
-    percentage_age_under_25 = Column(Numeric)
-
-    district = relationship('District')
+    educational_assistance = Column(Integer)
+    parenting_counselor = Column(Integer)
+    pedagogical_family_assistance = Column(Integer)
+    child_day_care_facility = Column(Integer)
+    full_time_care = Column(Integer)
+    residential_education = Column(Integer)
+    integration_assistance = Column(Integer)
+    additional_support = Column(Integer)

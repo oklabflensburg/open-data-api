@@ -99,7 +99,7 @@ async def fetch_weather_stations(session: AsyncSession = Depends(get_session)):
     tags=['Marktstammdatenregister Meta'],
     description=('Retrieves a list of German states with corresponding ids.')
 )
-async def get_energy_state_meta(
+async def fetch_energy_state_meta(
     session: AsyncSession = Depends(get_session)
 ):
     rows = await service.get_energy_state_meta(session)
@@ -117,7 +117,7 @@ async def get_energy_state_meta(
     tags=['Marktstammdatenregister Meta'],
     description=('Retrieves a list of countries provided by the German market master data register.')
 )
-async def get_energy_country_meta(
+async def fetch_energy_country_meta(
     session: AsyncSession = Depends(get_session)
 ):
     rows = await service.get_energy_country_meta(session)
@@ -135,7 +135,7 @@ async def get_energy_country_meta(
     tags=['Marktstammdatenregister Meta'],
     description=('Retrieves a list of network operator audit codes provided by the German market master data register')
 )
-async def get_network_operator_audit_meta(
+async def fetch_network_operator_audit_meta(
     session: AsyncSession = Depends(get_session)
 ):
     rows = await service.get_network_operator_audit_meta(session)
@@ -153,7 +153,7 @@ async def get_network_operator_audit_meta(
     tags=['Marktstammdatenregister Meta'],
     description=('Retrieves a list of energy location codes')
 )
-async def get_energy_location_meta(
+async def fetch_energy_location_meta(
     session: AsyncSession = Depends(get_session)
 ):
     rows = await service.get_energy_location_meta(session)
@@ -171,7 +171,7 @@ async def get_energy_location_meta(
     tags=['Marktstammdatenregister Meta'],
     description=('Retrieves a list of energy supply types')
 )
-async def get_energy_supply_meta(
+async def fetch_energy_supply_meta(
     session: AsyncSession = Depends(get_session)
 ):
     rows = await service.get_energy_supply_meta(session)
@@ -189,7 +189,7 @@ async def get_energy_supply_meta(
     tags=['Marktstammdatenregister Meta'],
     description=('Retrieves a list of energy source types')
 )
-async def get_energy_source_meta(
+async def fetch_energy_source_meta(
     session: AsyncSession = Depends(get_session)
 ):
     rows = await service.get_energy_source_meta(session)
@@ -207,7 +207,7 @@ async def get_energy_source_meta(
     tags=['Marktstammdatenregister Meta'],
     description=('Retrieves a list of turbine manufacturers.')
 )
-async def get_turbine_manufacturer_meta(
+async def fetch_turbine_manufacturer_meta(
     session: AsyncSession = Depends(get_session)
 ):
     rows = await service.get_turbine_manufacturer_meta(session)
@@ -225,7 +225,7 @@ async def get_turbine_manufacturer_meta(
     tags=['Marktstammdatenregister Meta'],
     description=('Retrieves a list of power limitations.')
 )
-async def get_power_limitation_meta(
+async def fetch_power_limitation_meta(
     session: AsyncSession = Depends(get_session)
 ):
     rows = await service.get_power_limitation_meta(session)
@@ -243,7 +243,7 @@ async def get_power_limitation_meta(
     tags=['Marktstammdatenregister Meta'],
     description=('Retrieves a list of power technologies.')
 )
-async def get_power_technology_meta(
+async def fetch_power_technology_meta(
     session: AsyncSession = Depends(get_session)
 ):
     rows = await service.get_power_technology_meta(session)
@@ -261,7 +261,7 @@ async def get_power_technology_meta(
     tags=['Marktstammdatenregister Meta'],
     description=('Retrieves a list of main orientations.')
 )
-async def get_main_orientation_meta(
+async def fetch_main_orientation_meta(
     session: AsyncSession = Depends(get_session)
 ):
     rows = await service.get_main_orientation_meta(session)
@@ -279,7 +279,7 @@ async def get_main_orientation_meta(
     tags=['Marktstammdatenregister Meta'],
     description=('Retrieves a list of orientation tilt angles.')
 )
-async def get_orientation_tilt_angle_meta(
+async def fetch_orientation_tilt_angle_meta(
     session: AsyncSession = Depends(get_session)
 ):
     rows = await service.get_orientation_tilt_angle_meta(session)
@@ -297,7 +297,7 @@ async def get_orientation_tilt_angle_meta(
     tags=['Marktstammdatenregister Meta'],
     description=('Retrieves a list of usage areas.')
 )
-async def get_usage_area_meta(
+async def fetch_usage_area_meta(
     session: AsyncSession = Depends(get_session)
 ):
     rows = await service.get_usage_area_meta(session)
@@ -315,7 +315,7 @@ async def get_usage_area_meta(
     tags=['Marktstammdatenregister Meta'],
     description=('Retrieves a list of operational statuses.')
 )
-async def get_operational_status_meta(
+async def fetch_operational_status_meta(
     session: AsyncSession = Depends(get_session)
 ):
     rows = await service.get_operational_status_meta(session)
@@ -333,7 +333,7 @@ async def get_operational_status_meta(
     tags=['Marktstammdatenregister Meta'],
     description=('Retrieves a list of biomass types.')
 )
-async def get_biomass_type_meta(
+async def fetch_biomass_type_meta(
     session: AsyncSession = Depends(get_session)
 ):
     rows = await service.get_biomass_type_meta(session)
@@ -351,7 +351,7 @@ async def get_biomass_type_meta(
     tags=['Marktstammdatenregister Meta'],
     description=('Retrieves a list of primary fuels.')
 )
-async def get_primary_fuel_meta(
+async def fetch_primary_fuel_meta(
     session: AsyncSession = Depends(get_session)
 ):
     rows = await service.get_primary_fuel_meta(session)
@@ -370,7 +370,7 @@ async def get_primary_fuel_meta(
     tags=['Marktstammdatenregister Combustion'],
     description=('Retrieves details about a specific combustion unit based on the provided 15 digit unit registration number.')
 )
-async def get_combustion_unit_by_id(
+async def fetch_combustion_unit_by_id(
     unit_id: str = Query(None, min_length=15, max_length=15),
     session: AsyncSession = Depends(get_session)
 ):
@@ -389,7 +389,7 @@ async def get_combustion_unit_by_id(
     tags=['Marktstammdatenregister Combustion'],
     description=('Retrieves a list of combustion units with each detail based on the provided German municipality key (AGS).')
 )
-async def get_combustion_unit_by_municipality_key(
+async def fetch_combustion_unit_by_municipality_key(
     municipality_key: str = Query(None, min_length=8, max_length=8),
     session: AsyncSession = Depends(get_session)
 ):
@@ -409,7 +409,7 @@ async def get_combustion_unit_by_municipality_key(
     tags=['Marktstammdatenregister Nuclear'],
     description=('Retrieves details about a specific nuclear unit based on the provided 15 digit unit registration number.')
 )
-async def get_nuclear_unit_by_id(
+async def fetch_nuclear_unit_by_id(
     unit_id: str = Query(None, min_length=15, max_length=15),
     session: AsyncSession = Depends(get_session)
 ):
@@ -428,7 +428,7 @@ async def get_nuclear_unit_by_id(
     tags=['Marktstammdatenregister Nuclear'],
     description=('Retrieves a list of nuclear units with each detail based on the provided German municipality key (AGS).')
 )
-async def get_nuclear_unit_by_municipality_key(
+async def fetch_nuclear_unit_by_municipality_key(
     municipality_key: str = Query(None, min_length=8, max_length=8),
     session: AsyncSession = Depends(get_session)
 ):
@@ -448,7 +448,7 @@ async def get_nuclear_unit_by_municipality_key(
     tags=['Marktstammdatenregister Water'],
     description=('Retrieves details about a specific water unit based on the provided 15 digit unit registration number.')
 )
-async def get_water_unit_by_id(
+async def fetch_water_unit_by_id(
     unit_id: str = Query(None, min_length=15, max_length=15),
     session: AsyncSession = Depends(get_session)
 ):
@@ -467,7 +467,7 @@ async def get_water_unit_by_id(
     tags=['Marktstammdatenregister Water'],
     description=('Retrieves a list of water units with each detail based on the provided German municipality key (AGS).')
 )
-async def get_water_unit_by_municipality_key(
+async def fetch_water_unit_by_municipality_key(
     municipality_key: str = Query(None, min_length=8, max_length=8),
     session: AsyncSession = Depends(get_session)
 ):
@@ -487,7 +487,7 @@ async def get_water_unit_by_municipality_key(
     tags=['Marktstammdatenregister Biomass'],
     description=('Retrieves details about a specific biomass unit based on the provided 15 digit unit registration number.')
 )
-async def get_biomass_unit_by_id(
+async def fetch_biomass_unit_by_id(
     unit_id: str = Query(None, min_length=15, max_length=15),
     session: AsyncSession = Depends(get_session)
 ):
@@ -506,7 +506,7 @@ async def get_biomass_unit_by_id(
     tags=['Marktstammdatenregister Biomass'],
     description=('Retrieves a list of biomass units with each details based on the provided german municipality key (AGS).')
 )
-async def get_biomass_by_municipality_key(
+async def fetch_biomass_by_municipality_key(
     municipality_key: str = Query(None, min_length=8, max_length=8),
     session: AsyncSession = Depends(get_session)
 ):
@@ -526,7 +526,7 @@ async def get_biomass_by_municipality_key(
     tags=['Marktstammdatenregister Wind'],
     description=('Retrieves details about a specific wind turbine unit based on the provided 15 digit unit registration number.')
 )
-async def get_wind_unit_by_id(
+async def fetch_wind_unit_by_id(
     unit_id: str = Query(None, min_length=15, max_length=15),
     session: AsyncSession = Depends(get_session)
 ):
@@ -545,7 +545,7 @@ async def get_wind_unit_by_id(
     tags=['Marktstammdatenregister Wind'],
     description=('Retrieves a list of wind turbine units with each details based on the provided german municipality key (AGS).')
 )
-async def get_wind_unit_by_municipality_key(
+async def fetch_wind_unit_by_municipality_key(
     municipality_key: str = Query(None, min_length=8, max_length=8),
     session: AsyncSession = Depends(get_session)
 ):
@@ -565,7 +565,7 @@ async def get_wind_unit_by_municipality_key(
     tags=['Marktstammdatenregister Solar'],
     description=('Retrieves the solar unit details based on the provided 15 digit unit registration number.')
 )
-async def get_solar_unit_by_id(
+async def fetch_solar_unit_by_id(
     unit_id: str = Query(None, min_length=15, max_length=15),
     session: AsyncSession = Depends(get_session)
 ):
@@ -584,7 +584,7 @@ async def get_solar_unit_by_id(
     tags=['Marktstammdatenregister Solar'],
     description=('Retrieves a list of solar units with each details based on the provided german municipality key (AGS).')
 )
-async def get_solar_unit_by_municipality_key(
+async def fetch_solar_unit_by_municipality_key(
     municipality_key: str = Query(None, min_length=8, max_length=8),
     session: AsyncSession = Depends(get_session)
 ):
@@ -599,7 +599,7 @@ async def get_solar_unit_by_municipality_key(
 
 
 @router5.get('/parcel', response_model=list, tags=['Verwaltungsgebiete'])
-async def get_parcel_meta_by_lat_lng(lat: float, lng: float, session: AsyncSession = Depends(get_session)):
+async def fetch_parcel_meta_by_lat_lng(lat: float, lng: float, session: AsyncSession = Depends(get_session)):
     rows = await service.get_parcel_meta_by_lat_lng(session, lat, lng)
     response = jsonable_encoder(rows)
 
@@ -615,7 +615,7 @@ async def get_parcel_meta_by_lat_lng(lat: float, lng: float, session: AsyncSessi
     tags=['Verwaltungsgebiete'],
     description=('Retrieves municipality name and key as well as the region name based on the provided query.')
 )
-async def get_municipality_by_query(
+async def fetch_municipality_by_query(
     query: str = Query(None, min_length=2),
     session: AsyncSession = Depends(get_session)
 ):
@@ -634,7 +634,7 @@ async def get_municipality_by_query(
     tags=['Verwaltungsgebiete'],
     description=('Retrieves the geometry, bounding box, shape area, and statistical information of a municipality based on the provided municipality key (AGS) or the municipality name.')
 )
-async def get_municipality(
+async def fetch_municipality(
     municipality_key: str = Query(None, min_length=8, max_length=8),
     municipality_name: str = Query(None, min_length=2),
     session: AsyncSession = Depends(get_session)
@@ -661,7 +661,7 @@ async def get_municipality(
 
 
 @router4.get('/point', response_model=list, tags=['Biotopkartierung'])
-async def get_biotope_meta_by_lat_lng(lat: float, lng: float, session: AsyncSession = Depends(get_session)):
+async def fetch_biotope_meta_by_lat_lng(lat: float, lng: float, session: AsyncSession = Depends(get_session)):
     rows = await service.get_biotope_meta_by_lat_lng(session, lat, lng)
     response = jsonable_encoder(rows)
 
@@ -672,7 +672,7 @@ async def get_biotope_meta_by_lat_lng(lat: float, lng: float, session: AsyncSess
 
 
 @router4.get('/origin', response_model=list, tags=['Biotopkartierung'])
-async def get_biotope_origin(code: str, session: AsyncSession = Depends(get_session)):
+async def fetch_biotope_origin(code: str, session: AsyncSession = Depends(get_session)):
     rows = await service.get_biotope_origin(session, code)
     response = jsonable_encoder(rows)
 
@@ -684,7 +684,7 @@ async def get_biotope_origin(code: str, session: AsyncSession = Depends(get_sess
 
 
 @router3.get('/details', response_model=list, tags=['Denkmalliste'])
-async def get_monument_by_object_id(object_id: int, session: AsyncSession = Depends(get_session)):
+async def fetch_monument_by_object_id(object_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_monument_by_object_id(session, object_id)
     response = jsonable_encoder(rows)
 
@@ -696,7 +696,7 @@ async def get_monument_by_object_id(object_id: int, session: AsyncSession = Depe
 
 
 @router2.get('/meta', response_model=list, tags=['Unfallatlas'])
-async def get_accident_meta(session: AsyncSession = Depends(get_session)):
+async def fetch_accident_meta(session: AsyncSession = Depends(get_session)):
     rows = await service.get_accident_meta(session)
     result =jsonable_encoder(rows)
 
@@ -704,7 +704,7 @@ async def get_accident_meta(session: AsyncSession = Depends(get_session)):
 
 
 @router2.get('/details', response_model=list, tags=['Unfallatlas'])
-async def get_accident_details_by_city(query: str, session: AsyncSession = Depends(get_session)):
+async def fetch_accident_details_by_city(query: str, session: AsyncSession = Depends(get_session)):
     rows = await service.get_accident_details_by_city(session, query)
     result =jsonable_encoder(rows)
 
@@ -713,7 +713,7 @@ async def get_accident_details_by_city(query: str, session: AsyncSession = Depen
 
 
 @router1.get('/meta', response_model=list, tags=['Sozialatlas'])
-async def get_demographics_meta(session: AsyncSession = Depends(get_session)):
+async def fetch_demographics_meta(session: AsyncSession = Depends(get_session)):
     rows = await service.get_demographics_meta(session)
     result =jsonable_encoder(rows)
 
@@ -722,7 +722,7 @@ async def get_demographics_meta(session: AsyncSession = Depends(get_session)):
 
 
 @router1.get('/details', response_model=list, tags=['Sozialatlas'])
-async def get_district_details(session: AsyncSession = Depends(get_session)):
+async def fetch_district_details(session: AsyncSession = Depends(get_session)):
     rows = await service.get_district_details(session)
     schema = schemas.DistrictDetails
     result =jsonable_encoder(rows)
@@ -731,7 +731,7 @@ async def get_district_details(session: AsyncSession = Depends(get_session)):
 
 
 @router1.get('/districts/', response_model=list[schemas.District], tags=['Sozialatlas'])
-async def get_districts(session: AsyncSession = Depends(get_session)):
+async def fetch_districts(session: AsyncSession = Depends(get_session)):
     rows = await service.get_districts(session)
     schema = schemas.District
 
@@ -739,7 +739,7 @@ async def get_districts(session: AsyncSession = Depends(get_session)):
 
 
 @router1.get('/{district_id}', response_model=list[schemas.District], tags=['Sozialatlas'])
-async def get_district(district_id: int, session: AsyncSession = Depends(get_session)):
+async def fetch_district(district_id: int, session: AsyncSession = Depends(get_session)):
     row = await service.get_district(session, district_id)
     schema = schemas.District
 
@@ -751,7 +751,7 @@ async def get_district(district_id: int, session: AsyncSession = Depends(get_ses
 
 
 @router1.get('/household/types', response_model=list[schemas.HouseholdType], tags=['Sozialatlas'])
-async def get_household_types(session: AsyncSession = Depends(get_session)):
+async def fetch_household_types(session: AsyncSession = Depends(get_session)):
     rows = await service.get_household_types(session)
     schema = schemas.HouseholdTypes
 
@@ -759,7 +759,7 @@ async def get_household_types(session: AsyncSession = Depends(get_session)):
 
 
 @router1.get('/residents/agegroups', response_model=list[schemas.AgeGroupsOfResidents], tags=['Sozialatlas'])
-async def get_residents_by_age_groups(session: AsyncSession = Depends(get_session)):
+async def fetch_residents_by_age_groups(session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_by_age_groups(session)
     schema = schemas.AgeGroupsOfResidents
 
@@ -770,7 +770,7 @@ async def get_residents_by_age_groups(session: AsyncSession = Depends(get_sessio
 
 
 @router1.get('/residents/nongermans', response_model=list[schemas.NonGermanNationalsResidenceStatus], tags=['Sozialatlas'])
-async def get_residents_non_germans(session: AsyncSession = Depends(get_session)):
+async def fetch_residents_non_germans(session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_non_germans(session)
     schema = schemas.NonGermanNationalsResidenceStatus
 
@@ -784,7 +784,7 @@ async def get_residents_non_germans(session: AsyncSession = Depends(get_session)
 
 
 @router1.get('/residents/debtcounseling', response_model=list[schemas.DebtCounselingOfResidents], tags=['Sozialatlas'])
-async def get_residents_debt_counseling(session: AsyncSession = Depends(get_session)):
+async def fetch_residents_debt_counseling(session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_debt_counseling(session)
     schema = schemas.DebtCounselingOfResidents
 
@@ -792,7 +792,7 @@ async def get_residents_debt_counseling(session: AsyncSession = Depends(get_sess
 
 
 @router1.get('/residents/education/support', response_model=list[schemas.ChildEducationSupport], tags=['Sozialatlas'])
-async def get_residents_education_support(session: AsyncSession = Depends(get_session)):
+async def fetch_residents_education_support(session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_education_support(session)
     schema = schemas.ChildEducationSupport
 
@@ -809,15 +809,15 @@ async def get_residents_education_support(session: AsyncSession = Depends(get_se
 
 
 @router1.get('/districts/residents', response_model=list[schemas.ResidentsByDistrict], tags=['Sozialatlas'])
-async def get_residents_by_districts(session: AsyncSession = Depends(get_session)):
-    rows = await service.get_residents_by_districts(session)
+async def fetch_residents(session: AsyncSession = Depends(get_session)):
+    rows = await service.get_residents(session)
     schema = schemas.ResidentsByDistrict
 
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
 
 
 @router1.get('/{district_id}/residents', response_model=list[schemas.ResidentsByDistrict], tags=['Sozialatlas'])
-async def get_residents_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
+async def fetch_residents_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_by_district(session, district_id)
     schema = schemas.ResidentsByDistrict
 
@@ -826,8 +826,8 @@ async def get_residents_by_district(district_id: int, session: AsyncSession = De
 
 
 @router1.get('/districts/residents/births', response_model=list[schemas.BirthsByDistrict], tags=['Sozialatlas'])
-async def get_residents_births_by_districts(session: AsyncSession = Depends(get_session)):
-    rows = await service.get_residents_births_by_districts(session)
+async def fetch_residents_births(session: AsyncSession = Depends(get_session)):
+    rows = await service.get_residents_births(session)
     schema = schemas.BirthsByDistrict
 
     return [schema(year=r.year,
@@ -837,7 +837,7 @@ async def get_residents_births_by_districts(session: AsyncSession = Depends(get_
 
 
 @router1.get('/{district_id}/residents/births', response_model=list[schemas.BirthsByDistrict], tags=['Sozialatlas'])
-async def get_residents_births_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
+async def fetch_residents_births_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_births_by_district(session, district_id)
     schema = schemas.BirthsByDistrict
 
@@ -848,8 +848,8 @@ async def get_residents_births_by_district(district_id: int, session: AsyncSessi
 
 
 @router1.get('/districts/residents/employed', response_model=list[schemas.EmployedWithPensionInsuranceByDistrict], tags=['Sozialatlas'])
-async def get_residents_employed_by_districts(session: AsyncSession = Depends(get_session)):
-    rows = await service.get_residents_employed_by_districts(session)
+async def fetch_residents_employed(session: AsyncSession = Depends(get_session)):
+    rows = await service.get_residents_employed(session)
     schema = schemas.EmployedWithPensionInsuranceByDistrict
 
     return [schema(year=r.year,
@@ -859,7 +859,7 @@ async def get_residents_employed_by_districts(session: AsyncSession = Depends(ge
 
 
 @router1.get('/{district_id}/residents/employed', response_model=list[schemas.EmployedWithPensionInsuranceByDistrict], tags=['Sozialatlas'])
-async def get_residents_employed_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
+async def fetch_residents_employed_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_employed_by_district(session, district_id)
     schema = schemas.EmployedWithPensionInsuranceByDistrict
 
@@ -871,15 +871,15 @@ async def get_residents_employed_by_district(district_id: int, session: AsyncSes
 
 
 @router1.get('/districts/residents/ageratio', response_model=list[schemas.AgeRatioByDistrict], tags=['Sozialatlas'])
-async def get_residents_ageratio_by_districts(session: AsyncSession = Depends(get_session)):
-    rows = await service.get_residents_ageratio_by_districts(session)
+async def fetch_residents_ageratio(session: AsyncSession = Depends(get_session)):
+    rows = await service.get_residents_ageratio(session)
     schema = schemas.AgeRatioByDistrict
 
     return [schema(year=r.year, district_id=r.district_id, quotient=r.quotient) for r in rows]
 
 
 @router1.get('/{district_id}/residents/ageratio', response_model=list[schemas.AgeRatioByDistrict], tags=['Sozialatlas'])
-async def get_residents_ageratio_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
+async def fetch_residents_ageratio_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_ageratio_by_district(session, district_id)
     schema = schemas.AgeRatioByDistrict
 
@@ -888,8 +888,8 @@ async def get_residents_ageratio_by_district(district_id: int, session: AsyncSes
 
 
 @router1.get('/districts/residents/basicbenefits', response_model=list[schemas.BasicBenefitsIncomeByDistrict], tags=['Sozialatlas'])
-async def get_residents_basicbenefits_by_districts(session: AsyncSession = Depends(get_session)):
-    rows = await service.get_residents_basicbenefits_by_districts(session)
+async def fetch_residents_basicbenefits(session: AsyncSession = Depends(get_session)):
+    rows = await service.get_residents_basicbenefits(session)
     schema = schemas.BasicBenefitsIncomeByDistrict
 
     return [schema(year=r.year,
@@ -901,7 +901,7 @@ async def get_residents_basicbenefits_by_districts(session: AsyncSession = Depen
 
 
 @router1.get('/{district_id}/residents/basicbenefits', response_model=list[schemas.BasicBenefitsIncomeByDistrict], tags=['Sozialatlas'])
-async def get_residents_basicbenefits_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
+async def fetch_residents_basicbenefits_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_basicbenefits_by_district(session, district_id)
     schema = schemas.BasicBenefitsIncomeByDistrict
 
@@ -915,15 +915,15 @@ async def get_residents_basicbenefits_by_district(district_id: int, session: Asy
 
 
 @router1.get('/districts/residents/ageunder18', response_model=list[schemas.ChildrenAgeUnder18ByDistrict], tags=['Sozialatlas'])
-async def get_residents_ageunder18_by_districts(session: AsyncSession = Depends(get_session)):
-    rows = await service.get_residents_ageunder18_by_districts(session)
+async def fetch_residents_ageunder18(session: AsyncSession = Depends(get_session)):
+    rows = await service.get_residents_ageunder18(session)
     schema = schemas.ChildrenAgeUnder18ByDistrict
 
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
 
 
 @router1.get('/{district_id}/residents/ageunder18', response_model=list[schemas.ChildrenAgeUnder18ByDistrict], tags=['Sozialatlas'])
-async def get_residents_ageunder18_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
+async def fetch_residents_ageunder18_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_ageunder18_by_district(session, district_id)
     schema = schemas.ChildrenAgeUnder18ByDistrict
 
@@ -932,15 +932,15 @@ async def get_residents_ageunder18_by_district(district_id: int, session: AsyncS
 
 
 @router1.get('/districts/residents/age18tounder65', response_model=list[schemas.ResidentsAge18ToUnder65ByDistrict], tags=['Sozialatlas'])
-async def get_residents_age18tounder65_by_districts(session: AsyncSession = Depends(get_session)):
-    rows = await service.get_residents_age18tounder65_by_districts(session)
+async def fetch_residents_age18tounder65(session: AsyncSession = Depends(get_session)):
+    rows = await service.get_residents_age18tounder65(session)
     schema = schemas.ResidentsAge18ToUnder65ByDistrict
 
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
 
 
 @router1.get('/{district_id}/residents/age18tounder65', response_model=list[schemas.ResidentsAge18ToUnder65ByDistrict], tags=['Sozialatlas'])
-async def get_residents_age18tounder65_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
+async def fetch_residents_age18tounder65_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_age18tounder65_by_district(session, district_id)
     schema = schemas.ResidentsAge18ToUnder65ByDistrict
 
@@ -949,15 +949,15 @@ async def get_residents_age18tounder65_by_district(district_id: int, session: As
 
 
 @router1.get('/districts/residents/age65andabove', response_model=list[schemas.ResidentsAge65AndAboveByDistrict], tags=['Sozialatlas'])
-async def get_residents_age65andabove_by_districts(session: AsyncSession = Depends(get_session)):
-    rows = await service.get_residents_age65andabove_by_districts(session)
+async def fetch_residents_age65andabove(session: AsyncSession = Depends(get_session)):
+    rows = await service.get_residents_age65andabove(session)
     schema = schemas.ResidentsAge65AndAboveByDistrict
 
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
 
 
 @router1.get('/{district_id}/residents/age65andabove', response_model=list[schemas.ResidentsAge65AndAboveByDistrict], tags=['Sozialatlas'])
-async def get_residents_age65andabove_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
+async def fetch_residents_age65andabove_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_age65andabove_by_district(session, district_id)
     schema = schemas.ResidentsAge65AndAboveByDistrict
 
@@ -966,8 +966,8 @@ async def get_residents_age65andabove_by_district(district_id: int, session: Asy
 
 
 @router1.get('/districts/residents/agegroups', response_model=list[schemas.AgeGroupsOfResidentsByDistrict], tags=['Sozialatlas'])
-async def get_residents_agegroups_by_districts(session: AsyncSession = Depends(get_session)):
-    rows = await service.get_residents_agegroups_by_districts(session)
+async def fetch_residents_agegroups(session: AsyncSession = Depends(get_session)):
+    rows = await service.get_residents_agegroups(session)
     schema = schemas.AgeGroupsOfResidentsByDistrict
 
     return [schema(year=r.year,
@@ -983,7 +983,7 @@ async def get_residents_agegroups_by_districts(session: AsyncSession = Depends(g
 
 
 @router1.get('/{district_id}/residents/agegroups', response_model=list[schemas.AgeGroupsOfResidentsByDistrict], tags=['Sozialatlas'])
-async def get_residents_agegroups_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
+async def fetch_residents_agegroups_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_agegroups_by_district(session, district_id)
     schema = schemas.AgeGroupsOfResidentsByDistrict
 
@@ -1001,15 +1001,15 @@ async def get_residents_agegroups_by_district(district_id: int, session: AsyncSe
 
 
 @router1.get('/districts/residents/unemployed', response_model=list[schemas.UnemployedResidentsByDistrict], tags=['Sozialatlas'])
-async def get_residents_unemployed_by_districts(session: AsyncSession = Depends(get_session)):
-    rows = await service.get_residents_unemployed_by_districts(session)
+async def fetch_residents_unemployed(session: AsyncSession = Depends(get_session)):
+    rows = await service.get_residents_unemployed(session)
     schema = schemas.UnemployedResidentsByDistrict
 
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
 
 
 @router1.get('/{district_id}/residents/unemployed', response_model=list[schemas.UnemployedResidentsByDistrict], tags=['Sozialatlas'])
-async def get_residents_unemployed_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
+async def fetch_residents_unemployed_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_unemployed_by_district(session, district_id)
     schema = schemas.UnemployedResidentsByDistrict
 
@@ -1018,8 +1018,8 @@ async def get_residents_unemployed_by_district(district_id: int, session: AsyncS
 
 
 @router1.get('/districts/residents/unemployed/categorized', response_model=list[schemas.UnemployedCategorizedResidentsByDistrict], tags=['Sozialatlas'])
-async def get_residents_unemployed_by_categories_by_districts(session: AsyncSession = Depends(get_session)):
-    rows = await service.get_residents_unemployed_by_categories_by_districts(session)
+async def fetch_residents_unemployed_by_categories(session: AsyncSession = Depends(get_session)):
+    rows = await service.get_residents_unemployed_by_categories(session)
     schema = schemas.UnemployedCategorizedResidentsByDistrict
 
     return [schema(year=r.year,
@@ -1034,7 +1034,7 @@ async def get_residents_unemployed_by_categories_by_districts(session: AsyncSess
 
 
 @router1.get('/{district_id}/residents/unemployed/categorized', response_model=list[schemas.UnemployedCategorizedResidentsByDistrict], tags=['Sozialatlas'])
-async def get_residents_unemployed_by_categories_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
+async def fetch_residents_unemployed_by_categories_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_unemployed_by_categories_by_district(session, district_id)
     schema = schemas.UnemployedCategorizedResidentsByDistrict
 
@@ -1051,15 +1051,15 @@ async def get_residents_unemployed_by_categories_by_district(district_id: int, s
 
 
 @router1.get('/districts/residents/beneficiaries', response_model=list[schemas.BeneficiariesByDistrict], tags=['Sozialatlas'])
-async def get_residents_beneficiaries_by_districts(session: AsyncSession = Depends(get_session)):
-    rows = await service.get_residents_beneficiaries_by_districts(session)
+async def fetch_residents_beneficiaries(session: AsyncSession = Depends(get_session)):
+    rows = await service.get_residents_beneficiaries(session)
     schema = schemas.BeneficiariesByDistrict
 
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
 
 
 @router1.get('/{district_id}/residents/beneficiaries', response_model=list[schemas.BeneficiariesByDistrict], tags=['Sozialatlas'])
-async def get_residents_beneficiaries_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
+async def fetch_residents_beneficiaries_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_beneficiaries_by_district(session, district_id)
     schema = schemas.BeneficiariesByDistrict
 
@@ -1068,15 +1068,15 @@ async def get_residents_beneficiaries_by_district(district_id: int, session: Asy
 
 
 @router1.get('/districts/residents/beneficiaries/inactive', response_model=list[schemas.InactiveBeneficiariesInHouseholdsByDistrict], tags=['Sozialatlas'])
-async def get_residents_beneficiaries_inactive_by_districts(session: AsyncSession = Depends(get_session)):
-    rows = await service.get_residents_beneficiaries_inactive_by_districts(session)
+async def fetch_residents_beneficiaries_inactive(session: AsyncSession = Depends(get_session)):
+    rows = await service.get_residents_beneficiaries_inactive(session)
     schema = schemas.InactiveBeneficiariesInHouseholdsByDistrict
 
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
 
 
 @router1.get('/{district_id}/residents/beneficiaries/inactive', response_model=list[schemas.InactiveBeneficiariesInHouseholdsByDistrict], tags=['Sozialatlas'])
-async def get_residents_beneficiaries_inactive_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
+async def fetch_residents_beneficiaries_inactive_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_beneficiaries_inactive_by_district(session, district_id)
     schema = schemas.InactiveBeneficiariesInHouseholdsByDistrict
 
@@ -1085,8 +1085,8 @@ async def get_residents_beneficiaries_inactive_by_district(district_id: int, ses
 
 
 @router1.get('/districts/residents/beneficiaries/characteristics', response_model=list[schemas.BeneficiariesCharacteristicsByDistrict], tags=['Sozialatlas'])
-async def get_residents_beneficiaries_by_characteristics_by_districts(session: AsyncSession = Depends(get_session)):
-    rows = await service.get_residents_beneficiaries_characteristics_by_districts(session)
+async def fetch_residents_beneficiaries_by_characteristics(session: AsyncSession = Depends(get_session)):
+    rows = await service.get_residents_beneficiaries_characteristics(session)
     schema = schemas.BeneficiariesCharacteristicsByDistrict
 
     return [schema(year=r.year,
@@ -1099,7 +1099,7 @@ async def get_residents_beneficiaries_by_characteristics_by_districts(session: A
 
 
 @router1.get('/{district_id}/residents/beneficiaries/characteristics', response_model=list[schemas.BeneficiariesCharacteristicsByDistrict], tags=['Sozialatlas'])
-async def get_residents_beneficiaries_by_characteristics_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
+async def fetch_residents_beneficiaries_by_characteristics_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_beneficiaries_characteristics_by_district(session, district_id)
     schema = schemas.BeneficiariesCharacteristicsByDistrict
 
@@ -1114,8 +1114,8 @@ async def get_residents_beneficiaries_by_characteristics_by_district(district_id
 
 
 @router1.get('/districts/residents/beneficiaries/age15tounder65', response_model=list[schemas.BeneficiariesAge15ToUnder65ByDistrict], tags=['Sozialatlas'])
-async def get_residents_beneficiaries_age15tounder65_by_districts(session: AsyncSession = Depends(get_session)):
-    rows = await service.get_residents_beneficiaries_age15tounder65_by_districts(session)
+async def fetch_residents_beneficiaries_age15tounder65(session: AsyncSession = Depends(get_session)):
+    rows = await service.get_residents_beneficiaries_age15tounder65(session)
     schema = schemas.BeneficiariesAge15ToUnder65ByDistrict
 
     return [schema(year=r.year,
@@ -1128,7 +1128,7 @@ async def get_residents_beneficiaries_age15tounder65_by_districts(session: Async
 
 
 @router1.get('/{district_id}/residents/beneficiaries/age15tounder65', response_model=list[schemas.BeneficiariesAge15ToUnder65ByDistrict], tags=['Sozialatlas'])
-async def get_residents_beneficiaries_age15tounder65_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
+async def fetch_residents_beneficiaries_age15tounder65_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_beneficiaries_age15tounder65_by_district(session, district_id)
     schema = schemas.BeneficiariesAge15ToUnder65ByDistrict
 
@@ -1143,8 +1143,8 @@ async def get_residents_beneficiaries_age15tounder65_by_district(district_id: in
 
 
 @router1.get('/districts/residents/migration/background', response_model=list[schemas.MigrationBackgroundByDistrict], tags=['Sozialatlas'])
-async def get_residents_migration_background_by_districts(session: AsyncSession = Depends(get_session)):
-    rows = await service.get_residents_migration_background_by_districts(session)
+async def fetch_residents_migration_background(session: AsyncSession = Depends(get_session)):
+    rows = await service.get_residents_migration_background(session)
     schema = schemas.MigrationBackgroundByDistrict
 
     return [schema(year=r.year,
@@ -1154,7 +1154,7 @@ async def get_residents_migration_background_by_districts(session: AsyncSession 
 
 
 @router1.get('/{district_id}/residents/migration/background', response_model=list[schemas.MigrationBackgroundByDistrict], tags=['Sozialatlas'])
-async def get_residents_migration_background_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
+async def fetch_residents_migration_background_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_migration_background_by_district(session, district_id)
     schema = schemas.MigrationBackgroundByDistrict
 
@@ -1166,8 +1166,8 @@ async def get_residents_migration_background_by_district(district_id: int, sessi
 
 
 @router1.get('/districts/residents/housing/assistance', response_model=list[schemas.HousingAssistanceCasesByDistrict], tags=['Sozialatlas'])
-async def get_residents_housing_assistance_by_districts(session: AsyncSession = Depends(get_session)):
-    rows = await service.get_residents_housing_assistance_by_districts(session)
+async def fetch_residents_housing_assistance(session: AsyncSession = Depends(get_session)):
+    rows = await service.get_residents_housing_assistance(session)
     schema = schemas.HousingAssistanceCasesByDistrict
 
     return [schema(year=r.year, district_id=r.district_id,
@@ -1181,7 +1181,7 @@ async def get_residents_housing_assistance_by_districts(session: AsyncSession = 
 
 
 @router1.get('/{district_id}/residents/housing/assistance', response_model=list[schemas.HousingAssistanceCasesByDistrict], tags=['Sozialatlas'])
-async def get_residents_housing_assistance_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
+async def fetch_residents_housing_assistance_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_housing_assistance_by_district(session, district_id)
     schema = schemas.HousingAssistanceCasesByDistrict
 
@@ -1197,8 +1197,8 @@ async def get_residents_housing_assistance_by_district(district_id: int, session
 
 
 @router1.get('/districts/residents/housing/benefit', response_model=list[schemas.HousingBenefitByDistrict], tags=['Sozialatlas'])
-async def get_residents_housing_benefit_by_district(session: AsyncSession = Depends(get_session)):
-    rows = await service.get_residents_housing_benefit_by_districts(session)
+async def fetch_residents_housing_benefit_by_district(session: AsyncSession = Depends(get_session)):
+    rows = await service.get_residents_housing_benefit(session)
     schema = schemas.HousingBenefitByDistrict
 
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
@@ -1206,15 +1206,15 @@ async def get_residents_housing_benefit_by_district(session: AsyncSession = Depe
 
 
 @router1.get('/districts/residents/housing/benefit', response_model=list[schemas.HousingBenefitByDistrict], tags=['Sozialatlas'])
-async def get_residents_housing_benefit_by_districts(session: AsyncSession = Depends(get_session)):
-    rows = await service.get_residents_housing_benefit_by_districts(session)
+async def fetch_residents_housing_benefit(session: AsyncSession = Depends(get_session)):
+    rows = await service.get_residents_housing_benefit(session)
     schema = schemas.HousingBenefitByDistrict
 
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
 
 
 @router1.get('/{district_id}/residents/housing/benefit', response_model=list[schemas.HousingBenefitByDistrict], tags=['Sozialatlas'])
-async def get_residents_housing_benefit_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
+async def fetch_residents_housing_benefit_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_housing_benefit_by_district(session, district_id)
     schema = schemas.HousingBenefitByDistrict
 
@@ -1224,15 +1224,15 @@ async def get_residents_housing_benefit_by_district(district_id: int, session: A
 
 @router1.get('/districts/residents/risk/homelessness',
         response_model=list[schemas.HouseholdsAtRiskOfHomelessnessByDistricts], tags=['Sozialatlas'])
-async def get_residents_risk_homelessness_by_districts(session: AsyncSession = Depends(get_session)):
-    rows = await service.get_residents_risk_homelessness_by_districts(session)
+async def fetch_residents_risk_homelessness(session: AsyncSession = Depends(get_session)):
+    rows = await service.get_residents_risk_homelessness(session)
     schema = schemas.HouseholdsAtRiskOfHomelessnessByDistricts
 
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
 
 
 @router1.get('/{district_id}/residents/risk/homelessness', response_model=list[schemas.HouseholdsAtRiskOfHomelessnessByDistrict], tags=['Sozialatlas'])
-async def get_residents_risk_homelessness_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
+async def fetch_residents_risk_homelessness_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
     rows = await service.get_residents_risk_homelessness_by_district(session, district_id)
     schema = schemas.HouseholdsAtRiskOfHomelessnessByDistrict
 
