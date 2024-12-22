@@ -4,7 +4,7 @@ from typing import Optional
 
 
 
-class DwdStationReference(BaseModel):
+class DwdStationReferenceResponse(BaseModel):
     station_name: str
     station_id: str
     identifier: str
@@ -30,7 +30,7 @@ class WeatherStationResponse(BaseModel):
 
 
 
-class DistrictDetails(BaseModel):
+class DistrictDetailsResponse(BaseModel):
     district_name: str
     residents: Optional[int]
     births: int
@@ -79,46 +79,46 @@ class DistrictDetails(BaseModel):
     german_citizenship: int
 
 
-class District(BaseModel):
+class DistrictResponse(BaseModel):
     district_id: int
     district_name: Optional[str]
 
 
-class Districts(District):
-    districts: list[District]
+class DistrictsResponse(DistrictResponse):
+    pass
 
 
-class HouseholdType(BaseModel):
+class HouseholdTypeResponse(BaseModel):
     household_id: Optional[int]
     household_type: Optional[str]
 
 
-class HouseholdTypes(HouseholdType):
+class HouseholdTypes(HouseholdTypeResponse):
     pass
 
 
-class ResidentsByDistrict(BaseModel):
+class ResidentsByDistrictResponse(BaseModel):
     year: int
     district_id: int
     residents: Optional[int]
 
 
-class ResidentsByDistricts(ResidentsByDistrict):
+class Residents(ResidentsByDistrictResponse):
     pass
 
 
-class BirthsByDistrict(BaseModel):
+class BirthsByDistrictResponse(BaseModel):
     year: int
     district_id: int
     births: Optional[int]
     birth_rate: Optional[float]
 
 
-class BirthsByDistricts(BirthsByDistrict):
+class Births(BirthsByDistrictResponse):
     pass
 
 
-class AgeGroupsOfResidents(BaseModel):
+class AgeGroupsOfResidentsResponse(BaseModel):
     year: int
     age_under_18: Optional[int]
     age_18_to_under_30: Optional[int]
@@ -128,17 +128,17 @@ class AgeGroupsOfResidents(BaseModel):
     age_80_and_above: Optional[int]
 
 
-class AgeRatioByDistrict(BaseModel):
+class AgeRatioByDistrictResponse(BaseModel):
     year: int
     district_id: int
     quotient: Optional[float]
 
 
-class AgeRatioByDistricts(AgeRatioByDistrict):
+class AgeRatio(AgeRatioByDistrictResponse):
     pass
 
 
-class AgeGroupsOfResidentsByDistrict(BaseModel):
+class AgeGroupsOfResidentsByDistrictResponse(BaseModel):
     year: int
     district_id: int
     age_under_18: Optional[int]
@@ -151,52 +151,52 @@ class AgeGroupsOfResidentsByDistrict(BaseModel):
     age_60_and_above: Optional[int]
 
 
-class AgeGroupsOfResidentsByDistrict(AgeGroupsOfResidentsByDistrict):
+class AgeGroupsOfResidentsByDistrict(AgeGroupsOfResidentsByDistrictResponse):
     pass
 
 
-class ChildrenAgeUnder18ByDistrict(BaseModel):
+class ChildrenAgeUnder18ByDistrictResponse(BaseModel):
     year: int
     district_id: int
     residents: Optional[int]
 
 
-class ChildrenAgeUnder18ByDistricts(ChildrenAgeUnder18ByDistrict):
+class ChildrenAgeUnder18(ChildrenAgeUnder18ByDistrictResponse):
     pass
 
 
-class ResidentsAge18ToUnder65ByDistrict(BaseModel):
+class ResidentsAge18ToUnder65ByDistrictResponse(BaseModel):
     year: int
     district_id: int
     residents: Optional[int]
 
 
-class ResidentsAge18ToUnder65ByDistricts(ResidentsAge18ToUnder65ByDistrict):
+class ResidentsAge18ToUnder65(ResidentsAge18ToUnder65ByDistrictResponse):
     pass
 
 
-class ResidentsAge65AndAboveByDistrict(BaseModel):
+class ResidentsAge65AndAboveByDistrictResponse(BaseModel):
     year: int
     district_id: int
     residents: Optional[int]
 
 
-class ResidentsAge65AndAboveByDistricts(ResidentsAge65AndAboveByDistrict):
+class ResidentsAge65AndAbove(ResidentsAge65AndAboveByDistrictResponse):
     pass
 
 
-class MigrationBackgroundByDistrict(BaseModel):
+class MigrationBackgroundByDistrictResponse(BaseModel):
     year: int
     district_id: int
     foreign_citizenship: Optional[int]
     german_citizenship: Optional[int]
 
 
-class MigrationBackgroundByDistricts(MigrationBackgroundByDistrict):
+class MigrationBackground(MigrationBackgroundByDistrictResponse):
     pass
 
 
-class NonGermanNationalsResidenceStatus(BaseModel):
+class NonGermanNationalsResidenceStatusResponse(BaseModel):
     year: Optional[int]
     permanent_residency: Optional[int]
     permanent_residency_according_eu_freedom_movement_act: Optional[int]
@@ -206,28 +206,28 @@ class NonGermanNationalsResidenceStatus(BaseModel):
     suspension_of_deportation: Optional[int]
 
 
-class EmployedWithPensionInsuranceByDistrict(BaseModel):
+class EmployedWithPensionInsuranceByDistrictResponse(BaseModel):
     year: int
     district_id: int
     residents: Optional[int]
     employment_rate: Optional[float]
 
 
-class EmployedWithPensionInsuranceByDistricts(EmployedWithPensionInsuranceByDistrict):
+class EmployedWithPensionInsurance(EmployedWithPensionInsuranceByDistrictResponse):
     pass
 
 
-class UnemployedResidentsByDistrict(BaseModel):
+class UnemployedResidentsByDistrictResponse(BaseModel):
     year: int
     district_id: int
     residents: Optional[int]
 
 
-class UnemployedResidentsByDistricts(UnemployedResidentsByDistrict):
+class UnemployedResidents(UnemployedResidentsByDistrictResponse):
     pass
 
 
-class UnemployedCategorizedResidentsByDistrict(BaseModel):
+class UnemployedResidentsCategorizedByDistrictResponse(BaseModel):
     year: int
     district_id: Optional[int]
     unemployed_total: Optional[int]
@@ -239,21 +239,21 @@ class UnemployedCategorizedResidentsByDistrict(BaseModel):
     percentage_age_under_25: Optional[float]
 
 
-class UnemployedCategorizedResidentsByDistricts(UnemployedCategorizedResidentsByDistrict):
+class UnemployedCategorizedResidents(UnemployedResidentsCategorizedByDistrictResponse):
     pass
 
 
-class HousingBenefitByDistrict(BaseModel):
+class HousingBenefitByDistrictResponse(BaseModel):
     year: int
     district_id: int
     residents: Optional[int]
 
 
-class HousingBenefitByDistricts(HousingBenefitByDistrict):
+class HousingBenefit(HousingBenefitByDistrictResponse):
     pass
 
 
-class HousingAssistanceCasesByDistrict(BaseModel):
+class HousingAssistanceCasesByDistrictResponse(BaseModel):
     year: int
     district_id: int
     general_consulting: Optional[int]
@@ -265,21 +265,21 @@ class HousingAssistanceCasesByDistrict(BaseModel):
     eviction_carried: Optional[int]
 
 
-class HousingAssistanceCasesByDistricts(HousingAssistanceCasesByDistrict):
+class HousingAssistanceCases(HousingAssistanceCasesByDistrictResponse):
     pass
 
 
-class HouseholdsAtRiskOfHomelessnessByDistrict(BaseModel):
+class HouseholdsRiskOfHomelessnessByDistrictResponse(BaseModel):
     year: Optional[int]
     district_id: int
     residents: Optional[int]
 
 
-class HouseholdsAtRiskOfHomelessnessByDistricts(HouseholdsAtRiskOfHomelessnessByDistrict):
+class HouseholdsAtRiskOfHomelessness(HouseholdsRiskOfHomelessnessByDistrictResponse):
     pass
 
 
-class BeneficiariesAge15ToUnder65ByDistrict(BaseModel):
+class BeneficiariesAge15ToUnder65ByDistrictResponse(BaseModel):
     year: int
     district_id: Optional[int]
     percentage_of_total_residents: Optional[float]
@@ -289,21 +289,21 @@ class BeneficiariesAge15ToUnder65ByDistrict(BaseModel):
     assisting_benefits: Optional[int]
 
 
-class BeneficiariesAge15ToUnder65ByDistricts(BeneficiariesAge15ToUnder65ByDistrict):
+class BeneficiariesAge15ToUnder65(BeneficiariesAge15ToUnder65ByDistrictResponse):
     pass
 
 
-class BeneficiariesByDistrict(BaseModel):
+class BeneficiariesByDistrictResponse(BaseModel):
     year: int
     district_id: int
     residents: Optional[int]
 
 
-class BeneficiariesByDistricts(BeneficiariesByDistrict):
+class Beneficiaries(BeneficiariesByDistrictResponse):
     pass
 
 
-class BeneficiariesCharacteristicsByDistrict(BaseModel):
+class BeneficiariesCharacteristicsByDistrictResponse(BaseModel):
     year: int
     district_id: Optional[int]
     unemployability: Optional[int]
@@ -313,21 +313,21 @@ class BeneficiariesCharacteristicsByDistrict(BaseModel):
     percentage_foreign_citizenship: Optional[float]
 
 
-class BeneficiariesCharacteristicsByDistricts(BeneficiariesCharacteristicsByDistrict):
+class BeneficiariesCharacteristics(BeneficiariesCharacteristicsByDistrictResponse):
     pass
 
 
-class InactiveBeneficiariesInHouseholdsByDistrict(BaseModel):
+class InactiveBeneficiariesInHouseholdsByDistrictResponse(BaseModel):
     year: int
     district_id: int
     residents: Optional[int]
 
 
-class InactiveBeneficiariesInHouseholdsByDistricts(InactiveBeneficiariesInHouseholdsByDistrict):
+class InactiveBeneficiariesInHouseholds(InactiveBeneficiariesInHouseholdsByDistrictResponse):
     pass
 
 
-class BasicBenefitsIncomeByDistrict(BaseModel):
+class BasicBenefitsIncomeByDistrictResponse(BaseModel):
     year: int
     district_id: Optional[int]
     male: Optional[int]
@@ -336,17 +336,17 @@ class BasicBenefitsIncomeByDistrict(BaseModel):
     age_65_and_above: Optional[int]
 
 
-class BasicBenefitsIncomeByDistricts(BasicBenefitsIncomeByDistrict):
+class BasicBenefitsIncome(BasicBenefitsIncomeByDistrictResponse):
     pass
 
 
-class DebtCounselingOfResidents(BaseModel):
+class DebtCounselingOfResidentsResponse(BaseModel):
     year: int
     household_type_id: Optional[int]
     residents: Optional[int]
 
 
-class ChildEducationSupport(BaseModel):
+class ChildEducationSupportResponse(BaseModel):
     year: int
     educational_assistance: Optional[int]
     parenting_counselor: Optional[int]

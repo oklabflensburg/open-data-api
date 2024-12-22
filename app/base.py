@@ -1,16 +1,15 @@
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from functools import lru_cache
 
-import config
+from .config import Settings
 
 
 
 @lru_cache()
 def get_settings():
-    return config.Settings()
+    return Settings()
 
 
 host = get_settings().host

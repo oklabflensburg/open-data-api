@@ -222,7 +222,7 @@ Once the data is imported, you can start the Open Data API locally using the fol
 ```sh
 cd ../open-data-api
 source venv/bin/activate
-uvicorn main:app --reload
+uvicorn app.main:app --reload
 ```
 
 ### Testing the API:
@@ -260,7 +260,7 @@ ExecStart=/srv/oklab/open-data-api/venv/bin/uvicorn \
         --forwarded-allow-ips='*' \
         --workers=4 \
         --port=6720 \
-        main:app
+        app.main:app
 ExecReload=/bin/kill -HUP ${MAINPID}
 RestartSec=1
 Restart=always
