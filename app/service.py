@@ -12,9 +12,6 @@ from .models import *
 
 
 async def get_dwd_stations_by_municipality_key(session: AsyncSession, municipality_key: str):
-    DwdStationReference = DwdStationReference
-    Vg250Gem = Vg250Gem
-
     geojson = cast(func.ST_AsGeoJSON(DwdStationReference.wkb_geometry, 15), JSON).label('geojson')
     gem_alias = aliased(Vg250Gem)
 
@@ -1219,7 +1216,7 @@ async def get_municipality_by_name(session: AsyncSession, name: str):
 
 
 
-async def get_biotope_origin(session: AsyncSession, code: str):
+async def get_biotope_origin_meta(session: AsyncSession, code: str):
     stmt = text('''
     SELECT
         bo.description
@@ -1330,6 +1327,7 @@ async def get_monument_by_object_id(session: AsyncSession, object_id: int):
             mxr.monument_id
     )
     SELECT
+        ST_AsGeoJSON(m.wkb_geometry, 15)::jsonb AS geojson,
         m.object_id,
         m.street,
         m.housenumber,
@@ -1339,16 +1337,15 @@ async def get_monument_by_object_id(session: AsyncSession, object_id: int):
         m.designation,
         m.description,
         m.monument_type,
-        r.reason_labels AS monument_reason,
-        ST_AsGeoJSON(m.wkb_geometry, 15)::jsonb AS geojson
+        r.reason_labels AS monument_reason
     FROM
         sh_monuments AS m
     LEFT JOIN
-        sh_monument_reasons AS r
+        monument_reasons AS r
     ON
         m.id = r.monument_id
     WHERE
-        m.object_id = :q
+        m.id = :q
     ''')
 
     sql = stmt.bindparams(q=object_id)

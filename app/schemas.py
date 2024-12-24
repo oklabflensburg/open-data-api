@@ -93,17 +93,13 @@ class HouseholdTypeResponse(BaseModel):
     household_type: Optional[str]
 
 
-class HouseholdTypes(HouseholdTypeResponse):
-    pass
-
-
 class ResidentsByDistrictResponse(BaseModel):
     year: int
     district_id: int
     residents: Optional[int]
 
 
-class Residents(ResidentsByDistrictResponse):
+class ResidentsResponse(ResidentsByDistrictResponse):
     pass
 
 
@@ -114,7 +110,7 @@ class BirthsByDistrictResponse(BaseModel):
     birth_rate: Optional[float]
 
 
-class Births(BirthsByDistrictResponse):
+class BirthsResponse(BirthsByDistrictResponse):
     pass
 
 
@@ -134,7 +130,7 @@ class AgeRatioByDistrictResponse(BaseModel):
     quotient: Optional[float]
 
 
-class AgeRatio(AgeRatioByDistrictResponse):
+class AgeRatioResponse(AgeRatioByDistrictResponse):
     pass
 
 
@@ -151,7 +147,7 @@ class AgeGroupsOfResidentsByDistrictResponse(BaseModel):
     age_60_and_above: Optional[int]
 
 
-class AgeGroupsOfResidentsByDistrict(AgeGroupsOfResidentsByDistrictResponse):
+class AgeGroupsOfResidentsByDistrictResponse(AgeGroupsOfResidentsByDistrictResponse):
     pass
 
 
@@ -161,7 +157,7 @@ class ChildrenAgeUnder18ByDistrictResponse(BaseModel):
     residents: Optional[int]
 
 
-class ChildrenAgeUnder18(ChildrenAgeUnder18ByDistrictResponse):
+class ChildrenAgeUnder18Response(ChildrenAgeUnder18ByDistrictResponse):
     pass
 
 
@@ -171,7 +167,7 @@ class ResidentsAge18ToUnder65ByDistrictResponse(BaseModel):
     residents: Optional[int]
 
 
-class ResidentsAge18ToUnder65(ResidentsAge18ToUnder65ByDistrictResponse):
+class ResidentsAge18ToUnder65Response(ResidentsAge18ToUnder65ByDistrictResponse):
     pass
 
 
@@ -181,7 +177,7 @@ class ResidentsAge65AndAboveByDistrictResponse(BaseModel):
     residents: Optional[int]
 
 
-class ResidentsAge65AndAbove(ResidentsAge65AndAboveByDistrictResponse):
+class ResidentsAge65AndAboveResponse(ResidentsAge65AndAboveByDistrictResponse):
     pass
 
 
@@ -192,7 +188,7 @@ class MigrationBackgroundByDistrictResponse(BaseModel):
     german_citizenship: Optional[int]
 
 
-class MigrationBackground(MigrationBackgroundByDistrictResponse):
+class MigrationBackgroundResponse(MigrationBackgroundByDistrictResponse):
     pass
 
 
@@ -213,7 +209,7 @@ class EmployedWithPensionInsuranceByDistrictResponse(BaseModel):
     employment_rate: Optional[float]
 
 
-class EmployedWithPensionInsurance(EmployedWithPensionInsuranceByDistrictResponse):
+class EmployedWithPensionInsuranceResponse(EmployedWithPensionInsuranceByDistrictResponse):
     pass
 
 
@@ -223,7 +219,7 @@ class UnemployedResidentsByDistrictResponse(BaseModel):
     residents: Optional[int]
 
 
-class UnemployedResidents(UnemployedResidentsByDistrictResponse):
+class UnemployedResidentsResponse(UnemployedResidentsByDistrictResponse):
     pass
 
 
@@ -239,7 +235,7 @@ class UnemployedResidentsCategorizedByDistrictResponse(BaseModel):
     percentage_age_under_25: Optional[float]
 
 
-class UnemployedCategorizedResidents(UnemployedResidentsCategorizedByDistrictResponse):
+class UnemployedCategorizedResidentsResponse(UnemployedResidentsCategorizedByDistrictResponse):
     pass
 
 
@@ -249,7 +245,7 @@ class HousingBenefitByDistrictResponse(BaseModel):
     residents: Optional[int]
 
 
-class HousingBenefit(HousingBenefitByDistrictResponse):
+class HousingBenefitResponse(HousingBenefitByDistrictResponse):
     pass
 
 
@@ -265,7 +261,7 @@ class HousingAssistanceCasesByDistrictResponse(BaseModel):
     eviction_carried: Optional[int]
 
 
-class HousingAssistanceCases(HousingAssistanceCasesByDistrictResponse):
+class HousingAssistanceCasesResponse(HousingAssistanceCasesByDistrictResponse):
     pass
 
 
@@ -275,7 +271,7 @@ class HouseholdsRiskOfHomelessnessByDistrictResponse(BaseModel):
     residents: Optional[int]
 
 
-class HouseholdsAtRiskOfHomelessness(HouseholdsRiskOfHomelessnessByDistrictResponse):
+class HouseholdsAtRiskOfHomelessnessResponse(HouseholdsRiskOfHomelessnessByDistrictResponse):
     pass
 
 
@@ -289,7 +285,7 @@ class BeneficiariesAge15ToUnder65ByDistrictResponse(BaseModel):
     assisting_benefits: Optional[int]
 
 
-class BeneficiariesAge15ToUnder65(BeneficiariesAge15ToUnder65ByDistrictResponse):
+class BeneficiariesAge15ToUnder65Response(BeneficiariesAge15ToUnder65ByDistrictResponse):
     pass
 
 
@@ -299,7 +295,7 @@ class BeneficiariesByDistrictResponse(BaseModel):
     residents: Optional[int]
 
 
-class Beneficiaries(BeneficiariesByDistrictResponse):
+class BeneficiariesResponse(BeneficiariesByDistrictResponse):
     pass
 
 
@@ -313,7 +309,7 @@ class BeneficiariesCharacteristicsByDistrictResponse(BaseModel):
     percentage_foreign_citizenship: Optional[float]
 
 
-class BeneficiariesCharacteristics(BeneficiariesCharacteristicsByDistrictResponse):
+class BeneficiariesCharacteristicsResponse(BeneficiariesCharacteristicsByDistrictResponse):
     pass
 
 
@@ -323,7 +319,7 @@ class InactiveBeneficiariesInHouseholdsByDistrictResponse(BaseModel):
     residents: Optional[int]
 
 
-class InactiveBeneficiariesInHouseholds(InactiveBeneficiariesInHouseholdsByDistrictResponse):
+class InactiveBeneficiariesInHouseholdsResponse(InactiveBeneficiariesInHouseholdsByDistrictResponse):
     pass
 
 
@@ -336,7 +332,7 @@ class BasicBenefitsIncomeByDistrictResponse(BaseModel):
     age_65_and_above: Optional[int]
 
 
-class BasicBenefitsIncome(BasicBenefitsIncomeByDistrictResponse):
+class BasicBenefitsIncomeResponse(BasicBenefitsIncomeByDistrictResponse):
     pass
 
 
