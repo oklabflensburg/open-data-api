@@ -526,3 +526,13 @@ class ChildEducationSupport(Base):
     residential_education = Column(Integer)
     integration_assistance = Column(Integer)
     additional_support = Column(Integer)
+
+
+# Accident Meta Model
+class DeAccidentMeta(Base):
+    __tablename__ = 'de_accident_meta'
+
+    id = Column(Integer, primary_key=True, index=True)
+    value = Column(Integer, nullable=False)
+    name = Column(String, nullable=False)
+    category = Column(String, nullable=False)

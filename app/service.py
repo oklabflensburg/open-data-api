@@ -1380,68 +1380,8 @@ async def get_demographics_meta(session: AsyncSession):
 
 
 async def get_accident_meta(session: AsyncSession):
-    stmt = text('''
-    SELECT json_build_object(
-        'istfuss', (
-            SELECT json_agg(row_to_json(f))
-            FROM istfuss AS f
-        ),
-        'istgkfz', (
-            SELECT json_agg(row_to_json(g))
-            FROM istgkfz AS g
-        ),
-        'istkrad', (
-            SELECT json_agg(row_to_json(k))
-            FROM istkrad AS k
-        ),
-        'istpkw', (
-            SELECT json_agg(row_to_json(p))
-            FROM istpkw AS p
-        ),
-        'istrad', (
-            SELECT json_agg(row_to_json(r))
-            FROM istrad AS r
-        ),
-        'istsonstig', (
-            SELECT json_agg(row_to_json(s))
-            FROM istsonstig AS s
-        ),
-        'uart', (
-            SELECT json_agg(row_to_json(a))
-            FROM uart AS a
-        ),
-        'ukategorie', (
-            SELECT json_agg(row_to_json(c))
-            FROM ukategorie AS c
-        ),
-        'uland', (
-            SELECT json_agg(row_to_json(l))
-            FROM uland AS l
-        ),
-        'ulichtverh', (
-            SELECT json_agg(row_to_json(y))
-            FROM ulichtverh AS y
-        ),
-        'ustrzustan', (
-            SELECT json_agg(row_to_json(z))
-            FROM ustrzustan AS z
-        ),
-        'uwochentag', (
-            SELECT json_agg(row_to_json(w))
-            FROM uwochentag AS w
-        ),
-        'umonat', (
-            SELECT json_agg(row_to_json(m))
-            FROM umonat AS m
-        ),
-        'utyp1', (
-            SELECT json_agg(row_to_json(t))
-            FROM utyp1 AS t
-        )
-    ) AS meta
-    ''')
-
-    result = await session.execute(stmt)
+    model = DeAccidentMeta
+    result = await session.execute(select(model))
 
     return result.scalars().all()
 

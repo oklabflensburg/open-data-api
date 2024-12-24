@@ -352,3 +352,9 @@ class ChildEducationSupportResponse(BaseModel):
     residential_education: Optional[int]
     integration_assistance: Optional[int]
     additional_support: Optional[int]
+
+
+class DeAccidentMetaResponse(BaseModel):
+    value: int
+    name: str
+    category: str
