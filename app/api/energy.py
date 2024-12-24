@@ -1,4 +1,4 @@
-from fastapi import Depends, APIRouter, Query
+from fastapi import HTTPException, Depends, APIRouter, Query
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.ext.asyncio import AsyncSession
