@@ -5,8 +5,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
 
 from ..dependencies import get_session
-from ..service import get_dwd_stations_by_municipality_key, get_weather_service_stations
-from ..schemas import DwdStationReferenceResponse, WeatherStationResponse
+from ..services.climate import get_dwd_stations_by_municipality_key, get_weather_service_stations
+from ..schemas.climate import DwdStationReferenceResponse, WeatherStationResponse
 
 
 route_climate = APIRouter(prefix='/climate/v1')

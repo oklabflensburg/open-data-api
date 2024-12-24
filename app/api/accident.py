@@ -5,8 +5,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
 
 from ..dependencies import get_session
-from ..service import get_accident_meta, get_accident_details_by_city
-from ..schemas import DeAccidentMetaResponse
+from ..services.accident import get_accident_meta, get_accident_details_by_city
+from ..schemas.accident import DeAccidentMetaResponse
 
 route_accident = APIRouter(prefix='/accident/v1')
 

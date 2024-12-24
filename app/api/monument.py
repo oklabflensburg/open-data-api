@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
 
 from ..dependencies import get_session
-from ..service import get_monument_by_object_id
+from ..services.monument import get_monument_by_object_id
 
 
 route_monument = APIRouter(prefix='/monument/v1')

@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
 
 from ..dependencies import get_session
-from ..service import get_biotope_meta_by_lat_lng, get_biotope_origin_meta
+from ..services.biotope import get_biotope_meta_by_lat_lng, get_biotope_origin_meta
 
 route_biotope = APIRouter(prefix='/biotope/v1')
 

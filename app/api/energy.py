@@ -5,10 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
 
 from ..dependencies import get_session
-from ..service import (
-    get_energy_state_meta, get_energy_country_meta, get_network_operator_audit_meta, get_energy_location_meta, get_energy_supply_meta, get_energy_source_meta, get_turbine_manufacturer_meta, get_power_limitation_meta, get_power_technology_meta, get_main_orientation_meta, get_orientation_tilt_angle_meta, get_usage_area_meta, get_operational_status_meta, get_biomass_type_meta, get_primary_fuel_meta, get_combustion_unit_by_id, get_combustion_unit_by_municipality_key, get_nuclear_unit_by_id, get_nuclear_unit_by_municipality_key, get_water_unit_by_id, get_water_unit_by_municipality_key, get_biomass_unit_by_id, get_biomass_unit_by_municipality_key, get_wind_unit_by_id, get_wind_unit_by_municipality_key, get_solar_unit_by_id, get_solar_unit_by_municipality_key)
-from ..schemas import *
-
+from ..services.energy import *
 
 route_energy = APIRouter(prefix='/energy/v1')
 

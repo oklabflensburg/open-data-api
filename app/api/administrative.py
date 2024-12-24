@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
 
 from ..dependencies import get_session
-from ..service import get_parcel_meta_by_lat_lng, get_municipality_by_query, get_municipality_by_name, get_municipality_by_key
+from ..services.administrative import get_parcel_meta_by_lat_lng, get_municipality_by_query, get_municipality_by_name, get_municipality_by_key
 
 
 route_administrative = APIRouter(prefix='/administrative/v1')
