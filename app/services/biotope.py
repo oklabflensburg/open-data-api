@@ -1,22 +1,25 @@
-from sqlalchemy.sql import text
+from sqlalchemy.sql import func, text
+from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import HTTPException
 
+from ..models.biotope import ShBiotopeOrigin
+from ..utils.sanitizer import sanitize_string
 
 
 async def get_biotope_origin_meta(session: AsyncSession, code: str):
-    stmt = text('''
-    SELECT
-        bo.description
-    FROM
-        sh_biotope_origin AS bo
-    WHERE
-        LOWER(bo.code) = :code
-    ''')
+    try:
+        value = sanitize_string(code.lower())
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
-    sql = stmt.bindparams(code=code.lower())
-    result = await session.execute(sql)
+    model = ShBiotopeOrigin
 
-    return result.mappings().all()
+    stmt = select(model.description).where(func.lower(model.code) == value)
+
+    result = await session.execute(stmt)
+
+    return result.scalars().all()
 
 
 
