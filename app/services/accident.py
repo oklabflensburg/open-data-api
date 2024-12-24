@@ -1,8 +1,10 @@
 from sqlalchemy.sql import func, text, bindparam
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from fastapi import HTTPException
 
 from ..models.accident import DeAccidentMeta
+from ..utils.sanitizer import sanitize_string
 
 
 
@@ -14,6 +16,11 @@ async def get_accident_meta(session: AsyncSession):
 
 
 async def get_accident_details_by_city(session: AsyncSession, query: str):
+    try:
+        value = sanitize_string(query.lower())
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
     stmt = text('''
     SELECT json_build_object(
         'type', 'FeatureCollection',
@@ -40,7 +47,7 @@ async def get_accident_details_by_city(session: AsyncSession, query: str):
     ) AS fc
     ''')
 
-    sql = stmt.bindparams(q=query.lower())
+    sql = stmt.bindparams(q=value)
     result = await session.execute(sql)
 
     return result.scalars().all()
