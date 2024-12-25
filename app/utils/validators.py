@@ -17,3 +17,10 @@ def validate_positive_smallint(value: int) -> int:
         raise ValueError('Value must be a positive smallint.')
 
     return value
+
+
+def validate_not_none(value, field_name='value'):
+    if value is None:
+        raise ValueError(f'{field_name} must not be None.')
+
+    return value

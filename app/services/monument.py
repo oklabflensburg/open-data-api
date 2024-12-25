@@ -2,7 +2,7 @@ from sqlalchemy.sql import text
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException
 
-from ..utils.validate import validate_positive_int32
+from ..utils.validators import validate_positive_int32
 
 
 
