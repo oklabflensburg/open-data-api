@@ -3,10 +3,10 @@ name: Run codeql
 on:
   push:
     paths:
-     - 'src/**/*.py'
+     - 'app/**/*.py'
   pull_request:
     paths:
-     - 'src/**/*.py'
+     - 'app/**/*.py'
 
 jobs:
   analyze:
