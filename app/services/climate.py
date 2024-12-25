@@ -4,13 +4,22 @@ from sqlalchemy.sql.expression import cast
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import aliased
+from fastapi import HTTPException
 
+from ..utils.validators import validate_not_none
+from ..utils.sanitizer import sanitize_string
 from ..models.climate import DwdStationReference, WeatherStation
 from ..models.administrative import Vg250Gem
 
 
 
 async def get_dwd_stations_by_municipality_key(session: AsyncSession, municipality_key: str):
+    try:
+        validated_key = validate_not_none(municipality_key)
+        validated_key = sanitize_string(validated_key)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
     geojson = cast(func.ST_AsGeoJSON(DwdStationReference.wkb_geometry, 15), JSON).label('geojson')
     gem_alias = aliased(Vg250Gem)
 
@@ -41,7 +50,7 @@ async def get_dwd_stations_by_municipality_key(session: AsyncSession, municipali
         )
     )
 
-    result = await session.execute(stmt, {'municipality_key': municipality_key})
+    result = await session.execute(stmt, {'municipality_key': validated_key})
     return result.mappings().all()
 
 
