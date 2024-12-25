@@ -1,9 +1,17 @@
 from sqlalchemy.sql import text
 from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import HTTPException
+
+from ..utils.validate import validate_positive_int32
 
 
 
 async def get_monument_by_object_id(session: AsyncSession, object_id: int):
+    try:
+        validated_object_id = validate_positive_int32(object_id)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
     stmt = text('''
     WITH monument_reasons AS (
         SELECT
@@ -40,7 +48,7 @@ async def get_monument_by_object_id(session: AsyncSession, object_id: int):
         m.id = :q
     ''')
 
-    sql = stmt.bindparams(q=object_id)
+    sql = stmt.bindparams(q=validated_object_id)
     result = await session.execute(sql)
     rows = result.mappings().all()
 
