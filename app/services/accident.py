@@ -3,8 +3,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from fastapi import HTTPException
 
-from ..models.accident import DeAccidentMeta
 from ..utils.sanitizer import sanitize_string
+from ..models.accident import DeAccidentMeta
 
 
 

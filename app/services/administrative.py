@@ -1,5 +1,9 @@
 from sqlalchemy.sql import text
 from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import HTTPException
+
+from ..utils.validators import validate_not_none
+from ..utils.sanitizer import sanitize_string
 
 
 
@@ -35,6 +39,12 @@ async def get_parcel_meta_by_lat_lng(session: AsyncSession, lat: float, lng: flo
 
 
 async def get_municipality_by_key(session: AsyncSession, key: str):
+    try:
+        validated_key = validate_not_none(key)
+        validated_key = sanitize_string(validated_key)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
     stmt = text('''
     SELECT
         mk.municipality_key AS municipality_key,
@@ -68,7 +78,7 @@ async def get_municipality_by_key(session: AsyncSession, key: str):
         LOWER(mk.municipality_key) = :key
     ''')
 
-    sql = stmt.bindparams(key=key.lower())
+    sql = stmt.bindparams(key=validated_key.lower())
     result = await session.execute(sql)
 
     return result.mappings().all()
@@ -109,6 +119,12 @@ async def get_municipality_by_name(session: AsyncSession, name: str):
 
 
 async def get_municipality_by_query(session: AsyncSession, query: str):
+    try:
+        validated_query = validate_not_none(query)
+        sanitized_query = sanitize_string(validated_query)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
     stmt = text('''
     SELECT
         gem.ags AS municipality_key,
@@ -145,7 +161,7 @@ async def get_municipality_by_query(session: AsyncSession, query: str):
     LIMIT 10
     ''')
 
-    sql = stmt.bindparams(q=query.lower())
+    sql = stmt.bindparams(q=sanitized_query.lower())
     result = await session.execute(sql)
     rows = result.mappings().all()
 
