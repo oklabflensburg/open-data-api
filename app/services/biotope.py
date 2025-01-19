@@ -11,7 +11,7 @@ async def get_biotope_origin_meta(session: AsyncSession, code: str):
     try:
         value = sanitize_string(code.lower())
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=422, detail=str(e))
 
     model = ShBiotopeOrigin
 

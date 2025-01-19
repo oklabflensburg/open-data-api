@@ -44,6 +44,18 @@ sudo apt install postgresql-16 postgresql-postgis gdal-bin
 ```
 
 
+## Install Firewall
+
+```sh
+sudo apt install ufw
+sudo ufw allow 22/tcp
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+sudo ufw allow 5665/tcp
+sudo ufw enable
+sudo ufw status
+```
+
 ---
 
 

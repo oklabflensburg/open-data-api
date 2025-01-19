@@ -1,10 +1,12 @@
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.staticfiles import StaticFiles
+from fastapi.openapi.docs import get_swagger_ui_html
+from fastapi.responses import JSONResponse, HTMLResponse, RedirectResponse
+from fastapi.exceptions import RequestValidationError
 from sqlalchemy.ext.declarative import declarative_base
 
 from .database import engine
+from .utils.exceptions import CustomValidationError
 
 from .api.biotope import route_biotope
 from .api.climate import route_climate
@@ -39,6 +41,14 @@ async def swagger_ui_html(req: Request) -> HTMLResponse:
         title=app.title,
         openapi_url='/openapi.json',
         swagger_favicon_url='/static/favicon.ico'
+    )
+
+
+@app.exception_handler(CustomValidationError)
+async def custom_validation_error_handler(request: Request, exc: CustomValidationError):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={'error': exc.detail['msg']}
     )
 
 

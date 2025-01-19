@@ -38,12 +38,12 @@ async def get_parcel_meta_by_lat_lng(session: AsyncSession, lat: float, lng: flo
     return result.mappings().all()
 
 
-async def get_municipality_by_key(session: AsyncSession, key: str):
+async def get_municipality_by_key(session: AsyncSession, municipality_key: str):
     try:
-        validated_key = validate_not_none(key)
+        validated_key = validate_not_none(municipality_key, 'query', 'municipality_key')
         validated_key = sanitize_string(validated_key)
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=422, detail=str(e))
 
     stmt = text('''
     SELECT
@@ -84,7 +84,13 @@ async def get_municipality_by_key(session: AsyncSession, key: str):
     return result.mappings().all()
 
 
-async def get_municipality_by_name(session: AsyncSession, name: str):
+async def get_municipality_by_name(session: AsyncSession, municipality_name: str):
+    try:
+        validated_name = validate_not_none(municipality_name, 'query', 'municipality_name')
+        validated_name = sanitize_string(validated_name)
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+
     stmt = text('''
     SELECT
         mk.municipality_key AS municipality_key,
@@ -110,8 +116,7 @@ async def get_municipality_by_name(session: AsyncSession, name: str):
         LOWER(vg.gen) LIKE :name
     ''')
 
-    query = f'{name.lower()}%'
-    sql = stmt.bindparams(name=query)
+    sql = stmt.bindparams(name=validated_name.lower())
     result = await session.execute(sql)
 
     return result.mappings().all()
@@ -120,10 +125,10 @@ async def get_municipality_by_name(session: AsyncSession, name: str):
 
 async def get_municipality_by_query(session: AsyncSession, query: str):
     try:
-        validated_query = validate_not_none(query)
+        validated_query = validate_not_none(query, 'query', 'query')
         sanitized_query = sanitize_string(validated_query)
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=422, detail=str(e))
 
     stmt = text('''
     SELECT
@@ -166,4 +171,3 @@ async def get_municipality_by_query(session: AsyncSession, query: str):
     rows = result.mappings().all()
 
     return [dict(row) for row in rows]
-

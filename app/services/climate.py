@@ -15,10 +15,10 @@ from ..models.administrative import Vg250Gem
 
 async def get_dwd_stations_by_municipality_key(session: AsyncSession, municipality_key: str):
     try:
-        validated_key = validate_not_none(municipality_key)
+        validated_key = validate_not_none(municipality_key, 'query', 'municipality_key')
         validated_key = sanitize_string(validated_key)
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=422, detail=str(e))
 
     geojson = cast(func.ST_AsGeoJSON(DwdStationReference.wkb_geometry, 15), JSON).label('geojson')
     gem_alias = aliased(Vg250Gem)

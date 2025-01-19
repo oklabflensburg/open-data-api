@@ -124,10 +124,10 @@ async def get_primary_fuel_meta(session: AsyncSession):
 
 async def get_combustion_unit_by_municipality_key(session: AsyncSession, key: str):
     try:
-        validated_key = validate_not_none(key)
+        validated_key = validate_not_none(key, 'query', 'municipality_key')
         validated_key = sanitize_string(validated_key.lower())
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=422, detail=str(e))
 
     stmt = text('''
     SELECT
@@ -199,10 +199,10 @@ async def get_combustion_unit_by_municipality_key(session: AsyncSession, key: st
 
 async def get_combustion_unit_by_id(session: AsyncSession, unit_id: str):
     try:
-        validated_unit_id = validate_not_none(unit_id)
+        validated_unit_id = validate_not_none(unit_id, 'query', 'unit_id')
         validated_unit_id = sanitize_string(validated_unit_id)
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=422, detail=str(e))
 
     stmt = text('''
     SELECT
@@ -275,10 +275,10 @@ async def get_combustion_unit_by_id(session: AsyncSession, unit_id: str):
 
 async def get_nuclear_unit_by_municipality_key(session: AsyncSession, key: str):
     try:
-        validated_key = validate_not_none(key)
+        validated_key = validate_not_none(key, 'query', 'municipality_key')
         validated_key = sanitize_string(validated_key.lower())
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=422, detail=str(e))
 
     stmt = text('''
     SELECT
@@ -346,10 +346,10 @@ async def get_nuclear_unit_by_municipality_key(session: AsyncSession, key: str):
 
 async def get_nuclear_unit_by_id(session: AsyncSession, unit_id: str):
     try:
-        validated_unit_id = validate_not_none(unit_id)
+        validated_unit_id = validate_not_none(unit_id, 'query', 'unit_id')
         validated_unit_id = sanitize_string(validated_unit_id)
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=422, detail=str(e))
 
     stmt = text('''
     SELECT
@@ -418,10 +418,10 @@ async def get_nuclear_unit_by_id(session: AsyncSession, unit_id: str):
 
 async def get_water_unit_by_municipality_key(session: AsyncSession, key: str):
     try:
-        validated_key = validate_not_none(key)
+        validated_key = validate_not_none(key, 'query', 'municipality_key')
         validated_key = sanitize_string(validated_key.lower())
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=422, detail=str(e))
 
     stmt = text('''
     SELECT
@@ -491,10 +491,10 @@ async def get_water_unit_by_municipality_key(session: AsyncSession, key: str):
 
 async def get_water_unit_by_id(session: AsyncSession, unit_id: str):
     try:
-        validated_unit_id = validate_not_none(unit_id)
+        validated_unit_id = validate_not_none(unit_id, 'query', 'unit_id')
         validated_unit_id = sanitize_string(validated_unit_id)
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=422, detail=str(e))
 
     stmt = text('''
     SELECT
@@ -564,10 +564,10 @@ async def get_water_unit_by_id(session: AsyncSession, unit_id: str):
 
 async def get_biomass_unit_by_municipality_key(session: AsyncSession, key: str):
     try:
-        validated_key = validate_not_none(key)
+        validated_key = validate_not_none(key, 'query', 'municipality_key')
         validated_key = sanitize_string(validated_key.lower())
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=422, detail=str(e))
 
     stmt = text('''
     SELECT
@@ -642,10 +642,10 @@ async def get_biomass_unit_by_municipality_key(session: AsyncSession, key: str):
 
 async def get_biomass_unit_by_id(session: AsyncSession, unit_id: str):
     try:
-        validated_unit_id = validate_not_none(unit_id)
+        validated_unit_id = validate_not_none(unit_id, 'query', 'unit_id')
         validated_unit_id = sanitize_string(validated_unit_id)
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=422, detail=str(e))
 
     stmt = text('''
     SELECT
@@ -721,10 +721,10 @@ async def get_biomass_unit_by_id(session: AsyncSession, unit_id: str):
 
 async def get_wind_unit_by_municipality_key(session: AsyncSession, key: str):
     try:
-        validated_key = validate_not_none(key)
+        validated_key = validate_not_none(key, 'query', 'municipality_key')
         validated_key = sanitize_string(validated_key.lower())
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=422, detail=str(e))
 
     stmt = text('''
     SELECT
@@ -805,10 +805,10 @@ async def get_wind_unit_by_municipality_key(session: AsyncSession, key: str):
 
 async def get_wind_unit_by_id(session: AsyncSession, unit_id: str):
     try:
-        validated_unit_id = validate_not_none(unit_id)
+        validated_unit_id = validate_not_none(unit_id, 'query', 'unit_id')
         validated_unit_id = sanitize_string(validated_unit_id)
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=422, detail=str(e))
 
     stmt = text('''
     SELECT
@@ -890,10 +890,10 @@ async def get_wind_unit_by_id(session: AsyncSession, unit_id: str):
 
 async def get_solar_unit_by_municipality_key(session: AsyncSession, key: str):
     try:
-        validated_key = validate_not_none(key)
+        validated_key = validate_not_none(key, 'query', 'municipality_key')
         validated_key = sanitize_string(validated_key.lower())
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=422, detail=str(e))
 
     stmt = text('''
     SELECT
@@ -1000,10 +1000,10 @@ async def get_solar_unit_by_municipality_key(session: AsyncSession, key: str):
 
 async def get_solar_unit_by_id(session: AsyncSession, unit_id: str):
     try:
-        validated_unit_id = validate_not_none(unit_id)
+        validated_unit_id = validate_not_none(unit_id, 'query', 'unit_id')
         validated_unit_id = sanitize_string(validated_unit_id)
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=422, detail=str(e))
 
     stmt = text('''
     SELECT

@@ -8,9 +8,9 @@ from ..utils.validators import validate_positive_int32
 
 async def get_monument_by_object_id(session: AsyncSession, object_id: int):
     try:
-        validated_object_id = validate_positive_int32(object_id)
+        validated_object_id = validate_positive_int32(object_id, 'query', 'object_id')
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=422, detail=str(e))
 
     stmt = text('''
     WITH monument_reasons AS (
