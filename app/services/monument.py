@@ -6,6 +6,23 @@ from ..utils.validators import validate_positive_int32
 
 
 
+async def get_monument_geometries_by_bbox(session: AsyncSession, xmin: float, ymin: float, xmax: float, ymax: float):
+    stmt = text('''
+    SELECT id, street, housenumber, ST_AsGeoJSON(wkb_geometry) AS geom
+
+    FROM sh_monument
+
+    WHERE ST_Within(wkb_geometry, ST_MakeEnvelope(:xmin, :ymin, :xmax, :ymax, 4326))
+    ''')
+
+    sql = stmt.bindparams(xmin=xmin, ymin=ymin, xmax=xmax, ymax=ymax)
+    result = await session.execute(sql)
+    rows = result.mappings().all()
+
+    return [dict(row) for row in rows]
+
+
+
 async def get_monument_by_object_id(session: AsyncSession, object_id: int):
     try:
         validated_object_id = validate_positive_int32(object_id, 'query', 'object_id')
@@ -39,7 +56,7 @@ async def get_monument_by_object_id(session: AsyncSession, object_id: int):
         m.monument_type,
         r.reason_labels AS monument_reason
     FROM
-        sh_monuments AS m
+        sh_monument AS m
     LEFT JOIN
         monument_reasons AS r
     ON
