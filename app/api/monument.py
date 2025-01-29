@@ -1,5 +1,4 @@
 import json
-import topojson as tp
 
 from fastapi import Depends, APIRouter, HTTPException
 from fastapi.responses import JSONResponse
@@ -44,12 +43,11 @@ async def fetch_monument_geometries_by_bbox(xmin: float, ymin: float, xmax: floa
             geometry=json.loads(row['geom']),
             properties={'label': f'{row["street"]} {row["housenumber"] or None}'}
         )
+
         for row in rows
     ]
     
     geojson_data = FeatureCollection(features)
-    topojson_data = tp.Topology(geojson_data).to_dict()
-    print(topojson_data)
-    response = jsonable_encoder(topojson_data)
+    response = jsonable_encoder(geojson_data)
 
     return JSONResponse(content=response)
