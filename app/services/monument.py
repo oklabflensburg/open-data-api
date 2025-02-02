@@ -59,6 +59,7 @@ async def get_monument_by_id(session: AsyncSession, monument_id: int):
     SELECT
         ST_AsGeoJSON(m.wkb_geometry, 15)::jsonb AS geojson,
         m.object_id,
+        m.slug,
         m.street,
         m.housenumber,
         m.postcode,
