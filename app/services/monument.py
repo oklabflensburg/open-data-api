@@ -23,9 +23,9 @@ async def get_monument_geometries_by_bbox(session: AsyncSession, xmin: float, ym
 
 
 
-async def get_monument_by_object_id(session: AsyncSession, object_id: int):
+async def get_monument_by_id(session: AsyncSession, monument_id: int):
     try:
-        validated_object_id = validate_positive_int32(object_id, 'query', 'object_id')
+        validated_monument_id = validate_positive_int32(monument_id, 'query', 'monument_id')
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e))
 
@@ -42,6 +42,19 @@ async def get_monument_by_object_id(session: AsyncSession, object_id: int):
             mxr.reason_id = mr.id
         GROUP BY
             mxr.monument_id
+    ),
+    monument_scopes AS (
+        SELECT
+            mxs.monument_id,
+            string_agg(ms.label, ', ') AS scope_labels
+        FROM
+            sh_monument_x_scope AS mxs
+        JOIN
+            sh_monument_scope AS ms
+        ON
+            mxs.scope_id = ms.id
+        GROUP BY
+            mxs.monument_id
     )
     SELECT
         ST_AsGeoJSON(m.wkb_geometry, 15)::jsonb AS geojson,
@@ -54,18 +67,23 @@ async def get_monument_by_object_id(session: AsyncSession, object_id: int):
         m.designation,
         m.description,
         m.monument_type,
-        r.reason_labels AS monument_reason
+        r.reason_labels AS monument_reason,
+        s.scope_labels AS monument_scope
     FROM
         sh_monument AS m
     LEFT JOIN
         monument_reasons AS r
     ON
         m.id = r.monument_id
+    LEFT JOIN
+        monument_scopes AS s
+    ON
+        m.id = s.monument_id
     WHERE
-        m.id = :q
+        m.id = :monument_id
     ''')
 
-    sql = stmt.bindparams(q=validated_object_id)
+    sql = stmt.bindparams(monument_id=validated_monument_id)
     result = await session.execute(sql)
     rows = result.mappings().all()
 

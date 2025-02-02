@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
 
 from ..dependencies import get_session
-from ..services.monument import get_monument_by_object_id, get_monument_geometries_by_bbox
+from ..services.monument import get_monument_by_id, get_monument_geometries_by_bbox
 
 
 route_monument = APIRouter(prefix='/monument/v1')
@@ -19,12 +19,12 @@ route_monument = APIRouter(prefix='/monument/v1')
     response_model=List,
     tags=['Denkmalliste']
 )
-async def fetch_monument_by_object_id(object_id: int, session: AsyncSession = Depends(get_session)):
-    rows = await get_monument_by_object_id(session, object_id)
+async def fetch_monument_by_monument_id(monument_id: int, session: AsyncSession = Depends(get_session)):
+    rows = await get_monument_by_id(session, monument_id)
     response = jsonable_encoder(rows)
 
     if len(response) == 0:
-        raise HTTPException(status_code=404, detail=f'No matches found for object id {object_id}')
+        raise HTTPException(status_code=404, detail=f'No matches found for monument id {monument_id}')
 
     return JSONResponse(content=response)
 
