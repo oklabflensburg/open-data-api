@@ -36,6 +36,8 @@ async def get_monument_by_slug(session: AsyncSession, slug: str):
     )
     SELECT
         ST_AsGeoJSON(m.wkb_geometry, 15)::jsonb AS geojson,
+        COALESCE(m.street || ' ' || m.housenumber, m.street) AS label,
+        m.id,
         m.object_id,
         m.slug,
         m.street,
