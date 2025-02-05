@@ -124,6 +124,8 @@ async def get_monument_by_id(session: AsyncSession, monument_id: int):
     )
     SELECT
         ST_AsGeoJSON(m.wkb_geometry, 15)::jsonb AS geojson,
+        COALESCE(m.street || ' ' || m.housenumber, m.street) AS label,
+        m.id,
         m.object_id,
         m.slug,
         m.street,
