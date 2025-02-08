@@ -538,7 +538,9 @@ This section describes how to set up and insert weather station reference data i
 Ensure that the PostgreSQL database schema for weather station reference is set up. Use the following command:
 
 ```sh
+psql -U oklab -h localhost -d oklab -p 5432 < data/de_weather_stations_schema.sql
 psql -U oklab -h localhost -d oklab -p 5432 < data/dwd_station_reference_schema.sql
+psql -U oklab -h localhost -d oklab -p 5432 < data/dwd_abbreviations_schema.sql
 ```
 
 
