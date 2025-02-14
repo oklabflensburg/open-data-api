@@ -603,3 +603,85 @@ Once the script has completed, deactivate the Python environment:
 ```sh
 deactivate
 ```
+
+
+---
+
+
+## Insert archaeological monuments
+
+> This section will guide your team through the necessary steps to download and load the archaeological monument data into the database.
+
+
+1. **Find the Latest JSON URL for "Denkmalliste unbeweglicher archäologischer Kulturdenkmale"**
+
+- Go to the [Open Data Schleswig-Holstein site](https://opendata.schleswig-holstein.de).
+- Find the latest dataset titled **"Denkmalliste unbeweglicher archäologischer Kulturdenkmale"** and get the latest JSON download URL.
+
+
+2. **Create the Required Database Table**
+
+Run the following command from the root of the repo to create the necessary schema in your PostgreSQL database:
+
+```bash
+psql -U oklab -h localhost -d oklab -p 5432 < data/sh_archaeological_monument_schema.sql
+```
+
+
+3. **Create `.env` File (If Not Already Created)**
+
+Ensure a `.env` file exists in the root directory of the `open-data-api` repository with the following content:
+
+```bash
+DB_PASS=oklab
+DB_HOST=localhost
+DB_USER=oklab
+DB_NAME=oklab
+DB_PORT=5432
+```
+
+
+4. **Set Up Python Environment**
+
+- Navigate to the `tools` directory:
+
+```bash
+cd tools
+```
+
+- Activate the virtual environment:
+
+```bash
+source venv/bin/activate
+```
+
+- Install the necessary dependencies:
+     
+```bash
+pip3 install -r requirements.txt
+```
+
+
+5. **Insert Archaeological Monuments Data**
+
+Use the following command to fetch and insert the data into the database. Replace the `--url` parameter with the latest JSON URL if necessary:
+
+```bash
+python3 insert_archaeological_monuments.py --env ../.env --target ../data --url https://opendata.schleswig-holstein.de/dataset/7db5bc2f-7a99-456b-9faa-005de581cceb/resource/e0157633-62f6-43a0-8f89-3d4aef75801f/download/denkmalliste_sh.json --verbose
+```
+
+
+6. **Deactivate the Virtual Environment**
+
+Once the script finishes, deactivate the virtual environment:
+
+```bash
+deactivate
+```
+
+
+7. **Navigate Back to the Root Directory of the Repo**
+
+```bash
+cd ..
+```
