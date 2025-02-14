@@ -1,8 +1,13 @@
-from sqlalchemy.sql import text
+from sqlalchemy.sql import func, text
+from sqlalchemy.types import JSON
+from sqlalchemy.future import select
+from sqlalchemy.sql.expression import cast
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException
 
-from ..utils.validators import validate_positive_int32
+from ..utils.validators import validate_positive_int32, validate_not_none
+from ..schemas.monument import ArchaeologicalMonumentResponse
+from ..models.monument import ArchaeologicalMonument
 
 
 
@@ -157,3 +162,25 @@ async def get_monument_by_id(session: AsyncSession, monument_id: int):
     rows = result.mappings().all()
 
     return [dict(row) for row in rows]
+
+
+async def get_archaeological_monument_by_id(session: AsyncSession, monument_id: int):
+    stmt = select(
+        ArchaeologicalMonument.object_name,
+        ArchaeologicalMonument.proper_name,
+        ArchaeologicalMonument.object_number,
+        ArchaeologicalMonument.district_name,
+        ArchaeologicalMonument.municipality_name,
+        ArchaeologicalMonument.object_description,
+        ArchaeologicalMonument.object_significance,
+        ArchaeologicalMonument.protection_scope,
+        func.to_char(ArchaeologicalMonument.date_registered, 'DD.MM.YYYY').label('date_registered'),
+        func.to_char(ArchaeologicalMonument.date_modified, 'DD.MM.YYYY').label('date_modified'),
+        ArchaeologicalMonument.status,
+        ArchaeologicalMonument.heritage_authority,
+        ArchaeologicalMonument.municipality_key,
+        cast(func.ST_AsGeoJSON(ArchaeologicalMonument.wkb_geometry, 15), JSON).label('geojson'),
+    ).where(ArchaeologicalMonument.id == monument_id)
+
+    result = await session.execute(stmt)
+    return result.mappings().all()
