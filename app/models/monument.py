@@ -1,5 +1,6 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime
+from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from geoalchemy2 import Geometry
 
@@ -27,7 +28,6 @@ class ArchaeologicalMonument(Base):
     __tablename__ = 'sh_archaeological_monument'
 
     id = Column(Integer, primary_key=True, index=True)
-    object_name = Column(String, nullable=False)
     proper_name = Column(String, nullable=True)
     object_number = Column(String(50), unique=True, nullable=False)
     district_name = Column(String, nullable=True)
@@ -41,3 +41,28 @@ class ArchaeologicalMonument(Base):
     heritage_authority = Column(String, nullable=True)
     municipality_key = Column(String(8), nullable=True)
     wkb_geometry = Column(Geometry('MULTIPOLYGON', srid=4326), nullable=False)
+    categories = relationship(
+        'ArchaeologicalMonumentCategory',
+        secondary='sh_archaeological_monument_x_category',
+        back_populates='monuments'
+    )
+
+
+class ArchaeologicalMonumentCategory(Base):
+    __tablename__ = 'sh_archaeological_monument_category'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    label = Column(String, unique=True, nullable=False)
+
+    monuments = relationship(
+        'ArchaeologicalMonument',
+        secondary='sh_archaeological_monument_x_category',
+        back_populates='categories'
+    )
+
+
+class ArchaeologicalMonumentXCategory(Base):
+    __tablename__ = 'sh_archaeological_monument_x_category'
+
+    category_id = Column(Integer, ForeignKey('sh_archaeological_monument_category.id'), primary_key=True)
+    monument_id = Column(Integer, ForeignKey('sh_archaeological_monument.id'), primary_key=True)

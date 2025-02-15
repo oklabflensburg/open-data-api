@@ -14,6 +14,7 @@ from shapely import wkt
 from shapely.ops import transform
 from shapely.geometry import MultiPolygon
 from geoalchemy2.shape import from_shape
+from psycopg2.errors import UniqueViolation, IntegrityError
 from pyproj import Transformer
 from datetime import datetime
 from urllib.parse import urlparse
@@ -82,9 +83,71 @@ def parse_json(conn, data):
             insert_row(cur, entry)
 
 
+def insert_category(cur, monument_id, category_label):
+    category_sql = '''
+        INSERT INTO sh_archaeological_monument_category (label)
+        VALUES (%s)
+        ON CONFLICT (label) DO UPDATE SET label = EXCLUDED.label
+        RETURNING id;
+    '''
+
+    try:
+        cur.execute(category_sql, (category_label,))
+        category_id = cur.fetchone()
+
+        if category_id is None:
+            log.error(f"Could not retrieve category ID for label: {category_label}")
+            return None
+
+        category_id = category_id[0]
+
+        monument_x_category_sql = '''
+            INSERT INTO sh_archaeological_monument_x_category (monument_id, category_id)
+            VALUES (%s, %s);
+        '''
+        cur.execute(monument_x_category_sql, (monument_id, category_id))
+    except IntegrityError as e:
+        log.error(f"Database error: {e}")
+
+
+'''
+def insert_category(cur, monument_id, category_label):
+    category_sql = 'INSERT INTO sh_archaeological_monument_category (label) VALUES (%s) RETURNING id'
+
+    try:
+        cur.execute(category_sql, (category_label,))
+        category_id = cur.fetchone()
+        print(category_id[0])
+    except UniqueViolation as e:
+        cur.connection.rollback()
+        query_category_sql = 'SELECT id FROM sh_archaeological_monument_category WHERE label = %s'
+        cur.execute(query_category_sql, (category_label,))
+        category_id = cur.fetchone()
+        print(category_id[0])
+
+    if category_id is None:
+        log.error(f'failed to retrieve archaeological category id for category label: {category_label}')
+        return
+
+    monument_x_category_sql = ''
+        INSERT INTO sh_archaeological_monument_x_category (monument_id, category_id) VALUES (%s, %s)
+    ''
+
+    try:
+        cur.execute(monument_x_category_sql, (monument_id, category_id[0]))
+    except IntegrityError as e:
+        cur.connection.rollback()
+        log.error(f'failed to insert archaeological monument category relationship: {e}')
+'''
+
+
 def insert_row(cur, row):
-    object_name = row.get('objektbezeichnung')
-    proper_name = row.get('eigenname')        
+    object_categories = row.get('objektbezeichnung').split('|')
+    proper_name = row.get('eigenname', None)
+
+    if proper_name:
+        proper_name = proper_name.replace('-', '').strip()
+
     object_number = row.get('objektnummer')
     district_name = row.get('kreis')             
     municipality_name = row.get('gemeinde')         
@@ -100,22 +163,22 @@ def insert_row(cur, row):
 
     sql = '''
     INSERT INTO sh_archaeological_monument (
-        object_name, proper_name, object_number, district_name, municipality_name,
-        object_description, object_significance, protection_scope, date_registered,
-        date_modified, status, heritage_authority, municipality_key, wkb_geometry
+        proper_name, object_number, district_name, municipality_name, object_description,
+        object_significance, protection_scope, date_registered, date_modified, status,
+        heritage_authority, municipality_key, wkb_geometry
     )
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id
     '''
 
     try:
-        cur.execute(sql, (object_name, proper_name, object_number, district_name,
-            municipality_name, object_description, object_significance, protection_scope,
-            date_registered, date_modified, status, heritage_authority, municipality_key,
-            wkb_geometry.wkb))
+        cur.execute(sql, (proper_name, object_number, district_name, municipality_name,
+            object_description, object_significance, protection_scope, date_registered,
+            date_modified, status, heritage_authority, municipality_key, wkb_geometry.wkb))
 
         last_inserted_id = cur.fetchone()[0]
 
-        log.info(f'inserted monument with proper_name {proper_name} with id {last_inserted_id}')
+        for object_category in object_categories:
+            insert_category(cur, last_inserted_id, object_category.strip())
     except Exception as e:
         log.error(e)
 

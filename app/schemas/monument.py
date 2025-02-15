@@ -5,9 +5,9 @@ from typing import Optional
 
 class ArchaeologicalMonumentResponse(BaseModel):
     monument_id: int
-    object_name: str
-    proper_name: Optional[str] = None
     object_number: str
+    object_category: str
+    proper_name: Optional[str] = None
     district_name: Optional[str] = None
     municipality_name: Optional[str] = None
     object_description: Optional[str] = None
