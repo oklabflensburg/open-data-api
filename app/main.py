@@ -12,6 +12,7 @@ from .api.biotope import route_biotope
 from .api.climate import route_climate
 from .api.accident import route_accident
 from .api.monument import route_monument
+from .api.archaeology import route_archaeology
 from .api.administrative import route_administrative
 from .api.demographic import route_demographic
 from .api.energy import route_energy
@@ -56,6 +57,7 @@ app.include_router(route_biotope)
 app.include_router(route_climate)
 app.include_router(route_accident)
 app.include_router(route_monument)
+app.include_router(route_archaeology)
 app.include_router(route_administrative)
 app.include_router(route_demographic)
 app.include_router(route_energy)

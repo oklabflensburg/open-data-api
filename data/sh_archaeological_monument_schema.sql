@@ -41,8 +41,10 @@ CREATE TABLE IF NOT EXISTS sh_archaeological_monument_x_category (
 
 
 -- INDEX
-CREATE INDEX IF NOT EXISTS idx_sh_archaeological_monument_municipality_key ON sh_archaeological_monument (municipality_key);
 CREATE INDEX IF NOT EXISTS idx_sh_archaeological_monument_object_number ON sh_archaeological_monument (object_number);
+CREATE INDEX IF NOT EXISTS idx_sh_archaeological_monument_municipality_key ON sh_archaeological_monument (municipality_key);
+CREATE INDEX IF NOT EXISTS idx_sh_archaeological_monument_date_registered ON sh_archaeological_monument (date_registered);
+CREATE INDEX IF NOT EXISTS idx_sh_archaeological_monument_date_modified ON sh_archaeological_monument (date_modified);
 
 -- UNIQUE INDEX
 CREATE UNIQUE INDEX IF NOT EXISTS idx_uniq_sh_archaeological_monument_category_label ON sh_archaeological_monument_category (label);
