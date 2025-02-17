@@ -6,8 +6,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException
 
 from ..utils.validators import validate_positive_int32, validate_not_none
-from ..schemas.monument import ArchaeologicalMonumentResponse
-from ..models.monument import ArchaeologicalMonument, ArchaeologicalMonumentCategory, ArchaeologicalMonumentXCategory
 
 
 
@@ -162,45 +160,3 @@ async def get_monument_by_id(session: AsyncSession, monument_id: int):
     rows = result.mappings().all()
 
     return [dict(row) for row in rows]
-
-
-
-async def get_archaeological_monument_by_id(session: AsyncSession, monument_id: int):
-    # Define the CTE for categories
-    cte_stmt = (
-        select(
-            ArchaeologicalMonumentXCategory.monument_id,
-            func.string_agg(ArchaeologicalMonumentCategory.label, ', ').label("category_labels")
-        )
-        .join(
-            ArchaeologicalMonumentCategory,
-            ArchaeologicalMonumentXCategory.category_id == ArchaeologicalMonumentCategory.id
-        )
-        .group_by(ArchaeologicalMonumentXCategory.monument_id)
-        .cte('archaeological_monument_categories')
-    )
-
-    stmt = (
-        select(
-            ArchaeologicalMonument.id.label('monument_id'),
-            cte_stmt.c.category_labels.label('object_category'),
-            ArchaeologicalMonument.proper_name,
-            ArchaeologicalMonument.object_number,
-            ArchaeologicalMonument.district_name,
-            ArchaeologicalMonument.municipality_name,
-            ArchaeologicalMonument.object_description,
-            ArchaeologicalMonument.object_significance,
-            ArchaeologicalMonument.protection_scope,
-            func.to_char(ArchaeologicalMonument.date_registered, 'DD.MM.YYYY').label('date_registered'),
-            func.to_char(ArchaeologicalMonument.date_modified, 'DD.MM.YYYY').label('date_modified'),
-            ArchaeologicalMonument.status,
-            ArchaeologicalMonument.heritage_authority,
-            ArchaeologicalMonument.municipality_key,
-            cast(func.ST_AsGeoJSON(ArchaeologicalMonument.wkb_geometry, 15), JSON).label('geojson')
-        )
-        .join(cte_stmt, ArchaeologicalMonument.id == cte_stmt.c.monument_id, isouter=True)
-        .where(ArchaeologicalMonument.id == monument_id)
-    )
-
-    result = await session.execute(stmt)
-    return result.mappings().all()

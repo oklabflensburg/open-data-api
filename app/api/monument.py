@@ -8,8 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
 
 from ..dependencies import get_session
-from ..services.monument import get_monument_by_id, get_monument_by_slug, get_monument_geometries_by_bbox, get_archaeological_monument_by_id
-from ..schemas.monument import ArchaeologicalMonumentResponse
+from ..services.monument import get_monument_by_id, get_monument_by_slug, get_monument_geometries_by_bbox
 
 
 route_monument = APIRouter(prefix='/monument/v1')
@@ -67,19 +66,5 @@ async def fetch_monument_geometries_by_bbox(xmin: float, ymin: float, xmax: floa
 
     geojson_data = FeatureCollection(features)
     response = jsonable_encoder(geojson_data)
-
-    return JSONResponse(content=response)
-
-
-
-
-@route_monument.get(
-    '/archaeological/detail',
-    response_model=ArchaeologicalMonumentResponse,
-    tags=['Denkmalliste']
-)
-async def fetch_archaeological_monument_by_id(monument_id: int, session: AsyncSession = Depends(get_session)):
-    rows = await get_archaeological_monument_by_id(session, monument_id)
-    response = jsonable_encoder(rows)
 
     return JSONResponse(content=response)
