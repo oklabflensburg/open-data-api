@@ -12,8 +12,9 @@ async def get_parcel_meta_by_lat_lng(session: AsyncSession, lat: float, lng: flo
     SELECT
         kreis AS district_name,
         kreisschl AS district_number,
-        flur AS field,
+        flur AS field_number,
         gemeinde AS municipality_name,
+        gmdschl AS municipality_number,
         gemarkung AS cadastral_district_name,
         gemaschl AS cadastral_district_number, 
         LPAD(gmdschl::text, 8, '0') AS municipality_number,
