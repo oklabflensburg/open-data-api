@@ -10,24 +10,23 @@ from ..utils.sanitizer import sanitize_string
 async def get_parcel_meta_by_lat_lng(session: AsyncSession, lat: float, lng: float):
     stmt = text('''
     SELECT
-        p.adv_id,
-        p.start_time,
-        p.field_number,
-        p.parcel_number,
-        p.municipality_number,
-        p.cadastral_district_number,
-        lp.cadastral_district_name,
-        lp.municipality_name,
-        ST_Area(ST_Transform(p.wkb_geometry, 3587)) AS shape_area,
-        ST_AsGeoJSON(p.wkb_geometry, 15)::jsonb AS geojson
-    FROM
-        sh_alkis_parcel AS p
-    JOIN
-        de_cadastral_district_meta AS lp
-        ON p.cadastral_district_number = lp.cadastral_district_number
+        kreis AS district_name,
+        kreisschl AS district_number,
+        flur AS field,
+        gemeinde AS municipality_name,
+        gemarkung AS cadastral_district_name,
+        gemaschl AS cadastral_district_number, 
+        LPAD(gmdschl::text, 8, '0') AS municipality_number,
+        CASE                                                                      
+            WHEN flstnrnen IS NOT NULL THEN flstnrzae::text || '/' || flstnrnen::text                                                                           
+            ELSE flstnrzae::text                                                                           
+        END AS parcel_number,                                                                                                                                 
+        ST_Area(ST_Transform(ST_GeomFromEWKB(geometrie), 3587)) / 10000 AS area_hectares,
+        ST_AsGeoJSON(geometrie, 15)::jsonb AS geojson                                                                    
+    FROM flurstueck
     WHERE
         ST_Contains(
-            wkb_geometry,
+            geometrie,
             ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)
         )
     ''')
