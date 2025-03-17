@@ -57,17 +57,17 @@ def parse_json(conn, data):
 
 
 def insert_row(cur, row):
-    municipality_key = row[0]
+    municipality_number = row[0]
     municipality_name = row[1]
     notes = row[2]
 
     sql = '''
-        INSERT INTO de_municipality_keys (municipality_key, municipality_name, notes)
+        INSERT INTO de_municipality_numbers (municipality_number, municipality_name, notes)
         VALUES (%s, %s, %s) RETURNING id
     '''
 
     try:
-        cur.execute(sql, (municipality_key, municipality_name, notes))
+        cur.execute(sql, (municipality_number, municipality_name, notes))
 
         last_inserted_id = cur.fetchone()[0]
 

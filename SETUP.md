@@ -1,14 +1,14 @@
 # Open Data Ingestion Tools
 
-This repository also provides tools to fetch, process, and insert various datasets into a PostgreSQL database. These tools are particularly useful for managing German administrative and energy-related data, such as municipality keys, energy unit metadata, and administrative areas.
+This repository also provides tools to fetch, process, and insert various datasets into a PostgreSQL database. These tools are particularly useful for managing German administrative and energy-related data, such as municipality numbers, energy unit metadata, and administrative areas.
 
 
 ---
 
 
-## Insert Municipality Keys
+## Insert Municipality numbers
 
-This tool fetches and inserts official German municipality keys into a PostgreSQL database.
+This tool fetches and inserts official German municipality numbers into a PostgreSQL database.
 
 
 ---
@@ -47,7 +47,7 @@ DB_PORT=5432
 1. Set up the database schema:
 
 ```sh
-psql -U oklab -h localhost -d oklab -p 5432 < data/de_municipality_keys_schema.sql
+psql -U oklab -h localhost -d oklab -p 5432 < data/de_municipality_numbers_schema.sql
 ```
 
 2. Activate a Python virtual environment and install dependencies:
@@ -59,10 +59,10 @@ source venv/bin/activate
 pip3 install -r requirements.txt
 ```
 
-3. Run the script to insert municipality keys:
+3. Run the script to insert municipality numbers:
 
 ```sh
-python3 insert_municipality_key.py \
+python3 insert_municipality_number.py \
     --env ../.env \
     --target ../data \
     --url https://www.xrepository.de/api/xrepository/urn:de:bund:destatis:bevoelkerungsstatistik:schluessel:ags_2024-10-31/download/AGS_2024-10-31.json \
@@ -85,7 +85,7 @@ This tool fetches and inserts wind turbine and solar energy metadata into your P
 
 ### Prerequisites
 
-Ensure the database and Python environment are set up as described in the **Insert Municipality Keys** section.
+Ensure the database and Python environment are set up as described in the **Insert Municipality numbers** section.
 
 
 ### Steps
@@ -255,7 +255,7 @@ CREATE INDEX IF NOT EXISTS idx_gem_sn_k ON vg250_gem (sn_k);
 CREATE INDEX IF NOT EXISTS idx_gem_sn_r ON vg250_gem (sn_r);
 CREATE INDEX IF NOT EXISTS idx_gem_sn_l ON vg250_gem (sn_l);
 
--- index for the municipality key
+-- index for the municipality number
 CREATE INDEX IF NOT EXISTS idx_vg250_gem_ags ON vg250_gem (ags);
 
 -- index state names
@@ -298,7 +298,7 @@ SELECT DISTINCT ON (point.name, gem.ags)
         WHEN point.place IN ('municipality', 'city', 'town') AND gem.ibz != 60 AND gem.ibz != 61 THEN krs.bez || ' ' || krs.gen
         ELSE lan.gen
     END AS region_name,
-    gem.ags AS municipality_key
+    gem.ags AS municipality_number
 FROM
     planet_osm_point AS point
 JOIN
@@ -336,7 +336,7 @@ CREATE EXTENSION IF NOT EXISTS pg_trgm;
 ```sql
 -- index for comparison based on column
 CREATE INDEX IF NOT EXISTS idx_mv_geographical_name ON mv_de_geographical_regions (geographical_name);
-CREATE INDEX IF NOT EXISTS idx_mv_municipality_key ON mv_de_geographical_regions (municipality_key);
+CREATE INDEX IF NOT EXISTS idx_mv_municipality_number ON mv_de_geographical_regions (municipality_number);
 CREATE INDEX IF NOT EXISTS idx_mv_region_name ON mv_de_geographical_regions (region_name);
 
 -- index for search based on ngram

@@ -10,14 +10,13 @@ from ..utils.sanitizer import sanitize_string
 async def get_parcel_meta_by_lat_lng(session: AsyncSession, lat: float, lng: float):
     stmt = text('''
     SELECT
-        kreis AS district_name,
-        kreisschl AS district_number,
+        dn.district_name,
+        dn.district_number,
         flur AS field_number,
-        gemeinde AS municipality_name,
-        gmdschl AS municipality_number,
+        mn.municipality_name,
         gemarkung AS cadastral_district_name,
         gemaschl AS cadastral_district_number, 
-        LPAD(gmdschl::text, 8, '0') AS municipality_number,
+        mn.municipality_number,
         CASE                                                                      
             WHEN flstnrnen IS NOT NULL THEN flstnrzae::text || '/' || flstnrnen::text                                                                           
             ELSE flstnrzae::text                                                                           
@@ -25,6 +24,10 @@ async def get_parcel_meta_by_lat_lng(session: AsyncSession, lat: float, lng: flo
         ST_Area(ST_Transform(ST_GeomFromEWKB(geometrie), 3587)) / 10000 AS area_hectares,
         ST_AsGeoJSON(geometrie, 15)::jsonb AS geojson                                                                    
     FROM flurstueck
+    JOIN de_municipality_numbers AS mn
+        ON mn.municipality_number = LPAD(gmdschl::text, 8, '0')
+    JOIN de_district_numbers AS dn
+        ON dn.district_number = LPAD(kreisschl::text, 5, '0')
     WHERE
         ST_Contains(
             geometrie,
