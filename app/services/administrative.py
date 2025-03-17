@@ -14,6 +14,8 @@ async def get_parcel_meta_by_lat_lng(session: AsyncSession, lat: float, lng: flo
         dn.district_number,
         flur AS field_number,
         mn.municipality_name,
+        aktualit AS last_update,
+        lagebeztxt AS place_description,
         gemarkung AS cadastral_district_name,
         gemaschl AS cadastral_district_number, 
         mn.municipality_number,
