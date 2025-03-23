@@ -1,11 +1,16 @@
-from fastapi import Depends, APIRouter, HTTPException, Query
+from fastapi import Depends, APIRouter, HTTPException, Query, status
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
 
 from ..dependencies import get_session
-from ..services.administrative import get_parcel_meta_by_lat_lng, get_municipality_by_query, get_municipality_by_name, get_municipality_by_key
+from ..services.administrative import (
+    get_parcel_meta_by_lat_lng,
+    get_municipality_by_query,
+    get_municipality_by_name,
+    get_municipality_by_key
+)
 
 
 route_administrative = APIRouter(prefix='/administrative/v1')
@@ -13,22 +18,43 @@ route_administrative = APIRouter(prefix='/administrative/v1')
 
 @route_administrative.get(
     '/parcel',
-    response_model=List, tags=['Verwaltungsgebiete'])
-async def fetch_parcel_meta_by_lat_lng(lat: float, lng: float, session: AsyncSession = Depends(get_session)):
+    response_model=List,
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
+    tags=['Verwaltungsgebiete'])
+async def fetch_parcel_meta_by_lat_lng(
+    lat: float,
+    lng: float,
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_parcel_meta_by_lat_lng(session, lat, lng)
     response = jsonable_encoder(rows)
 
     try:
         return JSONResponse(content=response[0])
-    except IndexError as e:
-        raise HTTPException(status_code=404, detail='Not found')
+    except IndexError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='Not found'
+        )
 
 
 @route_administrative.get(
     '/municipality/search',
     response_model=List,
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Verwaltungsgebiete'],
-    description=('Retrieves municipality name and key as well as the region name based on the provided query.')
+    description=(
+        'Retrieves municipality name and key as well as the region name based on the provided query.')
 )
 async def fetch_municipality_by_query(
     query: str = Query(None, min_length=2),
@@ -40,12 +66,19 @@ async def fetch_municipality_by_query(
     try:
         return JSONResponse(content=response)
     except IndexError as e:
-        raise HTTPException(status_code=404, detail=f'no results found')
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f'no results found')
 
 
 @route_administrative.get(
     '/municipality',
     response_model=List,
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Verwaltungsgebiete'],
     description=('Retrieves the geometry, bounding box, shape area, and statistical information of a municipality based on the provided municipality key (AGS) or the municipality name.')
 )
@@ -59,7 +92,10 @@ async def fetch_municipality(
         response = jsonable_encoder(rows)
 
         if len(response) == 0:
-            raise HTTPException(status_code=404, detail='No municipality was found')
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail='No municipality was not found'
+            )
 
         return JSONResponse(content=response)
     elif municipality_name:
@@ -67,9 +103,14 @@ async def fetch_municipality(
         response = jsonable_encoder(rows)
 
         if len(response) == 0:
-            raise HTTPException(status_code=404, detail='No municipality was found')
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail='No municipality was not found'
+            )
 
         return JSONResponse(content=response)
     else:
-        raise HTTPException(status_code=400, detail='Either "key" or "name" parameter must be provided')
-
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='Either "key" or "name" parameter must be provided'
+        )

@@ -9,7 +9,6 @@ from ..services.archaeology import get_archaeological_monument
 from ..schemas.archaeology import ArchaeologicalMonumentResponse
 
 
-
 route_archaeology = APIRouter(prefix='/archaeology/monument/v1')
 
 
@@ -35,10 +34,12 @@ async def fetch_archaeological_monument(
     }
 
     # Remove filters with None values
-    active_filters = {key: value for key, value in filters.items() if value not in [None, '']}
+    active_filters = {key: value for key, value in filters.items() if value not in [
+        None, '']}
 
     if not active_filters:
-        raise HTTPException(status_code=400, detail='At least one filter parameter is required')
+        raise HTTPException(
+            status_code=400, detail='At least one filter parameter is required')
 
     rows = await get_archaeological_monument(session, active_filters)
 

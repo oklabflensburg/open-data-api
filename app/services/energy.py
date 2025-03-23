@@ -1,16 +1,30 @@
 from sqlalchemy.sql import text
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from fastapi import HTTPException
 
 from ..utils.sanitizer import sanitize_string
 from ..utils.validators import validate_not_none
-from ..models.energy import *
-
+from ..models.energy import (
+    EnergySourceMeta,
+    EnergyCountryMeta,
+    NetworkOperatorAuditMeta,
+    EnergyLocationMeta,
+    EnergySupplyMeta,
+    TurbineManufacturerMeta,
+    PowerLimitationMeta,
+    PowerTechnologyMeta,
+    MainOrientationMeta,
+    OrientationTiltAngleMeta,
+    UsageAreaMeta,
+    OperationalStatusMeta,
+    BiomassTypeMeta,
+    PrimaryFuelMeta
+)
 
 
 async def get_energy_source_meta(session: AsyncSession):
     model = EnergySourceMeta
+
     result = await session.execute(select(model))
     return result.scalars().all()
 
@@ -45,89 +59,101 @@ async def get_energy_state_meta(session: AsyncSession):
 
 async def get_energy_country_meta(session: AsyncSession):
     model = EnergyCountryMeta
+
     result = await session.execute(select(model))
     return result.scalars().all()
 
 
 async def get_network_operator_audit_meta(session: AsyncSession):
     model = NetworkOperatorAuditMeta
+
     result = await session.execute(select(model))
     return result.scalars().all()
 
 
 async def get_energy_location_meta(session: AsyncSession):
     model = EnergyLocationMeta
+
     result = await session.execute(select(model))
     return result.scalars().all()
 
 
 async def get_energy_supply_meta(session: AsyncSession):
     model = EnergySupplyMeta
+
     result = await session.execute(select(model))
     return result.scalars().all()
 
 
 async def get_turbine_manufacturer_meta(session: AsyncSession):
     model = TurbineManufacturerMeta
+
     result = await session.execute(select(model))
     return result.scalars().all()
 
 
 async def get_power_limitation_meta(session: AsyncSession):
     model = PowerLimitationMeta
+
     result = await session.execute(select(model))
     return result.scalars().all()
 
 
 async def get_power_technology_meta(session: AsyncSession):
     model = PowerTechnologyMeta
+
     result = await session.execute(select(model))
     return result.scalars().all()
 
 
 async def get_main_orientation_meta(session: AsyncSession):
     model = MainOrientationMeta
+
     result = await session.execute(select(model))
     return result.scalars().all()
 
 
 async def get_orientation_tilt_angle_meta(session: AsyncSession):
     model = OrientationTiltAngleMeta
+
     result = await session.execute(select(model))
     return result.scalars().all()
 
 
 async def get_usage_area_meta(session: AsyncSession):
     model = UsageAreaMeta
+
     result = await session.execute(select(model))
     return result.scalars().all()
 
 
 async def get_operational_status_meta(session: AsyncSession):
     model = OperationalStatusMeta
+
     result = await session.execute(select(model))
     return result.scalars().all()
 
 
 async def get_biomass_type_meta(session: AsyncSession):
     model = BiomassTypeMeta
+
     result = await session.execute(select(model))
     return result.scalars().all()
 
 
 async def get_primary_fuel_meta(session: AsyncSession):
     model = PrimaryFuelMeta
+
     result = await session.execute(select(model))
     return result.scalars().all()
 
 
-
-async def get_combustion_unit_by_municipality_key(session: AsyncSession, key: str):
-    try:
-        validated_key = validate_not_none(key, 'query', 'municipality_key')
-        validated_key = sanitize_string(validated_key.lower())
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e))
+async def get_combustion_unit_by_municipality_key(
+    session: AsyncSession,
+    key: str
+):
+    validated_key = validate_not_none(key)
+    validated_key = sanitize_string(validated_key.lower())
 
     stmt = text('''
     SELECT
@@ -197,12 +223,12 @@ async def get_combustion_unit_by_municipality_key(session: AsyncSession, key: st
     return [dict(row) for row in rows]
 
 
-async def get_combustion_unit_by_id(session: AsyncSession, unit_id: str):
-    try:
-        validated_unit_id = validate_not_none(unit_id, 'query', 'unit_id')
-        validated_unit_id = sanitize_string(validated_unit_id)
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e))
+async def get_combustion_unit_by_id(
+    session: AsyncSession,
+    unit_id: str
+):
+    validated_unit_id = validate_not_none(unit_id)
+    validated_unit_id = sanitize_string(validated_unit_id)
 
     stmt = text('''
     SELECT
@@ -272,13 +298,12 @@ async def get_combustion_unit_by_id(session: AsyncSession, unit_id: str):
     return [dict(row) for row in rows]
 
 
-
-async def get_nuclear_unit_by_municipality_key(session: AsyncSession, key: str):
-    try:
-        validated_key = validate_not_none(key, 'query', 'municipality_key')
-        validated_key = sanitize_string(validated_key.lower())
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e))
+async def get_nuclear_unit_by_municipality_key(
+    session: AsyncSession,
+    key: str
+):
+    validated_key = validate_not_none(key)
+    validated_key = sanitize_string(validated_key.lower())
 
     stmt = text('''
     SELECT
@@ -344,12 +369,12 @@ async def get_nuclear_unit_by_municipality_key(session: AsyncSession, key: str):
     return [dict(row) for row in rows]
 
 
-async def get_nuclear_unit_by_id(session: AsyncSession, unit_id: str):
-    try:
-        validated_unit_id = validate_not_none(unit_id, 'query', 'unit_id')
-        validated_unit_id = sanitize_string(validated_unit_id)
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e))
+async def get_nuclear_unit_by_id(
+    session: AsyncSession,
+    unit_id: str
+):
+    validated_unit_id = validate_not_none(unit_id)
+    validated_unit_id = sanitize_string(validated_unit_id)
 
     stmt = text('''
     SELECT
@@ -415,13 +440,12 @@ async def get_nuclear_unit_by_id(session: AsyncSession, unit_id: str):
     return [dict(row) for row in rows]
 
 
-
-async def get_water_unit_by_municipality_key(session: AsyncSession, key: str):
-    try:
-        validated_key = validate_not_none(key, 'query', 'municipality_key')
-        validated_key = sanitize_string(validated_key.lower())
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e))
+async def get_water_unit_by_municipality_key(
+    session: AsyncSession,
+    key: str
+):
+    validated_key = validate_not_none(key)
+    validated_key = sanitize_string(validated_key.lower())
 
     stmt = text('''
     SELECT
@@ -488,13 +512,12 @@ async def get_water_unit_by_municipality_key(session: AsyncSession, key: str):
     return [dict(row) for row in rows]
 
 
-
-async def get_water_unit_by_id(session: AsyncSession, unit_id: str):
-    try:
-        validated_unit_id = validate_not_none(unit_id, 'query', 'unit_id')
-        validated_unit_id = sanitize_string(validated_unit_id)
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e))
+async def get_water_unit_by_id(
+    session: AsyncSession,
+    unit_id: str
+):
+    validated_unit_id = validate_not_none(unit_id)
+    validated_unit_id = sanitize_string(validated_unit_id)
 
     stmt = text('''
     SELECT
@@ -561,13 +584,12 @@ async def get_water_unit_by_id(session: AsyncSession, unit_id: str):
     return [dict(row) for row in rows]
 
 
-
-async def get_biomass_unit_by_municipality_key(session: AsyncSession, key: str):
-    try:
-        validated_key = validate_not_none(key, 'query', 'municipality_key')
-        validated_key = sanitize_string(validated_key.lower())
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e))
+async def get_biomass_unit_by_municipality_key(
+    session: AsyncSession,
+    key: str
+):
+    validated_key = validate_not_none(key)
+    validated_key = sanitize_string(validated_key.lower())
 
     stmt = text('''
     SELECT
@@ -640,12 +662,12 @@ async def get_biomass_unit_by_municipality_key(session: AsyncSession, key: str):
     return [dict(row) for row in rows]
 
 
-async def get_biomass_unit_by_id(session: AsyncSession, unit_id: str):
-    try:
-        validated_unit_id = validate_not_none(unit_id, 'query', 'unit_id')
-        validated_unit_id = sanitize_string(validated_unit_id)
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e))
+async def get_biomass_unit_by_id(
+    session: AsyncSession,
+    unit_id: str
+):
+    validated_unit_id = validate_not_none(unit_id)
+    validated_unit_id = sanitize_string(validated_unit_id)
 
     stmt = text('''
     SELECT
@@ -718,13 +740,12 @@ async def get_biomass_unit_by_id(session: AsyncSession, unit_id: str):
     return [dict(row) for row in rows]
 
 
-
-async def get_wind_unit_by_municipality_key(session: AsyncSession, key: str):
-    try:
-        validated_key = validate_not_none(key, 'query', 'municipality_key')
-        validated_key = sanitize_string(validated_key.lower())
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e))
+async def get_wind_unit_by_municipality_key(
+    session: AsyncSession,
+    key: str
+):
+    validated_key = validate_not_none(key)
+    validated_key = sanitize_string(validated_key.lower())
 
     stmt = text('''
     SELECT
@@ -803,12 +824,12 @@ async def get_wind_unit_by_municipality_key(session: AsyncSession, key: str):
     return [dict(row) for row in rows]
 
 
-async def get_wind_unit_by_id(session: AsyncSession, unit_id: str):
-    try:
-        validated_unit_id = validate_not_none(unit_id, 'query', 'unit_id')
-        validated_unit_id = sanitize_string(validated_unit_id)
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e))
+async def get_wind_unit_by_id(
+    session: AsyncSession,
+    unit_id: str
+):
+    validated_unit_id = validate_not_none(unit_id)
+    validated_unit_id = sanitize_string(validated_unit_id)
 
     stmt = text('''
     SELECT
@@ -887,13 +908,12 @@ async def get_wind_unit_by_id(session: AsyncSession, unit_id: str):
     return [dict(row) for row in rows]
 
 
-
-async def get_solar_unit_by_municipality_key(session: AsyncSession, key: str):
-    try:
-        validated_key = validate_not_none(key, 'query', 'municipality_key')
-        validated_key = sanitize_string(validated_key.lower())
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e))
+async def get_solar_unit_by_municipality_key(
+    session: AsyncSession,
+    key: str
+):
+    validated_key = validate_not_none(key)
+    validated_key = sanitize_string(validated_key.lower())
 
     stmt = text('''
     SELECT
@@ -998,12 +1018,12 @@ async def get_solar_unit_by_municipality_key(session: AsyncSession, key: str):
     return [dict(row) for row in rows]
 
 
-async def get_solar_unit_by_id(session: AsyncSession, unit_id: str):
-    try:
-        validated_unit_id = validate_not_none(unit_id, 'query', 'unit_id')
-        validated_unit_id = sanitize_string(validated_unit_id)
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e))
+async def get_solar_unit_by_id(
+    session: AsyncSession,
+    unit_id: str
+):
+    validated_unit_id = validate_not_none(unit_id)
+    validated_unit_id = sanitize_string(validated_unit_id)
 
     stmt = text('''
     SELECT

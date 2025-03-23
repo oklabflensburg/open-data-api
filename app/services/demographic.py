@@ -4,8 +4,33 @@ from sqlalchemy.future import select
 from fastapi import HTTPException
 
 from ..utils.validators import validate_positive_int32, validate_not_none
-from ..models.demographic import *
-
+from ..models.demographic import (
+    DebtCounselingOfResidents,
+    District,
+    HouseholdType,
+    AgeGroupsOfResidents,
+    NonGermanNationalsResidenceStatus,
+    HouseholdsRiskOfHomelessnessByDistrict,
+    HousingBenefitByDistrict,
+    ResidentsByDistrict,
+    ChildEducationSupport,
+    BirthsByDistrict,
+    EmployedWithPensionInsuranceByDistrict,
+    AgeRatioByDistrict,
+    BasicBenefitsIncomeByDistrict,
+    ChildrenAgeUnder18ByDistrict,
+    ResidentsAge18ToUnder65ByDistrict,
+    ResidentsAge65AndAboveByDistrict,
+    AgeGroupsOfResidentsByDistrict,
+    BeneficiariesByDistrict,
+    UnemployedResidentsByDistrict,
+    UnemployedResidentsCategorizedByDistrict,
+    InactiveBeneficiariesInHouseholdsByDistrict,
+    BeneficiariesCharacteristicsByDistrict,
+    BeneficiariesAge15ToUnder65ByDistrict,
+    MigrationBackgroundByDistrict,
+    HousingAssistanceCasesByDistrict
+)
 
 
 async def get_demographics_meta(session: AsyncSession):
@@ -28,7 +53,6 @@ async def get_demographics_meta(session: AsyncSession):
     result = await session.execute(stmt)
 
     return result.scalars().all()
-
 
 
 async def get_district_details(session: AsyncSession):
@@ -222,7 +246,6 @@ async def get_district_details(session: AsyncSession):
     return result.scalars().all()
 
 
-
 async def get_districts(session: AsyncSession):
     model = District
     result = await session.execute(select(model.id.label('district_id'), model.name.label('district_name')))
@@ -231,21 +254,18 @@ async def get_districts(session: AsyncSession):
 
 
 async def get_district(session: AsyncSession, district_id: int):
-    try:
-        validated_district_id = validate_not_none(district_id, 'query', 'district_id')
-        validated_district_id = validate_positive_int32(validated_district_id, 'query', 'district_id')
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e))
+    validated_district_id = validate_not_none(district_id)
+    validated_district_id = validate_positive_int32(validated_district_id)
 
     model = District
-    result = await session.execute(select(model.id, model.name).filter(model.id==validated_district_id))
+    result = await session.execute(select(model.id, model.name).filter(model.id == validated_district_id))
 
     return result.first()
 
 
-
 async def get_household_types(session: AsyncSession):
     model = HouseholdType
+
     result = await session.execute(select(model))
 
     return result.scalars().all()
@@ -253,14 +273,15 @@ async def get_household_types(session: AsyncSession):
 
 async def get_household_type(session: AsyncSession, household_type_id: int):
     model = HouseholdType
-    result = await session.execute(select(model).filter(model.id==household_type_id))
+
+    result = await session.execute(select(model).filter(model.id == household_type_id))
 
     return result.scalars().all()
 
 
-
 async def get_residents_by_age_groups(session: AsyncSession):
     model = AgeGroupsOfResidents
+
     result = await session.execute(select(model))
 
     return result.scalars().all()
@@ -268,10 +289,10 @@ async def get_residents_by_age_groups(session: AsyncSession):
 
 async def get_residents_by_age_group(session: AsyncSession, age_group_id: int):
     model = AgeGroupsOfResidents
-    result = await session.execute(select(model).filter(model.id==age_group_id))
+
+    result = await session.execute(select(model).filter(model.id == age_group_id))
 
     return result.scalars().all()
-
 
 
 async def get_residents_non_germans(session: AsyncSession):
@@ -281,7 +302,6 @@ async def get_residents_non_germans(session: AsyncSession):
     return result.scalars().all()
 
 
-
 async def get_residents_debt_counseling(session: AsyncSession):
     model = DebtCounselingOfResidents
     result = await session.execute(select(model))
@@ -289,13 +309,11 @@ async def get_residents_debt_counseling(session: AsyncSession):
     return result.scalars().all()
 
 
-
 async def get_residents_education_support(session: AsyncSession):
     model = ChildEducationSupport
     result = await session.execute(select(model))
 
     return result.scalars().all()
-
 
 
 async def get_residents(session: AsyncSession):
@@ -306,17 +324,13 @@ async def get_residents(session: AsyncSession):
 
 
 async def get_residents_by_district(session: AsyncSession, district_id: int):
-    try:
-        validated_district_id = validate_not_none(district_id, 'query', 'district_id')
-        validated_district_id = validate_positive_int32(validated_district_id, 'query', 'district_id')
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e))
+    validated_district_id = validate_not_none(district_id)
+    validated_district_id = validate_positive_int32(validated_district_id)
 
     model = ResidentsByDistrict
-    result = await session.execute(select(model).filter(model.district_id==validated_district_id))
+    result = await session.execute(select(model).filter(model.district_id == validated_district_id))
 
     return result.scalars().all()
-
 
 
 async def get_residents_births(session: AsyncSession):
@@ -327,17 +341,13 @@ async def get_residents_births(session: AsyncSession):
 
 
 async def get_residents_births_by_district(session: AsyncSession, district_id: int):
-    try:
-        validated_district_id = validate_not_none(district_id, 'query', 'district_id')
-        validated_district_id = validate_positive_int32(validated_district_id, 'query', 'district_id')
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e))
+    validated_district_id = validate_not_none(district_id)
+    validated_district_id = validate_positive_int32(validated_district_id)
 
     model = BirthsByDistrict
-    result = await session.execute(select(model).filter(model.district_id==validated_district_id))
+    result = await session.execute(select(model).filter(model.district_id == validated_district_id))
 
     return result.scalars().all()
-
 
 
 async def get_residents_employed(session: AsyncSession):
@@ -348,17 +358,13 @@ async def get_residents_employed(session: AsyncSession):
 
 
 async def get_residents_employed_by_district(session: AsyncSession, district_id: int):
-    try:
-        validated_district_id = validate_not_none(district_id, 'query', 'district_id')
-        validated_district_id = validate_positive_int32(validated_district_id, 'query', 'district_id')
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e))
+    validated_district_id = validate_not_none(district_id)
+    validated_district_id = validate_positive_int32(validated_district_id)
 
     model = EmployedWithPensionInsuranceByDistrict
-    result = await session.execute(select(model).filter(model.district_id==validated_district_id))
+    result = await session.execute(select(model).filter(model.district_id == validated_district_id))
 
     return result.scalars().all()
-
 
 
 async def get_residents_ageratio(session: AsyncSession):
@@ -369,17 +375,13 @@ async def get_residents_ageratio(session: AsyncSession):
 
 
 async def get_residents_ageratio_by_district(session: AsyncSession, district_id: int):
-    try:
-        validated_district_id = validate_not_none(district_id, 'query', 'district_id')
-        validated_district_id = validate_positive_int32(validated_district_id, 'query', 'district_id')
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e))
+    validated_district_id = validate_not_none(district_id)
+    validated_district_id = validate_positive_int32(validated_district_id)
 
     model = AgeRatioByDistrict
-    result = await session.execute(select(model).filter(model.district_id==validated_district_id))
+    result = await session.execute(select(model).filter(model.district_id == validated_district_id))
 
     return result.scalars().all()
-
 
 
 async def get_residents_basicbenefits(session: AsyncSession):
@@ -390,17 +392,13 @@ async def get_residents_basicbenefits(session: AsyncSession):
 
 
 async def get_residents_basicbenefits_by_district(session: AsyncSession, district_id: int):
-    try:
-        validated_district_id = validate_not_none(district_id, 'query', 'district_id')
-        validated_district_id = validate_positive_int32(validated_district_id, 'query', 'district_id')
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e))
+    validated_district_id = validate_not_none(district_id)
+    validated_district_id = validate_positive_int32(validated_district_id)
 
     model = BasicBenefitsIncomeByDistrict
-    result = await session.execute(select(model).filter(model.district_id==validated_district_id))
+    result = await session.execute(select(model).filter(model.district_id == validated_district_id))
 
     return result.scalars().all()
-
 
 
 async def get_residents_ageunder18(session: AsyncSession):
@@ -411,17 +409,13 @@ async def get_residents_ageunder18(session: AsyncSession):
 
 
 async def get_residents_ageunder18_by_district(session: AsyncSession, district_id: int):
-    try:
-        validated_district_id = validate_not_none(district_id, 'query', 'district_id')
-        validated_district_id = validate_positive_int32(validated_district_id, 'query', 'district_id')
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e))
+    validated_district_id = validate_not_none(district_id)
+    validated_district_id = validate_positive_int32(validated_district_id)
 
     model = ChildrenAgeUnder18ByDistrict
-    result = await session.execute(select(model).filter(model.district_id==validated_district_id))
+    result = await session.execute(select(model).filter(model.district_id == validated_district_id))
 
     return result.scalars().all()
-
 
 
 async def get_residents_age18tounder65(session: AsyncSession):
@@ -432,17 +426,13 @@ async def get_residents_age18tounder65(session: AsyncSession):
 
 
 async def get_residents_age18tounder65_by_district(session: AsyncSession, district_id: int):
-    try:
-        validated_district_id = validate_not_none(district_id, 'query', 'district_id')
-        validated_district_id = validate_positive_int32(validated_district_id, 'query', 'district_id')
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e))
+    validated_district_id = validate_not_none(district_id)
+    validated_district_id = validate_positive_int32(validated_district_id)
 
     model = ResidentsAge18ToUnder65ByDistrict
-    result = await session.execute(select(model).filter(model.district_id==validated_district_id))
+    result = await session.execute(select(model).filter(model.district_id == validated_district_id))
 
     return result.scalars().all()
-
 
 
 async def get_residents_age65andabove(session: AsyncSession):
@@ -453,17 +443,13 @@ async def get_residents_age65andabove(session: AsyncSession):
 
 
 async def get_residents_age65andabove_by_district(session: AsyncSession, district_id: int):
-    try:
-        validated_district_id = validate_not_none(district_id, 'query', 'district_id')
-        validated_district_id = validate_positive_int32(validated_district_id, 'query', 'district_id')
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e))
+    validated_district_id = validate_not_none(district_id)
+    validated_district_id = validate_positive_int32(validated_district_id)
 
     model = ResidentsAge65AndAboveByDistrict
-    result = await session.execute(select(model).filter(model.district_id==validated_district_id))
+    result = await session.execute(select(model).filter(model.district_id == validated_district_id))
 
     return result.scalars().all()
-
 
 
 async def get_residents_agegroups(session: AsyncSession):
@@ -474,17 +460,13 @@ async def get_residents_agegroups(session: AsyncSession):
 
 
 async def get_residents_agegroups_by_district(session: AsyncSession, district_id: int):
-    try:
-        validated_district_id = validate_not_none(district_id, 'query', 'district_id')
-        validated_district_id = validate_positive_int32(validated_district_id, 'query', 'district_id')
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e))
+    validated_district_id = validate_not_none(district_id)
+    validated_district_id = validate_positive_int32(validated_district_id)
 
     model = AgeGroupsOfResidentsByDistrict
-    result = await session.execute(select(model).filter(model.district_id==validated_district_id))
+    result = await session.execute(select(model).filter(model.district_id == validated_district_id))
 
     return result.scalars().all()
-
 
 
 async def get_residents_beneficiaries(session: AsyncSession):
@@ -492,7 +474,6 @@ async def get_residents_beneficiaries(session: AsyncSession):
     result = await session.execute(select(model))
 
     return result.scalars().all()
-
 
 
 async def get_residents_unemployed(session: AsyncSession):
@@ -503,17 +484,13 @@ async def get_residents_unemployed(session: AsyncSession):
 
 
 async def get_residents_unemployed_by_district(session: AsyncSession, district_id: int):
-    try:
-        validated_district_id = validate_not_none(district_id, 'query', 'district_id')
-        validated_district_id = validate_positive_int32(validated_district_id, 'query', 'district_id')
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e))
+    validated_district_id = validate_not_none(district_id)
+    validated_district_id = validate_positive_int32(validated_district_id)
 
     model = UnemployedResidentsByDistrict
-    result = await session.execute(select(model).filter(model.district_id==validated_district_id))
+    result = await session.execute(select(model).filter(model.district_id == validated_district_id))
 
     return result.scalars().all()
-
 
 
 async def get_residents_unemployed_by_categories(session: AsyncSession):
@@ -524,17 +501,13 @@ async def get_residents_unemployed_by_categories(session: AsyncSession):
 
 
 async def get_residents_unemployed_by_categories_by_district(session: AsyncSession, district_id: int):
-    try:
-        validated_district_id = validate_not_none(district_id, 'query', 'district_id')
-        validated_district_id = validate_positive_int32(validated_district_id, 'query', 'district_id')
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e))
+    validated_district_id = validate_not_none(district_id)
+    validated_district_id = validate_positive_int32(validated_district_id)
 
     model = UnemployedResidentsCategorizedByDistrict
-    result = await session.execute(select(model).filter(model.district_id==validated_district_id))
+    result = await session.execute(select(model).filter(model.district_id == validated_district_id))
 
     return result.scalars().all()
-
 
 
 async def get_residents_beneficiaries_inactive(session: AsyncSession):
@@ -545,17 +518,13 @@ async def get_residents_beneficiaries_inactive(session: AsyncSession):
 
 
 async def get_residents_beneficiaries_by_district(session: AsyncSession, district_id: int):
-    try:
-        validated_district_id = validate_not_none(district_id, 'query', 'district_id')
-        validated_district_id = validate_positive_int32(validated_district_id, 'query', 'district_id')
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e))
+    validated_district_id = validate_not_none(district_id)
+    validated_district_id = validate_positive_int32(validated_district_id)
 
     model = BeneficiariesByDistrict
-    result = await session.execute(select(model).filter(model.district_id==validated_district_id))
+    result = await session.execute(select(model).filter(model.district_id == validated_district_id))
 
     return result.scalars().all()
-
 
 
 async def get_residents_beneficiaries_characteristics(session: AsyncSession):
@@ -566,17 +535,13 @@ async def get_residents_beneficiaries_characteristics(session: AsyncSession):
 
 
 async def get_residents_beneficiaries_inactive_by_district(session: AsyncSession, district_id: int):
-    try:
-        validated_district_id = validate_not_none(district_id, 'query', 'district_id')
-        validated_district_id = validate_positive_int32(validated_district_id, 'query', 'district_id')
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e))
+    validated_district_id = validate_not_none(district_id)
+    validated_district_id = validate_positive_int32(validated_district_id)
 
     model = InactiveBeneficiariesInHouseholdsByDistrict
-    result = await session.execute(select(model).filter(model.district_id==validated_district_id))
+    result = await session.execute(select(model).filter(model.district_id == validated_district_id))
 
     return result.scalars().all()
-
 
 
 async def get_residents_beneficiaries_age15tounder65(session: AsyncSession):
@@ -587,31 +552,23 @@ async def get_residents_beneficiaries_age15tounder65(session: AsyncSession):
 
 
 async def get_residents_beneficiaries_age15tounder65_by_district(session: AsyncSession, district_id: int):
-    try:
-        validated_district_id = validate_not_none(district_id, 'query', 'district_id')
-        validated_district_id = validate_positive_int32(validated_district_id, 'query', 'district_id')
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e))
+    validated_district_id = validate_not_none(district_id)
+    validated_district_id = validate_positive_int32(validated_district_id)
 
     model = BeneficiariesAge15ToUnder65ByDistrict
-    result = await session.execute(select(model).filter(model.district_id==validated_district_id))
+    result = await session.execute(select(model).filter(model.district_id == validated_district_id))
 
     return result.scalars().all()
-
 
 
 async def get_residents_beneficiaries_characteristics_by_district(session: AsyncSession, district_id: int):
-    try:
-        validated_district_id = validate_not_none(district_id, 'query', 'district_id')
-        validated_district_id = validate_positive_int32(validated_district_id, 'query', 'district_id')
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e))
+    validated_district_id = validate_not_none(district_id)
+    validated_district_id = validate_positive_int32(validated_district_id)
 
     model = BeneficiariesCharacteristicsByDistrict
-    result = await session.execute(select(model).filter(model.district_id==validated_district_id))
+    result = await session.execute(select(model).filter(model.district_id == validated_district_id))
 
     return result.scalars().all()
-
 
 
 async def get_residents_migration_background(session: AsyncSession):
@@ -622,17 +579,13 @@ async def get_residents_migration_background(session: AsyncSession):
 
 
 async def get_residents_migration_background_by_district(session: AsyncSession, district_id: int):
-    try:
-        validated_district_id = validate_not_none(district_id, 'query', 'district_id')
-        validated_district_id = validate_positive_int32(validated_district_id, 'query', 'district_id')
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e))
+    validated_district_id = validate_not_none(district_id)
+    validated_district_id = validate_positive_int32(validated_district_id)
 
     model = MigrationBackgroundByDistrict
-    result = await session.execute(select(model).filter(model.district_id==validated_district_id))
+    result = await session.execute(select(model).filter(model.district_id == validated_district_id))
 
     return result.scalars().all()
-
 
 
 async def get_residents_housing_assistance(session: AsyncSession):
@@ -643,17 +596,13 @@ async def get_residents_housing_assistance(session: AsyncSession):
 
 
 async def get_residents_housing_assistance_by_district(session: AsyncSession, district_id: int):
-    try:
-        validated_district_id = validate_not_none(district_id, 'query', 'district_id')
-        validated_district_id = validate_positive_int32(validated_district_id, 'query', 'district_id')
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e))
+    validated_district_id = validate_not_none(district_id)
+    validated_district_id = validate_positive_int32(validated_district_id)
 
     model = HousingAssistanceCasesByDistrict
-    result = await session.execute(select(model).filter(model.district_id==validated_district_id))
+    result = await session.execute(select(model).filter(model.district_id == validated_district_id))
 
     return result.scalars().all()
-
 
 
 async def get_residents_housing_benefit(session: AsyncSession):
@@ -664,17 +613,13 @@ async def get_residents_housing_benefit(session: AsyncSession):
 
 
 async def get_residents_housing_benefit_by_district(session: AsyncSession, district_id: int):
-    try:
-        validated_district_id = validate_not_none(district_id, 'query', 'district_id')
-        validated_district_id = validate_positive_int32(validated_district_id, 'query', 'district_id')
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e))
+    validated_district_id = validate_not_none(district_id)
+    validated_district_id = validate_positive_int32(validated_district_id)
 
     model = HousingBenefitByDistrict
-    result = await session.execute(select(model).filter(model.district_id==validated_district_id))
+    result = await session.execute(select(model).filter(model.district_id == validated_district_id))
 
     return result.scalars().all()
-
 
 
 async def get_residents_risk_homelessness(session: AsyncSession):
@@ -685,13 +630,10 @@ async def get_residents_risk_homelessness(session: AsyncSession):
 
 
 async def get_residents_risk_homelessness_by_district(session: AsyncSession, district_id: int):
-    try:
-        validated_district_id = validate_not_none(district_id, 'query', 'district_id')
-        validated_district_id = validate_positive_int32(validated_district_id, 'query', 'district_id')
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e))
+    validated_district_id = validate_not_none(district_id)
+    validated_district_id = validate_positive_int32(validated_district_id)
 
     model = HouseholdsRiskOfHomelessnessByDistrict
-    result = await session.execute(select(model).filter(model.district_id==validated_district_id))
+    result = await session.execute(select(model).filter(model.district_id == validated_district_id))
 
     return result.scalars().all()

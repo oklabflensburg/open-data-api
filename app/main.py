@@ -2,7 +2,6 @@ from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.responses import JSONResponse, HTMLResponse, RedirectResponse
-from fastapi.exceptions import RequestValidationError
 from sqlalchemy.ext.declarative import declarative_base
 
 from .database import engine
@@ -18,7 +17,8 @@ from .api.demographic import route_demographic
 from .api.energy import route_energy
 
 
-app = FastAPI(docs_url=None, redoc_url=None, version='1.17', title='Opendata API', summary='Some endpoints are not yet implemented')
+app = FastAPI(docs_url=None, redoc_url=None, version='1.18', title='Opendata API',
+              summary='Opendata API developed by volonteers from https://oklabflensburg.de')
 Base = declarative_base()
 
 app.mount('/static', StaticFiles(directory='static'), name='static')
@@ -46,7 +46,10 @@ async def swagger_ui_html(req: Request) -> HTMLResponse:
 
 
 @app.exception_handler(CustomValidationError)
-async def custom_validation_error_handler(request: Request, exc: CustomValidationError):
+async def custom_validation_error_handler(
+    request: Request,
+    exc: CustomValidationError
+) -> JSONResponse:
     return JSONResponse(
         status_code=exc.status_code,
         content={'error': exc.detail['msg']}

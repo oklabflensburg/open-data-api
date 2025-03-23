@@ -1,13 +1,15 @@
 from sqlalchemy.sql import text
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import HTTPException
 
 from ..utils.validators import validate_not_none
 from ..utils.sanitizer import sanitize_string
 
 
-
-async def get_parcel_meta_by_lat_lng(session: AsyncSession, lat: float, lng: float):
+async def get_parcel_meta_by_lat_lng(
+    session: AsyncSession,
+    lat: float,
+    lng: float
+):
     stmt = text('''
     SELECT
         dn.district_name,
@@ -43,12 +45,12 @@ async def get_parcel_meta_by_lat_lng(session: AsyncSession, lat: float, lng: flo
     return result.mappings().all()
 
 
-async def get_municipality_by_key(session: AsyncSession, municipality_key: str):
-    try:
-        validated_key = validate_not_none(municipality_key, 'query', 'municipality_key')
-        validated_key = sanitize_string(validated_key)
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e))
+async def get_municipality_by_key(
+    session: AsyncSession,
+    municipality_key: str
+):
+    validated_key = validate_not_none(municipality_key)
+    validated_key = sanitize_string(validated_key)
 
     stmt = text('''
     SELECT
@@ -89,12 +91,12 @@ async def get_municipality_by_key(session: AsyncSession, municipality_key: str):
     return result.mappings().all()
 
 
-async def get_municipality_by_name(session: AsyncSession, municipality_name: str):
-    try:
-        validated_name = validate_not_none(municipality_name, 'query', 'municipality_name')
-        validated_name = sanitize_string(validated_name)
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e))
+async def get_municipality_by_name(
+    session: AsyncSession,
+    municipality_name: str
+):
+    validated_name = validate_not_none(municipality_name)
+    validated_name = sanitize_string(validated_name)
 
     stmt = text('''
     SELECT
@@ -127,13 +129,12 @@ async def get_municipality_by_name(session: AsyncSession, municipality_name: str
     return result.mappings().all()
 
 
-
-async def get_municipality_by_query(session: AsyncSession, query: str):
-    try:
-        validated_query = validate_not_none(query, 'query', 'query')
-        sanitized_query = sanitize_string(validated_query)
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e))
+async def get_municipality_by_query(
+    session: AsyncSession,
+    query: str
+):
+    validated_query = validate_not_none(query)
+    sanitized_query = sanitize_string(validated_query)
 
     stmt = text('''
     SELECT

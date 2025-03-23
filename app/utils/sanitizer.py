@@ -1,10 +1,15 @@
 import re
 
+from fastapi import HTTPException, status
+
 
 def sanitize_string(value: str) -> str:
     # Remove non-printable characters (any character with a hex value < 32 or > 127)
     if not value.isprintable():
-        raise ValueError('Invalid non-printable character detected.')
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='Invalid non-printable character detected.'
+        )
 
     # Matches non-ASCII printable characters
     sanitized_value = re.sub(r'[^\x20-\x7E]', '', value)

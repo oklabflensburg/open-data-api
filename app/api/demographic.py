@@ -1,12 +1,88 @@
-from fastapi import Depends, APIRouter, HTTPException
+from fastapi import Depends, APIRouter, HTTPException, status
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
 
 from ..dependencies import get_session
-from ..services.demographic import *
-from ..schemas.demographic import *
+
+from ..services.demographic import (
+    get_demographics_meta,
+    get_district_details,
+    get_districts,
+    get_district,
+    get_household_types,
+    get_residents_by_age_groups,
+    get_residents_non_germans,
+    get_residents_debt_counseling,
+    get_residents_education_support,
+    get_residents,
+    get_residents_by_district,
+    get_residents_births,
+    get_residents_births_by_district,
+    get_residents_employed,
+    get_residents_employed_by_district,
+    get_residents_ageratio,
+    get_residents_ageratio_by_district,
+    get_residents_basicbenefits,
+    get_residents_basicbenefits_by_district,
+    get_residents_ageunder18,
+    get_residents_ageunder18_by_district,
+    get_residents_age18tounder65,
+    get_residents_age18tounder65_by_district,
+    get_residents_age65andabove,
+    get_residents_age65andabove_by_district,
+    get_residents_agegroups,
+    get_residents_agegroups_by_district,
+    get_residents_unemployed,
+    get_residents_unemployed_by_district,
+    get_residents_unemployed_by_categories,
+    get_residents_unemployed_by_categories_by_district,
+    get_residents_beneficiaries,
+    get_residents_beneficiaries_by_district,
+    get_residents_beneficiaries_inactive,
+    get_residents_beneficiaries_inactive_by_district,
+    get_residents_beneficiaries_characteristics,
+    get_residents_beneficiaries_characteristics_by_district,
+    get_residents_beneficiaries_age15tounder65,
+    get_residents_beneficiaries_age15tounder65_by_district,
+    get_residents_migration_background,
+    get_residents_migration_background_by_district,
+    get_residents_housing_assistance,
+    get_residents_housing_assistance_by_district,
+    get_residents_housing_benefit,
+    get_residents_housing_benefit_by_district,
+    get_residents_risk_homelessness,
+    get_residents_risk_homelessness_by_district
+)
+
+from ..schemas.demographic import (
+    DistrictResponse,
+    HouseholdTypeResponse,
+    AgeGroupsOfResidentsResponse,
+    NonGermanNationalsResidenceStatusResponse,
+    DebtCounselingOfResidentsResponse,
+    ChildEducationSupportResponse,
+    ResidentsByDistrictResponse,
+    BirthsByDistrictResponse,
+    EmployedWithPensionInsuranceByDistrictResponse,
+    AgeRatioByDistrictResponse,
+    BasicBenefitsIncomeByDistrictResponse,
+    ChildrenAgeUnder18ByDistrictResponse,
+    ResidentsAge18ToUnder65ByDistrictResponse,
+    ResidentsAge65AndAboveByDistrictResponse,
+    AgeGroupsOfResidentsByDistrictResponse,
+    UnemployedResidentsByDistrictResponse,
+    UnemployedResidentsCategorizedByDistrictResponse,
+    BeneficiariesByDistrictResponse,
+    InactiveBeneficiariesInHouseholdsByDistrictResponse,
+    BeneficiariesCharacteristicsByDistrictResponse,
+    BeneficiariesAge15ToUnder65ByDistrictResponse,
+    MigrationBackgroundByDistrictResponse,
+    HousingBenefitByDistrictResponse,
+    HousingAssistanceCasesByDistrictResponse,
+    HouseholdsRiskOfHomelessnessByDistrictResponse
+)
 
 route_demographic = APIRouter(prefix='/demographic/v1')
 
@@ -14,6 +90,12 @@ route_demographic = APIRouter(prefix='/demographic/v1')
 @route_demographic.get(
     '/meta',
     response_model=List,
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_demographics_meta(session: AsyncSession = Depends(get_session)):
@@ -23,10 +105,15 @@ async def fetch_demographics_meta(session: AsyncSession = Depends(get_session)):
     return JSONResponse(content=result)
 
 
-
 @route_demographic.get(
     '/details',
     response_model=List,
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_district_details(session: AsyncSession = Depends(get_session)):
@@ -39,20 +126,33 @@ async def fetch_district_details(session: AsyncSession = Depends(get_session)):
 @route_demographic.get(
     '/districts/',
     response_model=List[DistrictResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_districts(session: AsyncSession = Depends(get_session)):
     rows = await get_districts(session)
 
     if len(rows) == 0:
-        raise HTTPException(status_code=404, detail='Could not retrieve list of Flensburg districts')
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail='Could not retrieve list of Flensburg districts')
 
-    return rows 
+    return rows
 
 
 @route_demographic.get(
     '/{district_id}',
     response_model=List[DistrictResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_district(district_id: int, session: AsyncSession = Depends(get_session)):
@@ -61,14 +161,20 @@ async def fetch_district(district_id: int, session: AsyncSession = Depends(get_s
 
     try:
         return [schema(district_id=row.id, district_name=row.name)]
-    except AttributeError as e:
-        raise HTTPException(status_code=404, detail='Not found')
-
+    except AttributeError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail='Not found')
 
 
 @route_demographic.get(
     '/household/types',
     response_model=List[HouseholdTypeResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_household_types(session: AsyncSession = Depends(get_session)):
@@ -81,6 +187,12 @@ async def fetch_household_types(session: AsyncSession = Depends(get_session)):
 @route_demographic.get(
     '/residents/agegroups',
     response_model=List[AgeGroupsOfResidentsResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents_by_age_groups(session: AsyncSession = Depends(get_session)):
@@ -88,14 +200,20 @@ async def fetch_residents_by_age_groups(session: AsyncSession = Depends(get_sess
     schema = AgeGroupsOfResidentsResponse
 
     return [schema(year=r.year,
-        age_under_18=r.age_under_18, age_18_to_under_30=r.age_18_to_under_30,
-        age_30_to_under_45=r.age_30_to_under_45, age_45_to_under_65=r.age_45_to_under_65,
-        age_65_to_under_80=r.age_65_to_under_80, age_80_and_above=r.age_80_and_above) for r in rows]
+                   age_under_18=r.age_under_18, age_18_to_under_30=r.age_18_to_under_30,
+                   age_30_to_under_45=r.age_30_to_under_45, age_45_to_under_65=r.age_45_to_under_65,
+                   age_65_to_under_80=r.age_65_to_under_80, age_80_and_above=r.age_80_and_above) for r in rows]
 
 
 @route_demographic.get(
     '/residents/nongermans',
     response_model=List[NonGermanNationalsResidenceStatusResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents_non_germans(session: AsyncSession = Depends(get_session)):
@@ -103,17 +221,23 @@ async def fetch_residents_non_germans(session: AsyncSession = Depends(get_sessio
     schema = NonGermanNationalsResidenceStatusResponse
 
     return [schema(year=r.year,
-        permanent_residency=r.permanent_residency,
-        permanent_residency_according_eu_freedom_movement_act=r.permanent_residency_according_eu_freedom_movement_act,
-        permanent_residency_third_country_nationality=r.permanent_residency_third_country_nationality,
-        without_permanent_residency=r.without_permanent_residency,
-        asylum_seeker=r.asylum_seeker,
-        suspension_of_deportation=r.suspension_of_deportation) for r in rows]
+                   permanent_residency=r.permanent_residency,
+                   permanent_residency_according_eu_freedom_movement_act=r.permanent_residency_according_eu_freedom_movement_act,
+                   permanent_residency_third_country_nationality=r.permanent_residency_third_country_nationality,
+                   without_permanent_residency=r.without_permanent_residency,
+                   asylum_seeker=r.asylum_seeker,
+                   suspension_of_deportation=r.suspension_of_deportation) for r in rows]
 
 
 @route_demographic.get(
     '/residents/debtcounseling',
     response_model=List[DebtCounselingOfResidentsResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents_debt_counseling(session: AsyncSession = Depends(get_session)):
@@ -126,6 +250,12 @@ async def fetch_residents_debt_counseling(session: AsyncSession = Depends(get_se
 @route_demographic.get(
     '/residents/education/support',
     response_model=List[ChildEducationSupportResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents_education_support(session: AsyncSession = Depends(get_session)):
@@ -133,20 +263,25 @@ async def fetch_residents_education_support(session: AsyncSession = Depends(get_
     schema = ChildEducationSupportResponse
 
     return [schema(year=r.year,
-        educational_assistance=r.educational_assistance,
-        parenting_counselor=r.parenting_counselor,
-        pedagogical_family_assistance=r.pedagogical_family_assistance,
-        child_day_care_facility=r.child_day_care_facility,
-        full_time_care=r.full_time_care,
-        residential_education=r.residential_education,
-        integration_assistance=r.integration_assistance,
-        additional_support=r.additional_support) for r in rows]
-
+                   educational_assistance=r.educational_assistance,
+                   parenting_counselor=r.parenting_counselor,
+                   pedagogical_family_assistance=r.pedagogical_family_assistance,
+                   child_day_care_facility=r.child_day_care_facility,
+                   full_time_care=r.full_time_care,
+                   residential_education=r.residential_education,
+                   integration_assistance=r.integration_assistance,
+                   additional_support=r.additional_support) for r in rows]
 
 
 @route_demographic.get(
     '/districts/residents',
     response_model=List[ResidentsByDistrictResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents(session: AsyncSession = Depends(get_session)):
@@ -159,6 +294,12 @@ async def fetch_residents(session: AsyncSession = Depends(get_session)):
 @route_demographic.get(
     '/{district_id}/residents',
     response_model=List[ResidentsByDistrictResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
@@ -168,10 +309,15 @@ async def fetch_residents_by_district(district_id: int, session: AsyncSession = 
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
 
 
-
 @route_demographic.get(
     '/districts/residents/births',
     response_model=List[BirthsByDistrictResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents_births(session: AsyncSession = Depends(get_session)):
@@ -179,14 +325,20 @@ async def fetch_residents_births(session: AsyncSession = Depends(get_session)):
     schema = BirthsByDistrictResponse
 
     return [schema(year=r.year,
-        district_id=r.district_id,
-        births=r.births,
-        birth_rate=r.birth_rate) for r in rows]
+                   district_id=r.district_id,
+                   births=r.births,
+                   birth_rate=r.birth_rate) for r in rows]
 
 
 @route_demographic.get(
     '/{district_id}/residents/births',
     response_model=List[BirthsByDistrictResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents_births_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
@@ -194,14 +346,20 @@ async def fetch_residents_births_by_district(district_id: int, session: AsyncSes
     schema = BirthsByDistrictResponse
 
     return [schema(year=r.year,
-        district_id=r.district_id,
-        births=r.births,
-        birth_rate=r.birth_rate) for r in rows]
+                   district_id=r.district_id,
+                   births=r.births,
+                   birth_rate=r.birth_rate) for r in rows]
 
 
 @route_demographic.get(
     '/districts/residents/employed',
     response_model=List[EmployedWithPensionInsuranceByDistrictResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents_employed(session: AsyncSession = Depends(get_session)):
@@ -209,14 +367,20 @@ async def fetch_residents_employed(session: AsyncSession = Depends(get_session))
     schema = EmployedWithPensionInsuranceByDistrictResponse
 
     return [schema(year=r.year,
-        district_id=r.district_id,
-        residents=r.residents,
-        employment_rate=r.employment_rate) for r in rows]
+                   district_id=r.district_id,
+                   residents=r.residents,
+                   employment_rate=r.employment_rate) for r in rows]
 
 
 @route_demographic.get(
     '/{district_id}/residents/employed',
     response_model=List[EmployedWithPensionInsuranceByDistrictResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents_employed_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
@@ -224,15 +388,20 @@ async def fetch_residents_employed_by_district(district_id: int, session: AsyncS
     schema = EmployedWithPensionInsuranceByDistrictResponse
 
     return [schema(year=r.year,
-        district_id=r.district_id,
-        residents=r.residents,
-        employment_rate=r.employment_rate) for r in rows]
-
+                   district_id=r.district_id,
+                   residents=r.residents,
+                   employment_rate=r.employment_rate) for r in rows]
 
 
 @route_demographic.get(
     '/districts/residents/ageratio',
     response_model=List[AgeRatioByDistrictResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents_ageratio(session: AsyncSession = Depends(get_session)):
@@ -245,6 +414,12 @@ async def fetch_residents_ageratio(session: AsyncSession = Depends(get_session))
 @route_demographic.get(
     '/{district_id}/residents/ageratio',
     response_model=List[AgeRatioByDistrictResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents_ageratio_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
@@ -254,10 +429,15 @@ async def fetch_residents_ageratio_by_district(district_id: int, session: AsyncS
     return [schema(year=r.year, district_id=r.district_id, quotient=r.quotient) for r in rows]
 
 
-
 @route_demographic.get(
     '/districts/residents/basicbenefits',
     response_model=List[BasicBenefitsIncomeByDistrictResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents_basicbenefits(session: AsyncSession = Depends(get_session)):
@@ -265,16 +445,22 @@ async def fetch_residents_basicbenefits(session: AsyncSession = Depends(get_sess
     schema = BasicBenefitsIncomeByDistrictResponse
 
     return [schema(year=r.year,
-        district_id=r.district_id,
-        male=r.male,
-        female=r.female,
-        age_18_to_under_65=r.age_18_to_under_65,
-        age_65_and_above=r.age_65_and_above) for r in rows]
+                   district_id=r.district_id,
+                   male=r.male,
+                   female=r.female,
+                   age_18_to_under_65=r.age_18_to_under_65,
+                   age_65_and_above=r.age_65_and_above) for r in rows]
 
 
 @route_demographic.get(
     '/{district_id}/residents/basicbenefits',
     response_model=List[BasicBenefitsIncomeByDistrictResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents_basicbenefits_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
@@ -282,17 +468,22 @@ async def fetch_residents_basicbenefits_by_district(district_id: int, session: A
     schema = BasicBenefitsIncomeByDistrictResponse
 
     return [schema(year=r.year,
-        district_id=r.district_id,
-        male=r.male,
-        female=r.female,
-        age_18_to_under_65=r.age_18_to_under_65,
-        age_65_and_above=r.age_65_and_above) for r in rows]
-
+                   district_id=r.district_id,
+                   male=r.male,
+                   female=r.female,
+                   age_18_to_under_65=r.age_18_to_under_65,
+                   age_65_and_above=r.age_65_and_above) for r in rows]
 
 
 @route_demographic.get(
     '/districts/residents/ageunder18',
     response_model=List[ChildrenAgeUnder18ByDistrictResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents_ageunder18(session: AsyncSession = Depends(get_session)):
@@ -305,6 +496,12 @@ async def fetch_residents_ageunder18(session: AsyncSession = Depends(get_session
 @route_demographic.get(
     '/{district_id}/residents/ageunder18',
     response_model=List[ChildrenAgeUnder18ByDistrictResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents_ageunder18_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
@@ -314,10 +511,15 @@ async def fetch_residents_ageunder18_by_district(district_id: int, session: Asyn
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
 
 
-
 @route_demographic.get(
     '/districts/residents/age18tounder65',
     response_model=List[ResidentsAge18ToUnder65ByDistrictResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents_age18tounder65(session: AsyncSession = Depends(get_session)):
@@ -330,6 +532,12 @@ async def fetch_residents_age18tounder65(session: AsyncSession = Depends(get_ses
 @route_demographic.get(
     '/{district_id}/residents/age18tounder65',
     response_model=List[ResidentsAge18ToUnder65ByDistrictResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents_age18tounder65_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
@@ -339,10 +547,15 @@ async def fetch_residents_age18tounder65_by_district(district_id: int, session: 
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
 
 
-
 @route_demographic.get(
     '/districts/residents/age65andabove',
     response_model=List[ResidentsAge65AndAboveByDistrictResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents_age65andabove(session: AsyncSession = Depends(get_session)):
@@ -355,6 +568,12 @@ async def fetch_residents_age65andabove(session: AsyncSession = Depends(get_sess
 @route_demographic.get(
     '/{district_id}/residents/age65andabove',
     response_model=List[ResidentsAge65AndAboveByDistrictResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents_age65andabove_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
@@ -364,10 +583,15 @@ async def fetch_residents_age65andabove_by_district(district_id: int, session: A
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
 
 
-
 @route_demographic.get(
     '/districts/residents/agegroups',
     response_model=List[AgeGroupsOfResidentsByDistrictResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents_agegroups(session: AsyncSession = Depends(get_session)):
@@ -375,20 +599,26 @@ async def fetch_residents_agegroups(session: AsyncSession = Depends(get_session)
     schema = AgeGroupsOfResidentsByDistrictResponse
 
     return [schema(year=r.year,
-        district_id=r.district_id,
-        age_under_18=r.age_under_18,
-        age_18_to_under_30=r.age_18_to_under_30,
-        age_30_to_under_45=r.age_30_to_under_45,
-        age_45_to_under_65=r.age_45_to_under_65,
-        age_65_to_under_80=r.age_65_to_under_80,
-        age_80_and_above=r.age_80_and_above,
-        age_0_to_under_7=r.age_0_to_under_7,
-        age_60_and_above=r.age_60_and_above) for r in rows]
+                   district_id=r.district_id,
+                   age_under_18=r.age_under_18,
+                   age_18_to_under_30=r.age_18_to_under_30,
+                   age_30_to_under_45=r.age_30_to_under_45,
+                   age_45_to_under_65=r.age_45_to_under_65,
+                   age_65_to_under_80=r.age_65_to_under_80,
+                   age_80_and_above=r.age_80_and_above,
+                   age_0_to_under_7=r.age_0_to_under_7,
+                   age_60_and_above=r.age_60_and_above) for r in rows]
 
 
 @route_demographic.get(
     '/{district_id}/residents/agegroups',
     response_model=List[AgeGroupsOfResidentsByDistrictResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents_agegroups_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
@@ -396,21 +626,26 @@ async def fetch_residents_agegroups_by_district(district_id: int, session: Async
     schema = AgeGroupsOfResidentsByDistrictResponse
 
     return [schema(year=r.year,
-        district_id=r.district_id,
-        age_under_18=r.age_under_18,
-        age_18_to_under_30=r.age_18_to_under_30,
-        age_30_to_under_45=r.age_30_to_under_45,
-        age_45_to_under_65=r.age_45_to_under_65,
-        age_65_to_under_80=r.age_65_to_under_80,
-        age_80_and_above=r.age_80_and_above,
-        age_0_to_under_7=r.age_0_to_under_7,
-        age_60_and_above=r.age_60_and_above) for r in rows]
-
+                   district_id=r.district_id,
+                   age_under_18=r.age_under_18,
+                   age_18_to_under_30=r.age_18_to_under_30,
+                   age_30_to_under_45=r.age_30_to_under_45,
+                   age_45_to_under_65=r.age_45_to_under_65,
+                   age_65_to_under_80=r.age_65_to_under_80,
+                   age_80_and_above=r.age_80_and_above,
+                   age_0_to_under_7=r.age_0_to_under_7,
+                   age_60_and_above=r.age_60_and_above) for r in rows]
 
 
 @route_demographic.get(
     '/districts/residents/unemployed',
     response_model=List[UnemployedResidentsByDistrictResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents_unemployed(session: AsyncSession = Depends(get_session)):
@@ -423,6 +658,12 @@ async def fetch_residents_unemployed(session: AsyncSession = Depends(get_session
 @route_demographic.get(
     '/{district_id}/residents/unemployed',
     response_model=List[UnemployedResidentsByDistrictResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents_unemployed_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
@@ -432,10 +673,15 @@ async def fetch_residents_unemployed_by_district(district_id: int, session: Asyn
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
 
 
-
 @route_demographic.get(
     '/districts/residents/unemployed/categorized',
     response_model=List[UnemployedResidentsCategorizedByDistrictResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents_unemployed_by_categories(session: AsyncSession = Depends(get_session)):
@@ -443,19 +689,25 @@ async def fetch_residents_unemployed_by_categories(session: AsyncSession = Depen
     schema = UnemployedResidentsCategorizedByDistrictResponse
 
     return [schema(year=r.year,
-        district_id=r.district_id,
-        unemployed_total=r.unemployed_total,
-        percentage_of_total=r.percentage_of_total,
-        percentage_sgb_iii=r.percentage_sgb_iii,
-        percentage_sgb_ii=r.percentage_sgb_ii,
-        percentage_foreign_citizenship=r.percentage_foreign_citizenship,
-        percentage_female=r.percentage_female,
-        percentage_age_under_25=r.percentage_age_under_25) for r in rows]
+                   district_id=r.district_id,
+                   unemployed_total=r.unemployed_total,
+                   percentage_of_total=r.percentage_of_total,
+                   percentage_sgb_iii=r.percentage_sgb_iii,
+                   percentage_sgb_ii=r.percentage_sgb_ii,
+                   percentage_foreign_citizenship=r.percentage_foreign_citizenship,
+                   percentage_female=r.percentage_female,
+                   percentage_age_under_25=r.percentage_age_under_25) for r in rows]
 
 
 @route_demographic.get(
     '/{district_id}/residents/unemployed/categorized',
     response_model=List[UnemployedResidentsCategorizedByDistrictResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents_unemployed_by_categories_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
@@ -463,20 +715,25 @@ async def fetch_residents_unemployed_by_categories_by_district(district_id: int,
     schema = UnemployedResidentsCategorizedByDistrictResponse
 
     return [schema(year=r.year,
-        district_id=r.district_id,
-        unemployed_total=r.unemployed_total,
-        percentage_of_total=r.percentage_of_total,
-        percentage_sgb_iii=r.percentage_sgb_iii,
-        percentage_sgb_ii=r.percentage_sgb_ii,
-        percentage_foreign_citizenship=r.percentage_foreign_citizenship,
-        percentage_female=r.percentage_female,
-        percentage_age_under_25=r.percentage_age_under_25) for r in rows]
-
+                   district_id=r.district_id,
+                   unemployed_total=r.unemployed_total,
+                   percentage_of_total=r.percentage_of_total,
+                   percentage_sgb_iii=r.percentage_sgb_iii,
+                   percentage_sgb_ii=r.percentage_sgb_ii,
+                   percentage_foreign_citizenship=r.percentage_foreign_citizenship,
+                   percentage_female=r.percentage_female,
+                   percentage_age_under_25=r.percentage_age_under_25) for r in rows]
 
 
 @route_demographic.get(
     '/districts/residents/beneficiaries',
     response_model=List[BeneficiariesByDistrictResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents_beneficiaries(session: AsyncSession = Depends(get_session)):
@@ -489,6 +746,12 @@ async def fetch_residents_beneficiaries(session: AsyncSession = Depends(get_sess
 @route_demographic.get(
     '/{district_id}/residents/beneficiaries',
     response_model=List[BeneficiariesByDistrictResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents_beneficiaries_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
@@ -498,10 +761,15 @@ async def fetch_residents_beneficiaries_by_district(district_id: int, session: A
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
 
 
-
 @route_demographic.get(
     '/districts/residents/beneficiaries/inactive',
     response_model=List[InactiveBeneficiariesInHouseholdsByDistrictResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents_beneficiaries_inactive(session: AsyncSession = Depends(get_session)):
@@ -514,6 +782,12 @@ async def fetch_residents_beneficiaries_inactive(session: AsyncSession = Depends
 @route_demographic.get(
     '/{district_id}/residents/beneficiaries/inactive',
     response_model=List[InactiveBeneficiariesInHouseholdsByDistrictResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents_beneficiaries_inactive_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
@@ -523,10 +797,15 @@ async def fetch_residents_beneficiaries_inactive_by_district(district_id: int, s
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
 
 
-
 @route_demographic.get(
     '/districts/residents/beneficiaries/characteristics',
     response_model=List[BeneficiariesCharacteristicsByDistrictResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents_beneficiaries_by_characteristics(session: AsyncSession = Depends(get_session)):
@@ -534,17 +813,23 @@ async def fetch_residents_beneficiaries_by_characteristics(session: AsyncSession
     schema = BeneficiariesCharacteristicsByDistrictResponse
 
     return [schema(year=r.year,
-        district_id=r.district_id,
-        unemployability=r.unemployability,
-        employability=r.employability,
-        percentage_females=r.percentage_females,
-        percentage_single_parents=r.percentage_single_parents,
-        percentage_foreign_citizenship=r.percentage_foreign_citizenship) for r in rows]
+                   district_id=r.district_id,
+                   unemployability=r.unemployability,
+                   employability=r.employability,
+                   percentage_females=r.percentage_females,
+                   percentage_single_parents=r.percentage_single_parents,
+                   percentage_foreign_citizenship=r.percentage_foreign_citizenship) for r in rows]
 
 
 @route_demographic.get(
     '/{district_id}/residents/beneficiaries/characteristics',
     response_model=List[BeneficiariesCharacteristicsByDistrictResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents_beneficiaries_by_characteristics_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
@@ -552,18 +837,23 @@ async def fetch_residents_beneficiaries_by_characteristics_by_district(district_
     schema = BeneficiariesCharacteristicsByDistrictResponse
 
     return [schema(year=r.year,
-        district_id=r.district_id,
-        unemployability=r.unemployability,
-        employability=r.employability,
-        percentage_females=r.percentage_females,
-        percentage_single_parents=r.percentage_single_parents,
-        percentage_foreign_citizenship=r.percentage_foreign_citizenship) for r in rows]
-
+                   district_id=r.district_id,
+                   unemployability=r.unemployability,
+                   employability=r.employability,
+                   percentage_females=r.percentage_females,
+                   percentage_single_parents=r.percentage_single_parents,
+                   percentage_foreign_citizenship=r.percentage_foreign_citizenship) for r in rows]
 
 
 @route_demographic.get(
     '/districts/residents/beneficiaries/age15tounder65',
     response_model=List[BeneficiariesAge15ToUnder65ByDistrictResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents_beneficiaries_age15tounder65(session: AsyncSession = Depends(get_session)):
@@ -571,17 +861,23 @@ async def fetch_residents_beneficiaries_age15tounder65(session: AsyncSession = D
     schema = BeneficiariesAge15ToUnder65ByDistrictResponse
 
     return [schema(year=r.year,
-        district_id=r.district_id,
-        percentage_of_total_residents=r.percentage_of_total_residents,
-        employable_with_benefits=r.employable_with_benefits,
-        unemployment_benefits=r.unemployment_benefits,
-        basic_income=r.basic_income,
-        assisting_benefits=r.assisting_benefits) for r in rows]
+                   district_id=r.district_id,
+                   percentage_of_total_residents=r.percentage_of_total_residents,
+                   employable_with_benefits=r.employable_with_benefits,
+                   unemployment_benefits=r.unemployment_benefits,
+                   basic_income=r.basic_income,
+                   assisting_benefits=r.assisting_benefits) for r in rows]
 
 
 @route_demographic.get(
     '/{district_id}/residents/beneficiaries/age15tounder65',
     response_model=List[BeneficiariesAge15ToUnder65ByDistrictResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents_beneficiaries_age15tounder65_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
@@ -589,18 +885,23 @@ async def fetch_residents_beneficiaries_age15tounder65_by_district(district_id: 
     schema = BeneficiariesAge15ToUnder65ByDistrictResponse
 
     return [schema(year=r.year,
-        district_id=r.district_id,
-        percentage_of_total_residents=r.percentage_of_total_residents,
-        employable_with_benefits=r.employable_with_benefits,
-        unemployment_benefits=r.unemployment_benefits,
-        basic_income=r.basic_income,
-        assisting_benefits=r.assisting_benefits) for r in rows]
-
+                   district_id=r.district_id,
+                   percentage_of_total_residents=r.percentage_of_total_residents,
+                   employable_with_benefits=r.employable_with_benefits,
+                   unemployment_benefits=r.unemployment_benefits,
+                   basic_income=r.basic_income,
+                   assisting_benefits=r.assisting_benefits) for r in rows]
 
 
 @route_demographic.get(
     '/districts/residents/migration/background',
     response_model=List[MigrationBackgroundByDistrictResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents_migration_background(session: AsyncSession = Depends(get_session)):
@@ -608,14 +909,20 @@ async def fetch_residents_migration_background(session: AsyncSession = Depends(g
     schema = MigrationBackgroundByDistrictResponse
 
     return [schema(year=r.year,
-        district_id=r.district_id,
-        foreign_citizenship=r.foreign_citizenship,
-        german_citizenship=r.german_citizenship) for r in rows]
+                   district_id=r.district_id,
+                   foreign_citizenship=r.foreign_citizenship,
+                   german_citizenship=r.german_citizenship) for r in rows]
 
 
 @route_demographic.get(
     '/{district_id}/residents/migration/background',
     response_model=List[MigrationBackgroundByDistrictResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents_migration_background_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
@@ -623,15 +930,20 @@ async def fetch_residents_migration_background_by_district(district_id: int, ses
     schema = MigrationBackgroundByDistrictResponse
 
     return [schema(year=r.year,
-        district_id=r.district_id,
-        foreign_citizenship=r.foreign_citizenship,
-        german_citizenship=r.german_citizenship) for r in rows]
-
+                   district_id=r.district_id,
+                   foreign_citizenship=r.foreign_citizenship,
+                   german_citizenship=r.german_citizenship) for r in rows]
 
 
 @route_demographic.get(
     '/districts/residents/housing/assistance',
     response_model=List[HousingAssistanceCasesByDistrictResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents_housing_assistance(session: AsyncSession = Depends(get_session)):
@@ -639,18 +951,24 @@ async def fetch_residents_housing_assistance(session: AsyncSession = Depends(get
     schema = HousingAssistanceCasesByDistrictResponse
 
     return [schema(year=r.year, district_id=r.district_id,
-        general_consulting=r.general_consulting,
-        notices_of_rent_arrears=r.notices_of_rent_arrears,
-        termination_rent_arrears=r.termination_rent_arrears,
-        termination_for_conduct=r.termination_for_conduct,
-        action_for_eviction=r.action_for_eviction,
-        eviction_notice=r.eviction_notice,
-        eviction_carried=r.eviction_carried) for r in rows]
+                   general_consulting=r.general_consulting,
+                   notices_of_rent_arrears=r.notices_of_rent_arrears,
+                   termination_rent_arrears=r.termination_rent_arrears,
+                   termination_for_conduct=r.termination_for_conduct,
+                   action_for_eviction=r.action_for_eviction,
+                   eviction_notice=r.eviction_notice,
+                   eviction_carried=r.eviction_carried) for r in rows]
 
 
 @route_demographic.get(
     '/{district_id}/residents/housing/assistance',
     response_model=List[HousingAssistanceCasesByDistrictResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents_housing_assistance_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
@@ -658,19 +976,24 @@ async def fetch_residents_housing_assistance_by_district(district_id: int, sessi
     schema = HousingAssistanceCasesByDistrictResponse
 
     return [schema(year=r.year, district_id=r.district_id,
-        general_consulting=r.general_consulting,
-        notices_of_rent_arrears=r.notices_of_rent_arrears,
-        termination_rent_arrears=r.termination_rent_arrears,
-        termination_for_conduct=r.termination_for_conduct,
-        action_for_eviction=r.action_for_eviction,
-        eviction_notice=r.eviction_notice,
-        eviction_carried=r.eviction_carried) for r in rows]
-
+                   general_consulting=r.general_consulting,
+                   notices_of_rent_arrears=r.notices_of_rent_arrears,
+                   termination_rent_arrears=r.termination_rent_arrears,
+                   termination_for_conduct=r.termination_for_conduct,
+                   action_for_eviction=r.action_for_eviction,
+                   eviction_notice=r.eviction_notice,
+                   eviction_carried=r.eviction_carried) for r in rows]
 
 
 @route_demographic.get(
     '/districts/residents/housing/benefit',
     response_model=List[HousingBenefitByDistrictResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents_housing_benefit_by_district(session: AsyncSession = Depends(get_session)):
@@ -680,10 +1003,15 @@ async def fetch_residents_housing_benefit_by_district(session: AsyncSession = De
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
 
 
-
 @route_demographic.get(
     '/districts/residents/housing/benefit',
     response_model=List[HousingBenefitByDistrictResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents_housing_benefit(session: AsyncSession = Depends(get_session)):
@@ -696,6 +1024,12 @@ async def fetch_residents_housing_benefit(session: AsyncSession = Depends(get_se
 @route_demographic.get(
     '/{district_id}/residents/housing/benefit',
     response_model=List[HousingBenefitByDistrictResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents_housing_benefit_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
@@ -705,10 +1039,15 @@ async def fetch_residents_housing_benefit_by_district(district_id: int, session:
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
 
 
-
 @route_demographic.get(
     '/districts/residents/risk/homelessness',
     response_model=List[HouseholdsRiskOfHomelessnessByDistrictResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents_risk_homelessness(session: AsyncSession = Depends(get_session)):
@@ -721,6 +1060,12 @@ async def fetch_residents_risk_homelessness(session: AsyncSession = Depends(get_
 @route_demographic.get(
     '/{district_id}/residents/risk/homelessness',
     response_model=List[HouseholdsRiskOfHomelessnessByDistrictResponse],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     tags=['Sozialatlas']
 )
 async def fetch_residents_risk_homelessness_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
@@ -728,6 +1073,3 @@ async def fetch_residents_risk_homelessness_by_district(district_id: int, sessio
     schema = HouseholdsRiskOfHomelessnessByDistrictResponse
 
     return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
-
-
-

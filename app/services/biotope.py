@@ -1,17 +1,16 @@
 from sqlalchemy.sql import func, text
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import HTTPException
 
 from ..models.biotope import ShBiotopeOrigin
 from ..utils.sanitizer import sanitize_string
 
 
-async def get_biotope_origin_meta(session: AsyncSession, code: str):
-    try:
-        value = sanitize_string(code.lower())
-    except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e))
+async def get_biotope_origin_meta(
+    session: AsyncSession,
+    code: str
+):
+    value = sanitize_string(code.lower())
 
     model = ShBiotopeOrigin
 
@@ -22,8 +21,11 @@ async def get_biotope_origin_meta(session: AsyncSession, code: str):
     return result.scalars().all()
 
 
-
-async def get_biotope_meta_by_lat_lng(session: AsyncSession, lat: float, lng: float):
+async def get_biotope_meta_by_lat_lng(
+    session: AsyncSession,
+    lat: float,
+    lng: float
+):
     stmt = text('''
     SELECT
         bm.code,

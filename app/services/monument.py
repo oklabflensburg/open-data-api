@@ -1,15 +1,13 @@
-from sqlalchemy.sql import func, text
-from sqlalchemy.types import JSON
-from sqlalchemy.future import select
-from sqlalchemy.sql.expression import cast
+from sqlalchemy.sql import text
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException
 
-from ..utils.validators import validate_positive_int32, validate_not_none
-
+from ..utils.validators import validate_positive_int32, validate_utf8_string
 
 
 async def get_monument_by_slug(session: AsyncSession, slug: str):
+    validated_slug = validate_utf8_string(slug)
+
     stmt = text('''
     WITH monument_reasons AS (
         SELECT
@@ -67,15 +65,20 @@ async def get_monument_by_slug(session: AsyncSession, slug: str):
         m.slug = :slug
     ''')
 
-    sql = stmt.bindparams(slug=slug)
+    sql = stmt.bindparams(slug=validated_slug)
     result = await session.execute(sql)
     rows = result.mappings().all()
 
     return [dict(row) for row in rows]
 
 
-
-async def get_monument_geometries_by_bbox(session: AsyncSession, xmin: float, ymin: float, xmax: float, ymax: float):
+async def get_monument_geometries_by_bbox(
+        session: AsyncSession, 
+        xmin: float,
+        ymin: float,
+        xmax: float,
+        ymax: float
+    ):
     stmt = text('''
     SELECT id, street, housenumber, ST_AsGeoJSON(wkb_geometry) AS geom
 
@@ -91,10 +94,9 @@ async def get_monument_geometries_by_bbox(session: AsyncSession, xmin: float, ym
     return [dict(row) for row in rows]
 
 
-
 async def get_monument_by_id(session: AsyncSession, monument_id: int):
     try:
-        validated_monument_id = validate_positive_int32(monument_id, 'query', 'monument_id')
+        validated_monument_id = validate_positive_int32(monument_id)
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e))
 
