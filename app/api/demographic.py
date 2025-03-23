@@ -98,7 +98,9 @@ route_demographic = APIRouter(prefix='/demographic/v1')
     },
     tags=['Sozialatlas']
 )
-async def fetch_demographics_meta(session: AsyncSession = Depends(get_session)):
+async def fetch_demographics_meta(
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_demographics_meta(session)
     result = jsonable_encoder(rows)
 
@@ -116,7 +118,9 @@ async def fetch_demographics_meta(session: AsyncSession = Depends(get_session)):
     },
     tags=['Sozialatlas']
 )
-async def fetch_district_details(session: AsyncSession = Depends(get_session)):
+async def fetch_district_details(
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_district_details(session)
     result = jsonable_encoder(rows)
 
@@ -134,12 +138,16 @@ async def fetch_district_details(session: AsyncSession = Depends(get_session)):
     },
     tags=['Sozialatlas']
 )
-async def fetch_districts(session: AsyncSession = Depends(get_session)):
+async def fetch_districts(
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_districts(session)
 
     if len(rows) == 0:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail='Could not retrieve list of Flensburg districts')
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='Could not retrieve list of Flensburg districts'
+        )
 
     return rows
 
@@ -155,7 +163,10 @@ async def fetch_districts(session: AsyncSession = Depends(get_session)):
     },
     tags=['Sozialatlas']
 )
-async def fetch_district(district_id: int, session: AsyncSession = Depends(get_session)):
+async def fetch_district(
+    district_id: int,
+    session: AsyncSession = Depends(get_session)
+):
     row = await get_district(session, district_id)
     schema = DistrictResponse
 
@@ -177,7 +188,9 @@ async def fetch_district(district_id: int, session: AsyncSession = Depends(get_s
     },
     tags=['Sozialatlas']
 )
-async def fetch_household_types(session: AsyncSession = Depends(get_session)):
+async def fetch_household_types(
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_household_types(session)
     schema = HouseholdTypeResponse
 
@@ -195,7 +208,9 @@ async def fetch_household_types(session: AsyncSession = Depends(get_session)):
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_by_age_groups(session: AsyncSession = Depends(get_session)):
+async def fetch_residents_by_age_groups(
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_residents_by_age_groups(session)
     schema = AgeGroupsOfResidentsResponse
 
@@ -216,7 +231,9 @@ async def fetch_residents_by_age_groups(session: AsyncSession = Depends(get_sess
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_non_germans(session: AsyncSession = Depends(get_session)):
+async def fetch_residents_non_germans(
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_residents_non_germans(session)
     schema = NonGermanNationalsResidenceStatusResponse
 
@@ -240,7 +257,9 @@ async def fetch_residents_non_germans(session: AsyncSession = Depends(get_sessio
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_debt_counseling(session: AsyncSession = Depends(get_session)):
+async def fetch_residents_debt_counseling(
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_residents_debt_counseling(session)
     schema = DebtCounselingOfResidentsResponse
 
@@ -258,7 +277,9 @@ async def fetch_residents_debt_counseling(session: AsyncSession = Depends(get_se
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_education_support(session: AsyncSession = Depends(get_session)):
+async def fetch_residents_education_support(
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_residents_education_support(session)
     schema = ChildEducationSupportResponse
 
@@ -284,7 +305,9 @@ async def fetch_residents_education_support(session: AsyncSession = Depends(get_
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents(session: AsyncSession = Depends(get_session)):
+async def fetch_residents(
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_residents(session)
     schema = ResidentsByDistrictResponse
 
@@ -302,7 +325,10 @@ async def fetch_residents(session: AsyncSession = Depends(get_session)):
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
+async def fetch_residents_by_district(
+    district_id: int,
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_residents_by_district(session, district_id)
     schema = ResidentsByDistrictResponse
 
@@ -320,7 +346,9 @@ async def fetch_residents_by_district(district_id: int, session: AsyncSession = 
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_births(session: AsyncSession = Depends(get_session)):
+async def fetch_residents_births(
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_residents_births(session)
     schema = BirthsByDistrictResponse
 
@@ -341,7 +369,10 @@ async def fetch_residents_births(session: AsyncSession = Depends(get_session)):
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_births_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
+async def fetch_residents_births_by_district(
+    district_id: int,
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_residents_births_by_district(session, district_id)
     schema = BirthsByDistrictResponse
 
@@ -362,7 +393,9 @@ async def fetch_residents_births_by_district(district_id: int, session: AsyncSes
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_employed(session: AsyncSession = Depends(get_session)):
+async def fetch_residents_employed(
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_residents_employed(session)
     schema = EmployedWithPensionInsuranceByDistrictResponse
 
@@ -383,7 +416,10 @@ async def fetch_residents_employed(session: AsyncSession = Depends(get_session))
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_employed_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
+async def fetch_residents_employed_by_district(
+    district_id: int,
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_residents_employed_by_district(session, district_id)
     schema = EmployedWithPensionInsuranceByDistrictResponse
 
@@ -404,7 +440,9 @@ async def fetch_residents_employed_by_district(district_id: int, session: AsyncS
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_ageratio(session: AsyncSession = Depends(get_session)):
+async def fetch_residents_ageratio(
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_residents_ageratio(session)
     schema = AgeRatioByDistrictResponse
 
@@ -422,7 +460,10 @@ async def fetch_residents_ageratio(session: AsyncSession = Depends(get_session))
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_ageratio_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
+async def fetch_residents_ageratio_by_district(
+    district_id: int,
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_residents_ageratio_by_district(session, district_id)
     schema = AgeRatioByDistrictResponse
 
@@ -440,7 +481,9 @@ async def fetch_residents_ageratio_by_district(district_id: int, session: AsyncS
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_basicbenefits(session: AsyncSession = Depends(get_session)):
+async def fetch_residents_basicbenefits(
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_residents_basicbenefits(session)
     schema = BasicBenefitsIncomeByDistrictResponse
 
@@ -463,7 +506,10 @@ async def fetch_residents_basicbenefits(session: AsyncSession = Depends(get_sess
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_basicbenefits_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
+async def fetch_residents_basicbenefits_by_district(
+    district_id: int,
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_residents_basicbenefits_by_district(session, district_id)
     schema = BasicBenefitsIncomeByDistrictResponse
 
@@ -486,7 +532,9 @@ async def fetch_residents_basicbenefits_by_district(district_id: int, session: A
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_ageunder18(session: AsyncSession = Depends(get_session)):
+async def fetch_residents_ageunder18(
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_residents_ageunder18(session)
     schema = ChildrenAgeUnder18ByDistrictResponse
 
@@ -504,7 +552,10 @@ async def fetch_residents_ageunder18(session: AsyncSession = Depends(get_session
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_ageunder18_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
+async def fetch_residents_ageunder18_by_district(
+    district_id: int,
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_residents_ageunder18_by_district(session, district_id)
     schema = ChildrenAgeUnder18ByDistrictResponse
 
@@ -522,7 +573,9 @@ async def fetch_residents_ageunder18_by_district(district_id: int, session: Asyn
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_age18tounder65(session: AsyncSession = Depends(get_session)):
+async def fetch_residents_age18tounder65(
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_residents_age18tounder65(session)
     schema = ResidentsAge18ToUnder65ByDistrictResponse
 
@@ -540,7 +593,10 @@ async def fetch_residents_age18tounder65(session: AsyncSession = Depends(get_ses
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_age18tounder65_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
+async def fetch_residents_age18tounder65_by_district(
+    district_id: int,
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_residents_age18tounder65_by_district(session, district_id)
     schema = ResidentsAge18ToUnder65ByDistrictResponse
 
@@ -558,7 +614,9 @@ async def fetch_residents_age18tounder65_by_district(district_id: int, session: 
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_age65andabove(session: AsyncSession = Depends(get_session)):
+async def fetch_residents_age65andabove(
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_residents_age65andabove(session)
     schema = ResidentsAge65AndAboveByDistrictResponse
 
@@ -576,7 +634,10 @@ async def fetch_residents_age65andabove(session: AsyncSession = Depends(get_sess
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_age65andabove_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
+async def fetch_residents_age65andabove_by_district(
+    district_id: int,
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_residents_age65andabove_by_district(session, district_id)
     schema = ResidentsAge65AndAboveByDistrictResponse
 
@@ -594,7 +655,9 @@ async def fetch_residents_age65andabove_by_district(district_id: int, session: A
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_agegroups(session: AsyncSession = Depends(get_session)):
+async def fetch_residents_agegroups(
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_residents_agegroups(session)
     schema = AgeGroupsOfResidentsByDistrictResponse
 
@@ -621,7 +684,10 @@ async def fetch_residents_agegroups(session: AsyncSession = Depends(get_session)
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_agegroups_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
+async def fetch_residents_agegroups_by_district(
+    district_id: int,
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_residents_agegroups_by_district(session, district_id)
     schema = AgeGroupsOfResidentsByDistrictResponse
 
@@ -648,7 +714,8 @@ async def fetch_residents_agegroups_by_district(district_id: int, session: Async
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_unemployed(session: AsyncSession = Depends(get_session)):
+async def fetch_residents_unemployed(
+        session: AsyncSession = Depends(get_session)):
     rows = await get_residents_unemployed(session)
     schema = UnemployedResidentsByDistrictResponse
 
@@ -666,7 +733,10 @@ async def fetch_residents_unemployed(session: AsyncSession = Depends(get_session
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_unemployed_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
+async def fetch_residents_unemployed_by_district(
+    district_id: int,
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_residents_unemployed_by_district(session, district_id)
     schema = UnemployedResidentsByDistrictResponse
 
@@ -684,7 +754,9 @@ async def fetch_residents_unemployed_by_district(district_id: int, session: Asyn
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_unemployed_by_categories(session: AsyncSession = Depends(get_session)):
+async def fetch_residents_unemployed_by_categories(
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_residents_unemployed_by_categories(session)
     schema = UnemployedResidentsCategorizedByDistrictResponse
 
@@ -710,7 +782,10 @@ async def fetch_residents_unemployed_by_categories(session: AsyncSession = Depen
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_unemployed_by_categories_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
+async def fetch_residents_unemployed_by_categories_by_district(
+    district_id: int,
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_residents_unemployed_by_categories_by_district(session, district_id)
     schema = UnemployedResidentsCategorizedByDistrictResponse
 
@@ -736,7 +811,9 @@ async def fetch_residents_unemployed_by_categories_by_district(district_id: int,
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_beneficiaries(session: AsyncSession = Depends(get_session)):
+async def fetch_residents_beneficiaries(
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_residents_beneficiaries(session)
     schema = BeneficiariesByDistrictResponse
 
@@ -754,7 +831,10 @@ async def fetch_residents_beneficiaries(session: AsyncSession = Depends(get_sess
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_beneficiaries_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
+async def fetch_residents_beneficiaries_by_district(
+    district_id: int,
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_residents_beneficiaries_by_district(session, district_id)
     schema = BeneficiariesByDistrictResponse
 
@@ -772,7 +852,9 @@ async def fetch_residents_beneficiaries_by_district(district_id: int, session: A
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_beneficiaries_inactive(session: AsyncSession = Depends(get_session)):
+async def fetch_residents_beneficiaries_inactive(
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_residents_beneficiaries_inactive(session)
     schema = InactiveBeneficiariesInHouseholdsByDistrictResponse
 
@@ -790,7 +872,10 @@ async def fetch_residents_beneficiaries_inactive(session: AsyncSession = Depends
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_beneficiaries_inactive_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
+async def fetch_residents_beneficiaries_inactive_by_district(
+    district_id: int,
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_residents_beneficiaries_inactive_by_district(session, district_id)
     schema = InactiveBeneficiariesInHouseholdsByDistrictResponse
 
@@ -808,7 +893,9 @@ async def fetch_residents_beneficiaries_inactive_by_district(district_id: int, s
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_beneficiaries_by_characteristics(session: AsyncSession = Depends(get_session)):
+async def fetch_residents_beneficiaries_by_characteristics(
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_residents_beneficiaries_characteristics(session)
     schema = BeneficiariesCharacteristicsByDistrictResponse
 
@@ -832,7 +919,10 @@ async def fetch_residents_beneficiaries_by_characteristics(session: AsyncSession
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_beneficiaries_by_characteristics_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
+async def fetch_residents_beneficiaries_by_characteristics_by_district(
+    district_id: int,
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_residents_beneficiaries_characteristics_by_district(session, district_id)
     schema = BeneficiariesCharacteristicsByDistrictResponse
 
@@ -856,7 +946,9 @@ async def fetch_residents_beneficiaries_by_characteristics_by_district(district_
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_beneficiaries_age15tounder65(session: AsyncSession = Depends(get_session)):
+async def fetch_residents_beneficiaries_age15tounder65(
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_residents_beneficiaries_age15tounder65(session)
     schema = BeneficiariesAge15ToUnder65ByDistrictResponse
 
@@ -880,7 +972,10 @@ async def fetch_residents_beneficiaries_age15tounder65(session: AsyncSession = D
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_beneficiaries_age15tounder65_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
+async def fetch_residents_beneficiaries_age15tounder65_by_district(
+    district_id: int,
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_residents_beneficiaries_age15tounder65_by_district(session, district_id)
     schema = BeneficiariesAge15ToUnder65ByDistrictResponse
 
@@ -904,7 +999,9 @@ async def fetch_residents_beneficiaries_age15tounder65_by_district(district_id: 
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_migration_background(session: AsyncSession = Depends(get_session)):
+async def fetch_residents_migration_background(
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_residents_migration_background(session)
     schema = MigrationBackgroundByDistrictResponse
 
@@ -925,7 +1022,10 @@ async def fetch_residents_migration_background(session: AsyncSession = Depends(g
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_migration_background_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
+async def fetch_residents_migration_background_by_district(
+    district_id: int,
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_residents_migration_background_by_district(session, district_id)
     schema = MigrationBackgroundByDistrictResponse
 
@@ -946,7 +1046,9 @@ async def fetch_residents_migration_background_by_district(district_id: int, ses
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_housing_assistance(session: AsyncSession = Depends(get_session)):
+async def fetch_residents_housing_assistance(
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_residents_housing_assistance(session)
     schema = HousingAssistanceCasesByDistrictResponse
 
@@ -971,7 +1073,10 @@ async def fetch_residents_housing_assistance(session: AsyncSession = Depends(get
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_housing_assistance_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
+async def fetch_residents_housing_assistance_by_district(
+    district_id: int,
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_residents_housing_assistance_by_district(session, district_id)
     schema = HousingAssistanceCasesByDistrictResponse
 
@@ -996,7 +1101,9 @@ async def fetch_residents_housing_assistance_by_district(district_id: int, sessi
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_housing_benefit_by_district(session: AsyncSession = Depends(get_session)):
+async def fetch_residents_housing_benefit_by_district(
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_residents_housing_benefit(session)
     schema = HousingBenefitByDistrictResponse
 
@@ -1014,7 +1121,9 @@ async def fetch_residents_housing_benefit_by_district(session: AsyncSession = De
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_housing_benefit(session: AsyncSession = Depends(get_session)):
+async def fetch_residents_housing_benefit(
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_residents_housing_benefit(session)
     schema = HousingBenefitByDistrictResponse
 
@@ -1032,7 +1141,10 @@ async def fetch_residents_housing_benefit(session: AsyncSession = Depends(get_se
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_housing_benefit_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
+async def fetch_residents_housing_benefit_by_district(
+    district_id: int,
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_residents_housing_benefit_by_district(session, district_id)
     schema = HousingBenefitByDistrictResponse
 
@@ -1050,7 +1162,9 @@ async def fetch_residents_housing_benefit_by_district(district_id: int, session:
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_risk_homelessness(session: AsyncSession = Depends(get_session)):
+async def fetch_residents_risk_homelessness(
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_residents_risk_homelessness(session)
     schema = HouseholdsRiskOfHomelessnessByDistrictResponse
 
@@ -1068,7 +1182,10 @@ async def fetch_residents_risk_homelessness(session: AsyncSession = Depends(get_
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_risk_homelessness_by_district(district_id: int, session: AsyncSession = Depends(get_session)):
+async def fetch_residents_risk_homelessness_by_district(
+    district_id: int,
+    session: AsyncSession = Depends(get_session)
+):
     rows = await get_residents_risk_homelessness_by_district(session, district_id)
     schema = HouseholdsRiskOfHomelessnessByDistrictResponse
 
