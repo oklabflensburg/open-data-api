@@ -85,7 +85,10 @@ async def fetch_monument_geometries_by_bbox(
             id=row['id'],
             geometry=json.loads(row['geom']),
             properties={
-                'label': f'{row["street"]} {row["housenumber"] or None}'}
+                'label': row['street']
+                if row['housenumber'] is None
+                else f'{row['street']} {row['housenumber']}'
+            },
         )
 
         for row in rows
