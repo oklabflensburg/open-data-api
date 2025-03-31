@@ -10,7 +10,7 @@ async def get_monument_by_slug(session: AsyncSession, slug: str):
 
     stmt = text('''
     SELECT
-        ST_AsGeoJSON(b.polygon_geom, 15)::jsonb AS geojson,
+        ST_AsGeoJSON(b.polygon_center, 15)::jsonb AS geojson,
         COALESCE(
             NULLIF(b.street, '') || ' ' || NULLIF(b.housenumber, ''),
             NULLIF(b.street, '')
@@ -79,7 +79,7 @@ async def get_monument_by_id(session: AsyncSession, monument_id: int):
 
     stmt = text('''
     SELECT
-        ST_AsGeoJSON(b.polygon_geom, 15)::jsonb AS geojson,
+        ST_AsGeoJSON(b.polygon_center, 15)::jsonb AS geojson,
         COALESCE(
             NULLIF(b.street, '') || ' ' || NULLIF(b.housenumber, ''),
             NULLIF(b.street, '')
