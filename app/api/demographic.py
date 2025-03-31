@@ -1101,26 +1101,6 @@ async def fetch_residents_housing_assistance_by_district(
     },
     tags=['Sozialatlas']
 )
-async def fetch_residents_housing_benefit_by_district(
-    session: AsyncSession = Depends(get_session)
-):
-    rows = await get_residents_housing_benefit(session)
-    schema = HousingBenefitByDistrictResponse
-
-    return [schema(year=r.year, district_id=r.district_id, residents=r.residents) for r in rows]
-
-
-@route_demographic.get(
-    '/districts/residents/housing/benefit',
-    response_model=List[HousingBenefitByDistrictResponse],
-    responses={
-        200: {'description': 'OK'},
-        400: {'description': 'Bad Request'},
-        404: {'description': 'Not Found'},
-        422: {'description': 'Unprocessable Entity'},
-    },
-    tags=['Sozialatlas']
-)
 async def fetch_residents_housing_benefit(
     session: AsyncSession = Depends(get_session)
 ):
