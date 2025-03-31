@@ -9,60 +9,29 @@ async def get_monument_by_slug(session: AsyncSession, slug: str):
     validated_slug = validate_utf8_string(slug)
 
     stmt = text('''
-    WITH monument_reasons AS (
-        SELECT
-            mxr.monument_id,
-            string_agg(mr.label, ', ') AS reason_labels
-        FROM
-            sh_monument_x_reason AS mxr
-        JOIN
-            sh_monument_reason AS mr
-        ON
-            mxr.reason_id = mr.id
-        GROUP BY
-            mxr.monument_id
-    ),
-    monument_scopes AS (
-        SELECT
-            mxs.monument_id,
-            string_agg(ms.label, ', ') AS scope_labels
-        FROM
-            sh_monument_x_scope AS mxs
-        JOIN
-            sh_monument_scope AS ms
-        ON
-            mxs.scope_id = ms.id
-        GROUP BY
-            mxs.monument_id
-    )
     SELECT
-        ST_AsGeoJSON(m.wkb_geometry, 15)::jsonb AS geojson,
-        COALESCE(m.street || ' ' || m.housenumber, m.street) AS label,
-        m.id,
-        m.object_id,
-        m.slug,
-        m.street,
-        m.housenumber,
-        m.postcode,
-        m.city,
-        m.image_url,
-        m.designation,
-        m.description,
-        m.monument_type,
-        r.reason_labels AS monument_reason,
-        s.scope_labels AS monument_scope
+        ST_AsGeoJSON(b.polygon_geom, 15)::jsonb AS geojson,
+        COALESCE(b.street || ' ' || b.housenumber, b.street) AS label,
+        b.id,
+        b.postcode,
+        b.city,
+        b.slug,
+        b.layer_name,
+        b.district,
+        b.municipality,
+        b.street,
+        b.housenumber,
+        b.description,
+        b.monument_type,
+        b.monument_function,
+        b.object_number,
+        b.photo_link,
+        b.detail_link,
+        b.last_update
     FROM
-        sh_monument AS m
-    LEFT JOIN
-        monument_reasons AS r
-    ON
-        m.id = r.monument_id
-    LEFT JOIN
-        monument_scopes AS s
-    ON
-        m.id = s.monument_id
+        sh_monument_boundary_processed AS b
     WHERE
-        m.slug = :slug
+        b.slug = :slug
     ''')
 
     sql = stmt.bindparams(slug=validated_slug)
@@ -73,18 +42,23 @@ async def get_monument_by_slug(session: AsyncSession, slug: str):
 
 
 async def get_monument_geometries_by_bbox(
-        session: AsyncSession, 
-        xmin: float,
-        ymin: float,
-        xmax: float,
-        ymax: float
-    ):
+    session: AsyncSession,
+    xmin: float,
+    ymin: float,
+    xmax: float,
+    ymax: float
+):
     stmt = text('''
-    SELECT id, street, housenumber, ST_AsGeoJSON(wkb_geometry) AS geom
+    SELECT id, street, housenumber, ST_AsGeoJSON(polygon_center) AS geom
 
-    FROM sh_monument
+    FROM sh_monument_boundary_processed
 
-    WHERE ST_Within(wkb_geometry, ST_MakeEnvelope(:xmin, :ymin, :xmax, :ymax, 4326))
+    WHERE ST_WITHIN(
+        polygon_center,
+        ST_MakeEnvelope(:xmin, :ymin, :xmax, :ymax, 4326)
+    )
+    AND ST_IsValid(polygon_center)
+    AND ST_IsSimple(polygon_center)
     ''')
 
     sql = stmt.bindparams(xmin=xmin, ymin=ymin, xmax=xmax, ymax=ymax)
@@ -101,60 +75,29 @@ async def get_monument_by_id(session: AsyncSession, monument_id: int):
         raise HTTPException(status_code=422, detail=str(e))
 
     stmt = text('''
-    WITH monument_reasons AS (
-        SELECT
-            mxr.monument_id,
-            string_agg(mr.label, ', ') AS reason_labels
-        FROM
-            sh_monument_x_reason AS mxr
-        JOIN
-            sh_monument_reason AS mr
-        ON
-            mxr.reason_id = mr.id
-        GROUP BY
-            mxr.monument_id
-    ),
-    monument_scopes AS (
-        SELECT
-            mxs.monument_id,
-            string_agg(ms.label, ', ') AS scope_labels
-        FROM
-            sh_monument_x_scope AS mxs
-        JOIN
-            sh_monument_scope AS ms
-        ON
-            mxs.scope_id = ms.id
-        GROUP BY
-            mxs.monument_id
-    )
     SELECT
-        ST_AsGeoJSON(m.wkb_geometry, 15)::jsonb AS geojson,
-        COALESCE(m.street || ' ' || m.housenumber, m.street) AS label,
-        m.id,
-        m.object_id,
-        m.slug,
-        m.street,
-        m.housenumber,
-        m.postcode,
-        m.city,
-        m.image_url,
-        m.designation,
-        m.description,
-        m.monument_type,
-        r.reason_labels AS monument_reason,
-        s.scope_labels AS monument_scope
+        ST_AsGeoJSON(b.polygon_geom, 15)::jsonb AS geojson,
+        COALESCE(b.street || ' ' || b.housenumber, b.street) AS label,
+        b.id,
+        b.postcode,
+        b.city,
+        b.slug,
+        b.layer_name,
+        b.district,
+        b.municipality,
+        b.street,
+        b.housenumber,
+        b.description,
+        b.monument_type,
+        b.monument_function,
+        b.object_number,
+        b.photo_link,
+        b.detail_link,
+        b.last_update
     FROM
-        sh_monument AS m
-    LEFT JOIN
-        monument_reasons AS r
-    ON
-        m.id = r.monument_id
-    LEFT JOIN
-        monument_scopes AS s
-    ON
-        m.id = s.monument_id
+        sh_monument_boundary_processed AS b
     WHERE
-        m.id = :monument_id
+        b.id = :monument_id
     ''')
 
     sql = stmt.bindparams(monument_id=validated_monument_id)
