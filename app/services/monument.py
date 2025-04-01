@@ -28,7 +28,7 @@ async def get_monument_by_slug(session: AsyncSession, slug: str):
         b.monument_type,
         b.monument_function,
         b.object_number,
-        b.photo_link,
+        COALESCE(m.image_url, b.photo_link) AS photo_link,
         b.detail_link,
         b.last_update
     FROM
@@ -99,7 +99,7 @@ async def get_monument_by_id(session: AsyncSession, monument_id: int):
         b.monument_type,
         b.monument_function,
         b.object_number,
-        b.photo_link,
+        COALESCE(m.image_url, b.photo_link) AS photo_link,
         b.detail_link,
         b.last_update
     FROM
