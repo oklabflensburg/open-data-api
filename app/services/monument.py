@@ -24,7 +24,7 @@ async def get_monument_by_slug(session: AsyncSession, slug: str):
         b.municipality,
         b.street,
         b.housenumber,
-        b.description,
+        COALESCE(m.description, b.description) AS description,
         b.monument_type,
         b.monument_function,
         b.object_number,
@@ -33,6 +33,8 @@ async def get_monument_by_slug(session: AsyncSession, slug: str):
         b.last_update
     FROM
         sh_monument_boundary_processed AS b
+    LEFT JOIN sh_monument AS m
+        ON b.object_number = m.object_number
     WHERE
         b.slug = :slug
     ''')
@@ -93,7 +95,7 @@ async def get_monument_by_id(session: AsyncSession, monument_id: int):
         b.municipality,
         b.street,
         b.housenumber,
-        b.description,
+        COALESCE(m.description, b.description) AS description,
         b.monument_type,
         b.monument_function,
         b.object_number,
@@ -102,6 +104,8 @@ async def get_monument_by_id(session: AsyncSession, monument_id: int):
         b.last_update
     FROM
         sh_monument_boundary_processed AS b
+    LEFT JOIN sh_monument AS m
+        ON b.object_number = m.object_number
     WHERE
         b.id = :monument_id
     ''')
