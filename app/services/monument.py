@@ -24,7 +24,12 @@ async def get_monument_by_slug(session: AsyncSession, slug: str):
         b.municipality,
         b.street,
         b.housenumber,
-        COALESCE(m.description, b.description) AS description,
+        CASE
+            WHEN m.description IS NOT NULL
+            AND LEFT(m.description, 12) != 'Alteintragung'
+            THEN m.description
+            ELSE b.description
+        END AS description,
         b.monument_type,
         b.monument_function,
         b.object_number,
@@ -46,27 +51,46 @@ async def get_monument_by_slug(session: AsyncSession, slug: str):
     return [dict(row) for row in rows]
 
 
-async def get_monument_geometries_by_bbox(
+async def get_monument_by_object_number(
     session: AsyncSession,
-    xmin: float,
-    ymin: float,
-    xmax: float,
-    ymax: float
+    object_number: str
 ):
     stmt = text('''
-    SELECT id, street, housenumber, ST_AsGeoJSON(polygon_center) AS geom
-
-    FROM sh_monument_boundary_processed
-
-    WHERE ST_WITHIN(
-        polygon_center,
-        ST_MakeEnvelope(:xmin, :ymin, :xmax, :ymax, 4326)
-    )
-    AND ST_IsValid(polygon_center)
-    AND ST_IsSimple(polygon_center)
+    SELECT
+        ST_AsGeoJSON(b.polygon_center, 15)::jsonb AS geojson,
+        COALESCE(
+            NULLIF(b.street, '') || ' ' || NULLIF(b.housenumber, ''),
+            NULLIF(b.street, '')
+        ) AS label,
+        b.postcode,
+        b.city,
+        b.slug,
+        b.layer_name,
+        b.district,
+        b.municipality,
+        b.street,
+        b.housenumber,
+       CASE
+            WHEN m.description IS NOT NULL
+            AND LEFT(m.description, 12) != 'Alteintragung'
+            THEN m.description
+            ELSE b.description
+        END AS description,
+        b.monument_type,
+        b.monument_function,
+        b.object_number,
+        COALESCE(m.image_url, b.photo_link) AS photo_link,
+        b.detail_link,
+        b.last_update
+    FROM
+        sh_monument_boundary_processed AS b
+    LEFT JOIN sh_monument AS m
+        ON b.object_number = m.object_number
+    WHERE
+        b.object_number = :object_number
     ''')
 
-    sql = stmt.bindparams(xmin=xmin, ymin=ymin, xmax=xmax, ymax=ymax)
+    sql = stmt.bindparams(object_number=object_number)
     result = await session.execute(sql)
     rows = result.mappings().all()
 
@@ -95,7 +119,12 @@ async def get_monument_by_id(session: AsyncSession, monument_id: int):
         b.municipality,
         b.street,
         b.housenumber,
-        COALESCE(m.description, b.description) AS description,
+       CASE
+            WHEN m.description IS NOT NULL
+            AND LEFT(m.description, 12) != 'Alteintragung'
+            THEN m.description
+            ELSE b.description
+        END AS description,
         b.monument_type,
         b.monument_function,
         b.object_number,
@@ -111,6 +140,72 @@ async def get_monument_by_id(session: AsyncSession, monument_id: int):
     ''')
 
     sql = stmt.bindparams(monument_id=validated_monument_id)
+    result = await session.execute(sql)
+    rows = result.mappings().all()
+
+    return [dict(row) for row in rows]
+
+
+async def get_monument_geometries_by_bbox(
+    session: AsyncSession,
+    xmin: float,
+    ymin: float,
+    xmax: float,
+    ymax: float
+):
+    stmt = text('''
+    SELECT
+        id,
+        ST_AsGeoJSON(polygon_center) AS geom,
+        COALESCE(
+            NULLIF(street, '') || ' ' || NULLIF(housenumber, ''),
+            NULLIF(street, '')
+        ) AS label
+    FROM
+        sh_monument_boundary_processed
+    WHERE
+        ST_WITHIN(
+            polygon_center,
+            ST_MakeEnvelope(:xmin, :ymin, :xmax, :ymax, 4326)
+        )
+        AND ST_IsValid(polygon_center)
+        AND ST_IsSimple(polygon_center)
+    ''')
+
+    sql = stmt.bindparams(xmin=xmin, ymin=ymin, xmax=xmax, ymax=ymax)
+    result = await session.execute(sql)
+    rows = result.mappings().all()
+
+    return [dict(row) for row in rows]
+
+
+async def get_monument_geometries_by_lat_lng(
+    session: AsyncSession,
+    lat: float,
+    lng: float,
+    radius: float = 1000
+):
+    stmt = text('''
+    SELECT
+        id,
+        ST_AsGeoJSON(polygon_center) AS geom,
+        COALESCE(
+            NULLIF(street, '') || ' ' || NULLIF(housenumber, ''),
+            NULLIF(street, '')
+        ) AS label
+    FROM
+        sh_monument_boundary_processed
+    WHERE
+        ST_DWithin(
+            polygon_center::geography,
+            ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography,
+            :radius
+        )
+        AND ST_IsValid(polygon_center)
+        AND ST_IsSimple(polygon_center)
+    ''')
+
+    sql = stmt.bindparams(lat=lat, lng=lng, radius=radius)
     result = await session.execute(sql)
     rows = result.mappings().all()
 
