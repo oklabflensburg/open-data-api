@@ -15,6 +15,7 @@ from .api.archaeology import route_archaeology
 from .api.administrative import route_administrative
 from .api.demographic import route_demographic
 from .api.energy import route_energy
+from .api.school import route_school
 
 
 app = FastAPI(docs_url=None, redoc_url=None, version='1.18', title='Opendata API',
@@ -56,6 +57,7 @@ async def custom_validation_error_handler(
     )
 
 
+app.include_router(route_school)
 app.include_router(route_biotope)
 app.include_router(route_climate)
 app.include_router(route_accident)
