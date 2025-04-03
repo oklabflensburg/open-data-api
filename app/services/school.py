@@ -97,10 +97,7 @@ async def get_school_geometries_by_bbox(
     SELECT
         id,
         ST_AsGeoJSON(wkb_geometry, 15) AS geojson,
-        COALESCE(
-            NULLIF(street, '') || ' ' || NULLIF(house_number, ''),
-            NULLIF(street, '')
-        ) AS label
+        name AS label
     FROM
         sh_school
     WHERE
@@ -127,10 +124,7 @@ async def get_school_geometries_by_lat_lng(
     SELECT
         id,
         ST_AsGeoJSON(wkb_geometry, 15) AS geojson,
-        COALESCE(
-            NULLIF(street, '') || ' ' || NULLIF(house_number, ''),
-            NULLIF(street, '')
-        ) AS label
+        name AS label
     FROM
         sh_school
     WHERE
