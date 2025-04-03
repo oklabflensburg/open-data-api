@@ -73,7 +73,7 @@ async def fetch_school_geometries_by_bbox(
     features = [
         Feature(
             id=row['id'],
-            geometry=json.loads(row['wkb_geometry']),
+            geometry=json.loads(row['geojson']),
             properties={'label': row['label']},
         )
         for row in rows
@@ -98,7 +98,7 @@ async def fetch_school_geometries_by_lat_lng(
     features = [
         Feature(
             id=row['id'],
-            geometry=json.loads(row['wkb_geometry']),
+            geometry=json.loads(row['geojson']),
             properties={'label': row['label']},
         )
         for row in rows
