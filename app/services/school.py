@@ -10,21 +10,21 @@ async def get_school_by_slug(session: AsyncSession, slug: str):
 
     stmt = text('''
     SELECT
-        ST_AsGeoJSON(wkb_geometry, 15)::jsonb AS geojson,
+        ST_AsGeoJSON(s.wkb_geometry, 15)::jsonb AS geojson,
         s.id,
         s.name,
-        city,
-        zipcode,
-        street,
-        house_number,
-        telephone,
-        fax,
-        email,
-        website,
-        agency_number,
+        s.city,
+        s.zipcode,
+        s.street,
+        s.house_number,
+        s.telephone,
+        s.fax,
+        s.email,
+        s.website,
+        s.agency_number,
         st.name AS main_school_type,
-        st2.name AS school_type,
-        slug
+        COALESCE(jsonb_agg(st2.name) FILTER (WHERE st2.name IS NOT NULL), '[]'::jsonb) AS school_types,
+        s.slug
     FROM
         sh_school AS s
     LEFT JOIN
@@ -32,9 +32,11 @@ async def get_school_by_slug(session: AsyncSession, slug: str):
         ON st.code = s.main_school_type
     LEFT JOIN
         sh_school_type AS st2
-        ON st2.code = s.school_type
+        ON (s.school_type & st2.code) != 0
     WHERE
         slug = :slug
+    GROUP BY
+        s.id, st.name
     ''')
 
     sql = stmt.bindparams(slug=validated_slug)
@@ -52,21 +54,21 @@ async def get_school_by_id(session: AsyncSession, school_id: int):
 
     stmt = text('''
     SELECT
-        ST_AsGeoJSON(wkb_geometry, 15)::jsonb AS geojson,
+        ST_AsGeoJSON(s.wkb_geometry, 15)::jsonb AS geojson,
         s.id,
         s.name,
-        city,
-        zipcode,
-        street,
-        house_number,
-        telephone,
-        fax,
-        email,
-        website,
-        agency_number,
+        s.city,
+        s.zipcode,
+        s.street,
+        s.house_number,
+        s.telephone,
+        s.fax,
+        s.email,
+        s.website,
+        s.agency_number,
         st.name AS main_school_type,
-        st2.name AS school_type,
-        slug
+        COALESCE(jsonb_agg(st2.name) FILTER (WHERE st2.name IS NOT NULL), '[]'::jsonb) AS school_types,
+        s.slug
     FROM
         sh_school AS s
     LEFT JOIN
@@ -74,9 +76,11 @@ async def get_school_by_id(session: AsyncSession, school_id: int):
         ON st.code = s.main_school_type
     LEFT JOIN
         sh_school_type AS st2
-        ON st2.code = s.school_type
+        ON (s.school_type & st2.code) != 0
     WHERE
         s.id = :school_id
+    GROUP BY
+        s.id, st.name
     ''')
 
     sql = stmt.bindparams(school_id=validated_school_id)
