@@ -43,7 +43,7 @@ async def get_school_by_slug(session: AsyncSession, slug: str):
     result = await session.execute(sql)
     rows = result.mappings().all()
 
-    return [dict(row) for row in rows]
+    return rows
 
 
 async def get_school_by_id(session: AsyncSession, school_id: int):
@@ -87,7 +87,7 @@ async def get_school_by_id(session: AsyncSession, school_id: int):
     result = await session.execute(sql)
     rows = result.mappings().all()
 
-    return [dict(row) for row in rows]
+    return rows
 
 
 async def get_school_geometries_by_bbox(
@@ -100,6 +100,7 @@ async def get_school_geometries_by_bbox(
     stmt = text('''
     SELECT
         id,
+        school_type,
         ST_AsGeoJSON(wkb_geometry, 15) AS geojson,
         name AS label
     FROM
@@ -109,13 +110,15 @@ async def get_school_geometries_by_bbox(
             wkb_geometry,
             ST_MakeEnvelope(:xmin, :ymin, :xmax, :ymax, 4326)
         )
+    AND
+        ST_IsValid(wkb_geometry)
     ''')
 
     sql = stmt.bindparams(xmin=xmin, ymin=ymin, xmax=xmax, ymax=ymax)
     result = await session.execute(sql)
     rows = result.mappings().all()
 
-    return [dict(row) for row in rows]
+    return rows
 
 
 async def get_school_geometries_by_lat_lng(
@@ -127,6 +130,7 @@ async def get_school_geometries_by_lat_lng(
     stmt = text('''
     SELECT
         id,
+        school_type,
         ST_AsGeoJSON(wkb_geometry, 15) AS geojson,
         name AS label
     FROM
@@ -137,10 +141,37 @@ async def get_school_geometries_by_lat_lng(
             ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography,
             :radius
         )
+    AND
+        ST_IsValid(wkb_geometry)
     ''')
 
     sql = stmt.bindparams(lat=lat, lng=lng, radius=radius)
     result = await session.execute(sql)
     rows = result.mappings().all()
 
-    return [dict(row) for row in rows]
+    return rows
+
+
+async def get_school_geometries_by_school_type(
+    session: AsyncSession,
+    school_type: int
+):
+    stmt = text('''
+    SELECT
+        id,
+        school_type,
+        ST_AsGeoJSON(wkb_geometry, 15) AS geojson,
+        name AS label
+    FROM
+        sh_school
+    WHERE
+        (school_type & :school_type) != 0
+    AND
+        ST_IsValid(wkb_geometry)
+    ''')
+
+    sql = stmt.bindparams(school_type=school_type)
+    result = await session.execute(sql)
+    rows = result.mappings().all()
+
+    return rows
