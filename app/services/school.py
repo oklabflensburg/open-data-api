@@ -175,3 +175,20 @@ async def get_school_geometries_by_school_type(
     rows = result.mappings().all()
 
     return rows
+
+
+async def get_school_types(
+    session: AsyncSession
+):
+    stmt = text('''
+    SELECT
+        code,
+        name
+    FROM
+        sh_school_type
+    ''')
+
+    result = await session.execute(stmt)
+    rows = result.mappings().all()
+
+    return rows

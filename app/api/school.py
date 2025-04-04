@@ -11,6 +11,7 @@ from ..dependencies import get_session
 from ..services.school import (
     get_school_by_id,
     get_school_by_slug,
+    get_school_types,
     get_school_geometries_by_bbox,
     get_school_geometries_by_lat_lng,
     get_school_geometries_by_school_type
@@ -158,3 +159,21 @@ async def fetch_school_geometries_by_school_type(
         'name': 'urn:ogc:def:crs:OGC:1.3:CRS84'}}
     geojson_data = FeatureCollection(features, crs=crs)
     return JSONResponse(content=jsonable_encoder(geojson_data))
+
+
+@route_school.get(
+    '/types',
+    response_model=dict,
+    tags=['Schulen']
+)
+async def fetch_school_types(
+    session: AsyncSession = Depends(get_session)
+):
+    rows = await get_school_types(session)
+
+    if len(rows) == 0:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='No matches found for school types'
+        )
+    return JSONResponse(content=jsonable_encoder(rows))
