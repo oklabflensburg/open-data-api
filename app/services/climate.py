@@ -14,7 +14,6 @@ from ..models.climate import (
     MosmixStation
 )
 
-from ..models.energy import EnergySourceMeta
 from ..models.administrative import Vg250Gem
 
 
@@ -103,8 +102,44 @@ async def get_weather_service_stations(session: AsyncSession):
     return result.mappings().all()
 
 
-async def get_energy_source_meta(session: AsyncSession):
-    model = EnergySourceMeta
+async def get_mosmix_geometries_by_bbox(
+    session: AsyncSession,
+    xmin: float,
+    ymin: float,
+    xmax: float,
+    ymax: float
+):
+    model = MosmixStation
 
-    result = await session.execute(select(model))
-    return result.scalars().all()
+    geojson = cast(func.ST_AsGeoJSON(
+        model.wkb_geometry, 15), JSON).label('geojson')
+
+    envelope = func.ST_MakeEnvelope(
+        bindparam('xmin'),
+        bindparam('ymin'),
+        bindparam('xmax'),
+        bindparam('ymax'),
+        4326
+    )
+
+    stmt = (
+        select(
+            model.station_id,
+            model.station_name,
+            model.station_elevation,
+            geojson
+        )
+        .where(
+            func.ST_WITHIN(model.wkb_geometry, envelope),
+            func.ST_IsValid(model.wkb_geometry)
+        )
+    )
+
+    result = await session.execute(
+        stmt,
+        {'xmin': xmin, 'ymin': ymin, 'xmax': xmax, 'ymax': ymax}
+    )
+
+    rows = result.mappings().all()
+
+    return rows
