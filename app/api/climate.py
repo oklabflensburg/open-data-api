@@ -1,4 +1,3 @@
-import json
 from fastapi import Depends, APIRouter, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
@@ -19,6 +18,8 @@ from ..schemas.climate import (
     WeatherStationResponse,
     MosmixStationResponse
 )
+
+from ..utils.dwd_kmz import retrieve_station_kmz
 
 
 route_climate = APIRouter(prefix='/climate/v1')
@@ -246,3 +247,32 @@ async def fetch_mosmix_nearest_geometriey_by_position(
     geojson_data = FeatureCollection([feature], crs=crs)
 
     return geojson_data
+
+
+@route_climate.get(
+    '/mosmix/forecast/{station_id}',
+    response_model=dict,
+    tags=['Deutscher Wetterdienst'],
+    description=(
+        'Retrieves a KML file for the specified station ID.'
+    ),
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    }
+)
+async def fetch_forecast_station_kmz(
+    station_id: int
+):
+    data = await retrieve_station_kmz(station_id)
+    
+    if not data:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f'No matches found for station ID {station_id}'
+        )
+
+    return data
+
