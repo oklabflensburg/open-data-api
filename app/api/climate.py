@@ -264,7 +264,7 @@ async def fetch_mosmix_nearest_geometriey_by_position(
     }
 )
 async def fetch_forecast_station_kmz(
-    station_id: int
+    station_id: str
 ):
     data = await retrieve_station_kmz(station_id)
 
