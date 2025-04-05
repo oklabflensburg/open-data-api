@@ -50,6 +50,7 @@ def analyse(tree: etree._ElementTree) -> dict:
         result["issue_time"] = dt.strftime("%Y-%m-%dT%H:%M:%S%z")
 
     result['station'] = {}
+
     # Station id
     for df in tree.xpath('//*[name()="kml:Placemark"]/*[name()="kml:name"]'):
         result['station']["name"] = df.text.strip()
@@ -64,7 +65,7 @@ def analyse(tree: etree._ElementTree) -> dict:
         for timeslot in df:
             dt = datetime.fromisoformat(timeslot.text.replace("Z", "+00:00"))
             time_stamps.append(dt.strftime("%Y-%m-%dT%H:%M:%S%z"))
-    result['station']["timeSteps"] = time_stamps
+    result["timeSteps"] = time_stamps
 
     # Weather values
     def add_transformed(key: str, values: list, transform=None):
