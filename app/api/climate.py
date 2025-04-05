@@ -267,7 +267,7 @@ async def fetch_forecast_station_kmz(
     station_id: int
 ):
     data = await retrieve_station_kmz(station_id)
-    
+
     if not data:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -275,4 +275,3 @@ async def fetch_forecast_station_kmz(
         )
 
     return data
-
