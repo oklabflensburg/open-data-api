@@ -4,7 +4,7 @@ from sqlalchemy.sql.expression import cast
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import aliased
-from geoalchemy2 import Geography as GEOGRAPHY
+from geoalchemy2 import Geography
 
 from ..utils.validators import validate_not_none
 from ..utils.sanitizer import sanitize_string
@@ -146,7 +146,7 @@ async def get_mosmix_geometries_by_bbox(
     return rows
 
 
-async def get_mosmix_geometries_by_lat_lng(
+async def get_mosmix_geometries_by_radius(
     session: AsyncSession,
     lat: float,
     lng: float,
@@ -170,8 +170,8 @@ async def get_mosmix_geometries_by_lat_lng(
         )
         .where(
             func.ST_DWithin(
-                cast(model.wkb_geometry, GEOGRAPHY),
-                cast(point, GEOGRAPHY),
+                cast(model.wkb_geometry, Geography),
+                cast(point, Geography),
                 bindparam('radius')
             ),
             func.ST_IsValid(model.wkb_geometry)
@@ -184,5 +184,48 @@ async def get_mosmix_geometries_by_lat_lng(
     )
 
     rows = result.mappings().all()
+
+    return rows
+
+
+async def get_mosmix_nearest_geometriey_by_position(
+    session: AsyncSession,
+    lat: float,
+    lng: float
+):
+    model = MosmixStation
+
+    geojson = cast(func.ST_AsGeoJSON(
+        model.wkb_geometry, 15), JSON).label('geojson')
+
+    point = func.ST_SetSRID(func.ST_MakePoint(
+        bindparam('lng'),
+        bindparam('lat')
+    ), 4326)
+
+    stmt = (
+        select(
+            model.station_id,
+            model.station_name,
+            geojson
+        )
+        .where(
+            func.ST_IsValid(model.wkb_geometry)
+        )
+        .order_by(
+            func.ST_Distance(
+                cast(model.wkb_geometry, Geography),
+                cast(point, Geography)
+            )
+        )
+        .limit(1)
+    )
+
+    result = await session.execute(
+        stmt,
+        {'lat': lat, 'lng': lng}
+    )
+
+    rows = result.mappings().first()
 
     return rows

@@ -7,7 +7,8 @@ from geojson import Feature, FeatureCollection
 from ..dependencies import get_session
 from ..services.climate import (
     get_dwd_stations_by_municipality_key,
-    get_mosmix_geometries_by_lat_lng,
+    get_mosmix_nearest_geometriey_by_position,
+    get_mosmix_geometries_by_radius,
     get_mosmix_geometries_by_bbox,
     get_weather_service_stations,
     get_all_mosmix_stations
@@ -170,7 +171,7 @@ async def fetch_mosmix_geometries_by_bbox(
         422: {'description': 'Unprocessable Entity'},
     }
 )
-async def fetch_mosmix_geometries_by_lat_lng(
+async def fetch_mosmix_geometries_by_radius(
     lat: float,
     lng: float,
     radius: float = Query(
@@ -181,7 +182,7 @@ async def fetch_mosmix_geometries_by_lat_lng(
     ),
     session: AsyncSession = Depends(get_session)
 ):
-    rows = await get_mosmix_geometries_by_lat_lng(session, lat, lng, radius)
+    rows = await get_mosmix_geometries_by_radius(session, lat, lng, radius)
 
     if len(rows) == 0:
         raise HTTPException(
@@ -201,5 +202,47 @@ async def fetch_mosmix_geometries_by_lat_lng(
     crs = {'type': 'name', 'properties': {
         'name': 'urn:ogc:def:crs:OGC:1.3:CRS84'}}
     geojson_data = FeatureCollection(features, crs=crs)
+
+    return geojson_data
+
+
+@route_climate.get(
+    '/mosmix/nearest',
+    response_model=dict,
+    tags=['Deutscher Wetterdienst'],
+    description=(
+        'Retrieves the nearest of German weather service station'
+        ' to the specified coordinates.'),
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    }
+)
+async def fetch_mosmix_nearest_geometriey_by_position(
+    lat: float,
+    lng: float,
+    session: AsyncSession = Depends(get_session)
+):
+    row = await get_mosmix_nearest_geometriey_by_position(
+        session, lat, lng
+    )
+
+    if not row:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f'No matches found for coordinates ({lat}, {lng})'
+        )
+
+    feature = Feature(
+        id=row['station_id'],
+        geometry=row['geojson'],
+        properties={'station_name': row['station_name']},
+    )
+
+    crs = {'type': 'name', 'properties': {
+        'name': 'urn:ogc:def:crs:OGC:1.3:CRS84'}}
+    geojson_data = FeatureCollection([feature], crs=crs)
 
     return geojson_data
