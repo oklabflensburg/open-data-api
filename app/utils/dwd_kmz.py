@@ -27,6 +27,7 @@ def get_element_value_as_list(tree: etree._ElementTree, element: str) -> list:
 
 def analyse(tree: etree._ElementTree) -> dict:
     result = {}
+    result['station'] = {}
 
     # Station ID
     for df in tree.xpath('////*[name()="dwd:Issuer"]'):
@@ -49,7 +50,9 @@ def analyse(tree: etree._ElementTree) -> dict:
         dt = datetime.fromisoformat(df.text.replace("Z", "+00:00"))
         result["issue_time"] = dt.strftime("%Y-%m-%dT%H:%M:%S%z")
 
-    result['station'] = {}
+    # Coordinates
+    for df in tree.xpath('////*[name()="kml:coordinates"]'):
+        result['station']["coordinates"] = df.text.split(',')
 
     # Station id
     for df in tree.xpath('//*[name()="kml:Placemark"]/*[name()="kml:name"]'):
