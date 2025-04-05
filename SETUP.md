@@ -437,6 +437,32 @@ deactivate
 ---
 
 
+## Insert Global MOSMIX Stations
+
+
+```sh
+psql -U oklab -h localhost -d oklab -p 5432 < data/global_mosmix_stations_schema.sql
+```
+
+
+```sh
+cd tools
+python3 -m venv venv
+source venv/bin/activate
+pip3 install -r requirements.txt
+python3 insert_mosmix_stations.py --env ../.env --src ../data/mosmix_stationskatalog.cfg --verbose
+deactivate
+```
+
+**Parameters:**
+- `--env ../.env`: Path to the environment variable file.
+- `--src ../data/mosmix_stationskatalog.cfg`: Path to the downloaded file.
+- `--verbose`: Optional flag to enable detailed logging output.
+
+
+---
+
+
 ## Insert EU Country Codes
 
 This tool fetches and inserts EU country code data into your PostgreSQL database.
