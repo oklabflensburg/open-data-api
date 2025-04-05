@@ -78,6 +78,7 @@ def analyse(tree: etree._ElementTree) -> dict:
         tree, 'PPPP'), lambda x: round(float(x) / 100.0, 2))
     add_transformed("FX1", get_element_value_as_list(tree, 'FX1'))
     add_transformed("TTT", get_element_value_as_list(tree, 'TTT'))
+    add_transformed("RR1c", get_element_value_as_list(tree, 'RR1c'))
     add_transformed("FF", get_element_value_as_list(tree, 'FF'))
     add_transformed("DD", get_element_value_as_list(tree, 'DD'))
     add_transformed("Td", get_element_value_as_list(tree, 'Td'))
