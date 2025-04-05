@@ -7,6 +7,7 @@ from geojson import Feature, FeatureCollection
 from ..dependencies import get_session
 from ..services.climate import (
     get_dwd_stations_by_municipality_key,
+    get_mosmix_geometries_by_lat_lng,
     get_mosmix_geometries_by_bbox,
     get_weather_service_stations,
     get_all_mosmix_stations
@@ -136,6 +137,56 @@ async def fetch_mosmix_geometries_by_bbox(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='No matches found for the given bounding box'
+        )
+
+    features = [
+        Feature(
+            id=row['station_id'],
+            geometry=row['geojson'],
+            properties={'station_name': row['station_name']},
+        )
+        for row in rows
+    ]
+
+    crs = {'type': 'name', 'properties': {
+        'name': 'urn:ogc:def:crs:OGC:1.3:CRS84'}}
+    geojson_data = FeatureCollection(features, crs=crs)
+
+    return geojson_data
+
+
+@route_climate.get(
+    '/mosmix/radius',
+    response_model=dict,
+    tags=['Deutscher Wetterdienst'],
+    description=(
+        'Retrieves a list of German weather service stations within the '
+        'specified radius.'
+    ),
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    }
+)
+async def fetch_mosmix_geometries_by_lat_lng(
+    lat: float,
+    lng: float,
+    radius: float = Query(
+        default=5000,
+        ge=0,
+        le=100000,
+        description='Radius in meters'
+    ),
+    session: AsyncSession = Depends(get_session)
+):
+    rows = await get_mosmix_geometries_by_lat_lng(session, lat, lng, radius)
+
+    if len(rows) == 0:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f'No matches found for coordinates ({lat}, {lng})'
         )
 
     features = [

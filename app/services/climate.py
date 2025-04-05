@@ -4,6 +4,7 @@ from sqlalchemy.sql.expression import cast
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import aliased
+from geoalchemy2 import Geography as GEOGRAPHY
 
 from ..utils.validators import validate_not_none
 from ..utils.sanitizer import sanitize_string
@@ -138,6 +139,48 @@ async def get_mosmix_geometries_by_bbox(
     result = await session.execute(
         stmt,
         {'xmin': xmin, 'ymin': ymin, 'xmax': xmax, 'ymax': ymax}
+    )
+
+    rows = result.mappings().all()
+
+    return rows
+
+
+async def get_mosmix_geometries_by_lat_lng(
+    session: AsyncSession,
+    lat: float,
+    lng: float,
+    radius: float
+):
+    model = MosmixStation
+
+    geojson = cast(func.ST_AsGeoJSON(
+        model.wkb_geometry, 15), JSON).label('geojson')
+
+    point = func.ST_SetSRID(func.ST_MakePoint(
+        bindparam('lng'),
+        bindparam('lat')
+    ), 4326)
+
+    stmt = (
+        select(
+            model.station_id,
+            model.station_name,
+            geojson
+        )
+        .where(
+            func.ST_DWithin(
+                cast(model.wkb_geometry, GEOGRAPHY),
+                cast(point, GEOGRAPHY),
+                bindparam('radius')
+            ),
+            func.ST_IsValid(model.wkb_geometry)
+        )
+    )
+
+    result = await session.execute(
+        stmt,
+        {'lat': lat, 'lng': lng, 'radius': radius}
     )
 
     rows = result.mappings().all()
