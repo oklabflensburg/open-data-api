@@ -82,12 +82,12 @@ def analyse(tree: etree._ElementTree) -> dict:
         tree, 'SunD'), lambda x: round(float(x), 2))
 
     TX = get_element_value_as_list(tree, 'TX')
-    result["TX"] = [round(float(t) - 273.15, 2) if int(t)
-                    > 99 else t for t in TX]
+    result['station']["TX"] = [round(float(t) - 273.15, 2) if int(t)
+                               > 99 else t for t in TX]
 
     TN = get_element_value_as_list(tree, 'TN')
-    result["TN"] = [round(float(t) - 273.15, 2) if int(t)
-                    > 99 else t for t in TN]
+    result['station']["TN"] = [round(float(t) - 273.15, 2) if int(t)
+                               > 99 else t for t in TN]
 
     add_transformed("Neff", get_element_value_as_list(
         tree, 'Neff'), lambda x: round(float(x) * 8 / 100, 2))
