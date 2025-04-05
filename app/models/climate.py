@@ -5,7 +5,6 @@ from geoalchemy2 import Geometry
 Base = declarative_base()
 
 
-
 class DwdStationReference(Base):
     __tablename__ = 'dwd_station_reference'
 
@@ -24,7 +23,6 @@ class DwdStationReference(Base):
     wkb_geometry = Column(Geometry('POINT', srid=4326))
 
 
-
 class WeatherStation(Base):
     __tablename__ = 'de_weather_stations'
 
@@ -38,4 +36,17 @@ class WeatherStation(Base):
     station_name = Column(String)
     state_name = Column(String)
     submission = Column(String)
+    wkb_geometry = Column(Geometry('POINT', srid=4326))
+
+
+class MosmixStation(Base):
+    __tablename__ = 'global_mosmix_stations'
+
+    id = Column(Integer, primary_key=True)
+    station_id = Column(String, nullable=False, unique=True)
+    icao_code = Column(String)
+    station_name = Column(String)
+    latitude = Column(Numeric, nullable=False)
+    longitude = Column(Numeric, nullable=False)
+    station_elevation = Column(Integer)
     wkb_geometry = Column(Geometry('POINT', srid=4326))
