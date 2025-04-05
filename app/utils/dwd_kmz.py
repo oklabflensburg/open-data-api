@@ -77,8 +77,7 @@ def analyse(tree: etree._ElementTree) -> dict:
         else:
             result['station'][key] = values
 
-    add_transformed("PPPP", get_element_value_as_list(
-        tree, 'PPPP'), lambda x: round(float(x) / 100.0, 2))
+    add_transformed("PPPP", get_element_value_as_list(tree, 'PPPP'))
     add_transformed("FX1", get_element_value_as_list(tree, 'FX1'))
     add_transformed("TTT", get_element_value_as_list(tree, 'TTT'))
     add_transformed("RR1c", get_element_value_as_list(tree, 'RR1c'))
@@ -87,19 +86,8 @@ def analyse(tree: etree._ElementTree) -> dict:
     add_transformed("DD", get_element_value_as_list(tree, 'DD'))
     add_transformed("Td", get_element_value_as_list(tree, 'Td'))
     add_transformed("ww", get_element_value_as_list(tree, 'ww'))
-    add_transformed("SunD", get_element_value_as_list(
-        tree, 'SunD'), lambda x: round(float(x), 2))
-
-    TX = get_element_value_as_list(tree, 'TX')
-    result['station']["TX"] = [round(float(t) - 273.15, 2) if int(t)
-                               > 99 else t for t in TX]
-
-    TN = get_element_value_as_list(tree, 'TN')
-    result['station']["TN"] = [round(float(t) - 273.15, 2) if int(t)
-                               > 99 else t for t in TN]
-
-    add_transformed("Neff", get_element_value_as_list(
-        tree, 'Neff'), lambda x: round(float(x) * 8 / 100, 2))
+    add_transformed("SunD", get_element_value_as_list(tree, 'SunD'))
+    add_transformed("Neff", get_element_value_as_list(tree, 'Neff'))
     add_transformed("R101", get_element_value_as_list(tree, 'R101'))
 
     return result
