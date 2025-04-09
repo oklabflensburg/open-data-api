@@ -13,7 +13,9 @@ from ..models.administrative import (
     DistrictNumber,
     MunicipalityKey,
     Flurstueck,
-    VG25Gem
+    VG25Gem,
+    VG25Krs,
+    VG25Lan
 )
 
 
@@ -171,46 +173,52 @@ async def get_municipality_by_query(
     query: str
 ):
     validated_query = validate_not_none(query)
-    sanitized_query = sanitize_string(validated_query)
+    sanitized_query = sanitize_string(validated_query.lower())
 
-    stmt = text('''
-    SELECT
-        gem.ags AS municipality_key,
-        gem.gen AS geographical_name,
-        CASE
-            WHEN gem.ibz != 60 THEN krs.bez || ' ' || krs.gen
-            ELSE lan.gen
-        END AS region_name,
-        jsonb_build_object(
-            'xmin', ST_XMin(gem.geom),
-            'ymin', ST_YMin(gem.geom),
-            'xmax', ST_XMax(gem.geom),
-            'ymax', ST_YMax(gem.geom)
-        ) AS bbox
-    FROM
-        vg25_gem AS gem
-    JOIN
-        vg250_krs AS krs
-    ON
-        gem.sn_l = krs.sn_l AND gem.sn_r = krs.sn_r AND gem.sn_k = krs.sn_k
-    JOIN
-        vg250_lan AS lan
-    ON
-        krs.sn_l = lan.sn_l
-    WHERE
-        (LOWER(gem.gen) % :q OR LOWER(gem.gen) ILIKE '%' || :q || '%')
-        AND gem.gf = 4
-        AND krs.gf = 4
-        AND lan.gf = 4
-    ORDER BY
-        (LOWER(gem.gen) ILIKE :q || '%') DESC,
-        (LOWER(gem.gen) ILIKE '%' || :q || '%') DESC,
-        similarity(LOWER(gem.gen), :q) DESC
-    LIMIT 10
-    ''')
+    region_name_case = case(
+        (VG25Gem.ibz != 60, func.concat(VG25Krs.bez, ' ', VG25Krs.gen)),
+        else_=VG25Lan.gen
+    ).label("region_name")
 
-    sql = stmt.bindparams(q=sanitized_query.lower())
-    result = await session.execute(sql)
-    rows = result.mappings().all()
+    stmt = (
+        select(
+            VG25Gem.ags.label("municipality_key"),
+            VG25Gem.gen.label("geographical_name"),
+            region_name_case,
+            func.jsonb_build_object(
+                'xmin', func.ST_XMin(VG25Gem.geom),
+                'ymin', func.ST_YMin(VG25Gem.geom),
+                'xmax', func.ST_XMax(VG25Gem.geom),
+                'ymax', func.ST_YMax(VG25Gem.geom)
+            ).label("bbox"),
+        )
+        .select_from(VG25Gem)
+        .join(
+            VG25Krs,
+            (VG25Gem.sn_l == VG25Krs.sn_l) &
+            (VG25Gem.sn_r == VG25Krs.sn_r) &
+            (VG25Gem.sn_k == VG25Krs.sn_k)
+        )
+        .join(
+            VG25Lan,
+            VG25Krs.sn_l == VG25Lan.sn_l
+        )
+        .where(
+            (
+                func.lower(VG25Gem.gen).op('%')(sanitized_query) |
+                func.lower(VG25Gem.gen).ilike(f"%{sanitized_query}%")
+            ) &
+            (VG25Gem.gf == 9) &
+            (VG25Krs.gf == 9) &
+            (VG25Lan.gf == 9)
+        )
+        .order_by(
+            func.lower(VG25Gem.gen).ilike(f"{sanitized_query}%").desc(),
+            func.lower(VG25Gem.gen).ilike(f"%{sanitized_query}%").desc(),
+            func.similarity(func.lower(VG25Gem.gen), sanitized_query).desc()
+        )
+        .limit(10)
+    )
 
-    return [dict(row) for row in rows]
+    result = await session.execute(stmt)
+    return result.mappings().all()

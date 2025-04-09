@@ -105,3 +105,87 @@ class VG25Gem(SQLModel, table=True):
     model_config = {
         'arbitrary_types_allowed': True
     }
+
+
+class VG25Krs(SQLModel, table=True):
+    __tablename__ = "vg25_krs"
+
+    id: int = Field(default=None, primary_key=True)
+
+    objid: Optional[str] = None
+    beginn: Optional[datetime] = None
+    ade: Optional[int] = None
+    gf: Optional[int] = None
+    bsg: Optional[int] = None
+    ars: Optional[str] = None
+    ags: Optional[str] = None
+    sdv_ars: Optional[str] = None
+    gen: Optional[str] = None
+    bez: Optional[str] = None
+    ibz: Optional[int] = None
+    bem: Optional[str] = None
+    nbd: Optional[str] = None
+    sn_l: Optional[str] = None
+    sn_r: Optional[str] = None
+    sn_k: Optional[str] = None
+    sn_v1: Optional[str] = None
+    sn_v2: Optional[str] = None
+    sn_g: Optional[str] = None
+    fk_s3: Optional[str] = None
+    nuts: Optional[str] = None
+    ars_0: Optional[str] = None
+    ags_0: Optional[str] = None
+    wsk: Optional[datetime] = None
+
+    geom: Optional[Geometry] = Field(
+        default=None,
+        sa_column=Column(
+            Geometry("MULTIPOLYGON", srid=4326, spatial_index=True)
+        )
+    )
+
+    model_config = {
+        "arbitrary_types_allowed": True
+    }
+
+
+class VG25Lan(SQLModel, table=True):
+    __tablename__ = "vg25_lan"
+
+    id: int = Field(default=None, primary_key=True)
+
+    objid: Optional[str] = None
+    beginn: Optional[datetime] = None
+    ade: Optional[int] = None
+    gf: Optional[int] = None
+    bsg: Optional[int] = None
+    ars: Optional[str] = None
+    ags: Optional[str] = None
+    sdv_ars: Optional[str] = None
+    gen: Optional[str] = None
+    bez: Optional[str] = None
+    ibz: Optional[int] = None
+    bem: Optional[str] = None
+    nbd: Optional[str] = None
+    sn_l: Optional[str] = None
+    sn_r: Optional[str] = None
+    sn_k: Optional[str] = None
+    sn_v1: Optional[str] = None
+    sn_v2: Optional[str] = None
+    sn_g: Optional[str] = None
+    fk_s3: Optional[str] = None
+    nuts: Optional[str] = None
+    ars_0: Optional[str] = None
+    ags_0: Optional[str] = None
+    wsk: Optional[datetime] = None
+
+    geom: Optional[Geometry] = Field(
+        default=None,
+        sa_column=Column(
+            Geometry("MULTIPOLYGON", srid=4326, spatial_index=True)
+        )
+    )
+
+    model_config = {
+        "arbitrary_types_allowed": True
+    }
