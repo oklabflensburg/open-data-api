@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Column, Integer, SmallInteger, Numeric, String, TIMESTAMP
+from sqlalchemy import Column
 from sqlalchemy.ext.declarative import declarative_base
 from geoalchemy2 import Geometry
 from sqlmodel import SQLModel, Field
@@ -73,7 +73,7 @@ class VG25Gem(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
     objid: Optional[str] = None
     beginn: Optional[datetime] = None
-    ade: Optional[int] = None  # smallint maps to int in Python
+    ade: Optional[int] = None
     gf: Optional[int] = None
     bsg: Optional[int] = None
     ars: Optional[str] = None

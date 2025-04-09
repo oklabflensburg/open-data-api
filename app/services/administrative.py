@@ -1,5 +1,5 @@
 from sqlalchemy import func
-from sqlalchemy.sql import text, case
+from sqlalchemy.sql import case
 from sqlalchemy.sql.sqltypes import String
 from sqlalchemy.future import select
 from sqlalchemy.sql.expression import cast
@@ -59,19 +59,19 @@ async def get_parcel_meta_by_lat_lng(
             MunicipalityKey.municipality_key.label('municipality_number'),
             parcel_number_case,
             area_hectares,
-            geojson,
+            geojson
         )
         .join(
             MunicipalityKey,
             MunicipalityKey.municipality_key == func.LPAD(
                 cast(Flurstueck.gmdschl, String), 8, '0'
-            ),
+            )
         )
         .join(
             DistrictNumber,
             DistrictNumber.district_number == func.LPAD(
                 cast(Flurstueck.kreisschl, String), 5, '0'
-            ),
+            )
         )
         .where(func.ST_Contains(Flurstueck.geometrie, point))
     )
@@ -178,19 +178,19 @@ async def get_municipality_by_query(
     region_name_case = case(
         (VG25Gem.ibz != 60, func.concat(VG25Krs.bez, ' ', VG25Krs.gen)),
         else_=VG25Lan.gen
-    ).label("region_name")
+    ).label('region_name')
 
     stmt = (
         select(
-            VG25Gem.ags.label("municipality_key"),
-            VG25Gem.gen.label("geographical_name"),
+            VG25Gem.ags.label('municipality_key'),
+            VG25Gem.gen.label('geographical_name'),
             region_name_case,
             func.jsonb_build_object(
                 'xmin', func.ST_XMin(VG25Gem.geom),
                 'ymin', func.ST_YMin(VG25Gem.geom),
                 'xmax', func.ST_XMax(VG25Gem.geom),
                 'ymax', func.ST_YMax(VG25Gem.geom)
-            ).label("bbox"),
+            ).label('bbox')
         )
         .select_from(VG25Gem)
         .join(
@@ -206,15 +206,15 @@ async def get_municipality_by_query(
         .where(
             (
                 func.lower(VG25Gem.gen).op('%')(sanitized_query) |
-                func.lower(VG25Gem.gen).ilike(f"%{sanitized_query}%")
+                func.lower(VG25Gem.gen).ilike(f'%{sanitized_query}%')
             ) &
             (VG25Gem.gf == 9) &
             (VG25Krs.gf == 9) &
             (VG25Lan.gf == 9)
         )
         .order_by(
-            func.lower(VG25Gem.gen).ilike(f"{sanitized_query}%").desc(),
-            func.lower(VG25Gem.gen).ilike(f"%{sanitized_query}%").desc(),
+            func.lower(VG25Gem.gen).ilike(f'{sanitized_query}%').desc(),
+            func.lower(VG25Gem.gen).ilike(f'%{sanitized_query}%').desc(),
             func.similarity(func.lower(VG25Gem.gen), sanitized_query).desc()
         )
         .limit(10)
