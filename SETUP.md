@@ -179,7 +179,7 @@ deactivate
 
 ## Retrieve Administrative Areas
 
-Download administrative area data with population figures from the [Federal Agency for Cartography and Geodesy](https://gdz.bkg.bund.de/index.php/default/verwaltungsgebiete-1-250-000-mit-einwohnerzahlen-stand-31-12-vg250-ew-31-12.html). Use the `ogr2ogr` tool to insert this data into your PostgreSQL database.
+Download administrative area data with population figures from the [Federal Agency for Cartography and Geodesy](https://gdz.bkg.bund.de/index.php/default/verwaltungsgebiete-1-25-000-stand-31-12-vg25.html). Use the `ogr2ogr` tool to insert this data into your PostgreSQL database.
 
 
 ### Steps
@@ -187,9 +187,9 @@ Download administrative area data with population figures from the [Federal Agen
 1. Download and unpack the administrative area dataset:
 
 ```sh
-wget https://daten.gdz.bkg.bund.de/produkte/vg/vg250-ew_ebenen_1231/aktuell/vg250-ew_12-31.utm32s.gpkg.ebenen.zip
-unzip vg250-ew_12-31.utm32s.gpkg.ebenen.zip
-cd vg250-ew_12-31.utm32s.gpkg.ebenen/vg250-ew_ebenen_1231
+wget https://daten.gdz.bkg.bund.de/produkte/vg/vg25_ebenen/aktuell/vg25.utm32s.gpkg.zip
+unzip vg25.utm32s.gpkg.zip
+cd daten
 ```
 
 2. Insert data into your database using `ogr2ogr`:
@@ -197,53 +197,47 @@ cd vg250-ew_12-31.utm32s.gpkg.ebenen/vg250-ew_ebenen_1231
 ```sh
 ogr2ogr -f "PostgreSQL" PG:"dbname=oklab user=oklab port=5432 host=localhost" \
     -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=NO \
-    -t_srs EPSG:4326 -nlt MULTIPOLYGON -overwrite -update DE_VG250.gpkg vg250_gem
+    -t_srs EPSG:4326 -nlt MULTIPOLYGON -overwrite -update DE_VG25.gpkg vg25_gem
 ```
 
 ```sh
 ogr2ogr -f "PostgreSQL" PG:"dbname=oklab user=oklab port=5432 host=localhost" \
     -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=NO \
-    -t_srs EPSG:4326 -nlt MULTIPOLYGON -overwrite -update DE_VG250.gpkg vg250_krs
+    -t_srs EPSG:4326 -nlt MULTIPOLYGON -overwrite -update DE_VG25.gpkg vg25_krs
 ```
 
 ```sh
 ogr2ogr -f "PostgreSQL" PG:"dbname=oklab user=oklab port=5432 host=localhost" \
     -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=NO \
-    -t_srs EPSG:4326 -nlt MULTIPOLYGON -overwrite -update DE_VG250.gpkg vg250_lan
+    -t_srs EPSG:4326 -nlt MULTIPOLYGON -overwrite -update DE_VG25.gpkg vg25_lan
 ```
 
 ```sh
 ogr2ogr -f "PostgreSQL" PG:"dbname=oklab user=oklab port=5432 host=localhost" \
     -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=NO \
-    -t_srs EPSG:4326 -nlt MULTIPOLYGON -overwrite -update DE_VG250.gpkg vg250_rbz
+    -t_srs EPSG:4326 -nlt MULTIPOLYGON -overwrite -update DE_VG25.gpkg vg25_rbz
 ```
 
 ```sh
 ogr2ogr -f "PostgreSQL" PG:"dbname=oklab user=oklab port=5432 host=localhost" \
     -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=NO \
-    -t_srs EPSG:4326 -nlt MULTIPOLYGON -overwrite -update DE_VG250.gpkg vg250_sta
+    -t_srs EPSG:4326 -nlt MULTIPOLYGON -overwrite -update DE_VG25.gpkg vg25_sta
 ```
 
 ```sh
 ogr2ogr -f "PostgreSQL" PG:"dbname=oklab user=oklab port=5432 host=localhost" \
     -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=NO \
-    -t_srs EPSG:4326 -nlt MULTIPOLYGON -overwrite -update DE_VG250.gpkg vg250_vwg
+    -t_srs EPSG:4326 -nlt MULTIPOLYGON -overwrite -update DE_VG25.gpkg vg25_vwg
 ```
 
 ```sh
 ogr2ogr -f "PostgreSQL" PG:"dbname=oklab user=oklab port=5432 host=localhost" \
     -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=NO \
-    -t_srs EPSG:4326 -nlt LINESTRING -overwrite -update DE_VG250.gpkg vg250_li
-```
-
-```sh
-ogr2ogr -f "PostgreSQL" PG:"dbname=oklab user=oklab port=5432 host=localhost" \
-    -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=NO \
-    -t_srs EPSG:4326 -nlt POINT -overwrite -update DE_VG250.gpkg vg250_pk
+    -t_srs EPSG:4326 -nlt LINESTRING -overwrite -update DE_VG25.gpkg vg25_li
 ```
 
 
-3. Next it is recommanded to create indecies using `psql`:
+1. Next it is recommanded to create indecies using `psql`:
 
 ```sql
 -- index state, county and municipality ids

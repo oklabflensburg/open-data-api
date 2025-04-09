@@ -15,7 +15,7 @@ from ..models.climate import (
     MosmixStation
 )
 
-from ..models.administrative import Vg250Gem
+from ..models.administrative import VG25Gem
 
 
 async def get_all_mosmix_stations(session: AsyncSession):
@@ -46,7 +46,7 @@ async def get_dwd_stations_by_municipality_key(
 
     geojson = cast(func.ST_AsGeoJSON(
         DwdStationReference.wkb_geometry, 15), JSON).label('geojson')
-    gem_alias = aliased(Vg250Gem)
+    gem_alias = aliased(VG25Gem)
 
     stmt = (
         select(
@@ -72,7 +72,6 @@ async def get_dwd_stations_by_municipality_key(
         )
         .where(
             gem_alias.ags == bindparam('municipality_key'),
-            gem_alias.gf == 4,
             DwdStationReference.recording_end > func.current_date() - text("INTERVAL '1 week'")
         )
     )

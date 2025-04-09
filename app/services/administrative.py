@@ -1,8 +1,18 @@
-from sqlalchemy.sql import text
+from sqlalchemy.sql import text, func, case
+from sqlalchemy.sql.sqltypes import String
+from sqlalchemy.future import select
+from sqlalchemy.sql.expression import cast
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..utils.validators import validate_not_none
 from ..utils.sanitizer import sanitize_string
+
+from ..models.administrative import (
+    DistrictNumber,
+    MunicipalityKey,
+    Flurstueck
+)
 
 
 async def get_parcel_meta_by_lat_lng(
@@ -10,38 +20,59 @@ async def get_parcel_meta_by_lat_lng(
     lat: float,
     lng: float
 ):
-    stmt = text('''
-    SELECT
-        dn.district_name,
-        dn.district_number,
-        flur AS field_number,
-        mn.municipality_name,
-        aktualit AS last_update,
-        lagebeztxt AS place_description,
-        gemarkung AS cadastral_district_name,
-        gemaschl AS cadastral_district_number, 
-        mn.municipality_number,
-        CASE                                                                      
-            WHEN flstnrnen IS NOT NULL THEN flstnrzae::text || '/' || flstnrnen::text                                                                           
-            ELSE flstnrzae::text                                                                           
-        END AS parcel_number,                                                                                                                                 
-        ST_Area(ST_Transform(ST_GeomFromEWKB(geometrie), 3587)) / 10000 AS area_hectares,
-        ST_AsGeoJSON(geometrie, 15)::jsonb AS geojson                                                                    
-    FROM flurstueck
-    JOIN de_municipality_numbers AS mn
-        ON mn.municipality_number = LPAD(gmdschl::text, 8, '0')
-    JOIN de_district_numbers AS dn
-        ON dn.district_number = LPAD(kreisschl::text, 5, '0')
-    WHERE
-        ST_Contains(
-            geometrie,
-            ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)
+    point = func.ST_SetSRID(func.ST_MakePoint(lng, lat), 4326)
+
+    parcel_number_case = case(
+        (
+            Flurstueck.flstnrnen is not None,
+            func.concat(
+                cast(Flurstueck.flstnrzae, String),
+                '/',
+                cast(Flurstueck.flstnrnen, String),
+            ),
+        ),
+        else_=cast(Flurstueck.flstnrzae, String),
+    ).label("parcel_number")
+
+    area_hectares = (
+        func.ST_Area(func.ST_Transform(Flurstueck.geometrie, 3587)) / 10000
+    ).label("area_hectares")
+
+    geojson = func.ST_AsGeoJSON(
+        Flurstueck.geometrie, 15
+    ).cast(JSONB).label("geojson")
+
+    stmt = (
+        select(
+            DistrictNumber.district_name,
+            DistrictNumber.district_number,
+            Flurstueck.flur.label("field_number"),
+            MunicipalityKey.municipality_name,
+            Flurstueck.aktualit.label("last_update"),
+            Flurstueck.lagebeztxt.label("place_description"),
+            Flurstueck.gemarkung.label("cadastral_district_name"),
+            Flurstueck.gemaschl.label("cadastral_district_number"),
+            MunicipalityKey.municipality_key.label("municipality_number"),
+            parcel_number_case,
+            area_hectares,
+            geojson,
         )
-    ''')
+        .join(
+            MunicipalityKey,
+            MunicipalityKey.municipality_key == func.LPAD(
+                cast(Flurstueck.gmdschl, String), 8, "0"
+            ),
+        )
+        .join(
+            DistrictNumber,
+            DistrictNumber.district_number == func.LPAD(
+                cast(Flurstueck.kreisschl, String), 5, "0"
+            ),
+        )
+        .where(func.ST_Contains(Flurstueck.geometrie, point))
+    )
 
-    sql = stmt.bindparams(lat=lat, lng=lng)
-    result = await session.execute(sql)
-
+    result = await session.execute(stmt)
     return result.mappings().all()
 
 
@@ -54,10 +85,9 @@ async def get_municipality_by_key(
 
     stmt = text('''
     SELECT
-        mk.municipality_key AS municipality_key,
+        vg.ags AS municipality_key,
         mk.municipality_name AS municipality_name,
         vg.gen AS geographical_name,
-        vg.ewz AS population,
         TO_CHAR(vg.beginn, 'DD.MM.YYYY') AS date_of_entry,
         ST_Area(ST_Transform(vg.geom, 3587)) AS shape_area,
         jsonb_build_object(
@@ -69,20 +99,20 @@ async def get_municipality_by_key(
         ST_AsGeoJSON(vg.geom, 15)::jsonb AS geojson
     FROM
         de_municipality_keys AS mk
-    LEFT JOIN vg250_gem AS vg
+    LEFT JOIN vg25_gem AS vg
         ON mk.municipality_key = vg.ags
-        AND vg.gf = 4
+        AND vg.gf = 9
     LEFT JOIN (
         SELECT
             ags,
             ST_Extent(geom) AS bbox
         FROM
-            vg250_gem
+            vg25_gem
         GROUP BY ags
     ) AS agg
         ON vg.ags = agg.ags
     WHERE
-        LOWER(mk.municipality_key) = :key
+        mk.municipality_key = :key
     ''')
 
     sql = stmt.bindparams(key=validated_key.lower())
@@ -100,10 +130,9 @@ async def get_municipality_by_name(
 
     stmt = text('''
     SELECT
-        mk.municipality_key AS municipality_key,
+        vg.ags AS municipality_key,
         mk.municipality_name AS municipality_name,
         vg.gen AS geographical_name,
-        vg.ewz AS population,
         TO_CHAR(vg.beginn, 'DD.MM.YYYY') AS date_of_entry,
         ST_Area(ST_Transform(vg.geom, 3587)) AS shape_area,
         jsonb_build_object(
@@ -114,11 +143,10 @@ async def get_municipality_by_name(
         ) AS bbox,
         ST_AsGeoJSON(vg.geom, 15)::jsonb AS geojson
     FROM
-        vg250_gem AS vg
-    JOIN
+        vg25_gem AS vg
+    LEFT JOIN
         de_municipality_keys AS mk
         ON vg.ags = mk.municipality_key
-        AND vg.gf = 4
     WHERE
         LOWER(vg.gen) LIKE :name
     ''')
@@ -151,7 +179,7 @@ async def get_municipality_by_query(
             'ymax', ST_YMax(gem.geom)
         ) AS bbox
     FROM
-        vg250_gem AS gem
+        vg25_gem AS gem
     JOIN
         vg250_krs AS krs
     ON
