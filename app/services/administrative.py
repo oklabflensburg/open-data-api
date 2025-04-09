@@ -2,7 +2,7 @@ from sqlalchemy import func
 from sqlalchemy.sql import case
 from sqlalchemy.sql.sqltypes import String
 from sqlalchemy.future import select
-from sqlalchemy.sql.expression import cast
+from sqlalchemy.sql.expression import cast, literal
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -28,14 +28,14 @@ async def get_parcel_meta_by_lat_lng(
 
     parcel_number_case = case(
         (
-            Flurstueck.flstnrnen is not None,
+            Flurstueck.flstnrnen.isnot(None),
             func.concat(
                 cast(Flurstueck.flstnrzae, String),
-                '/',
+                literal('/'),
                 cast(Flurstueck.flstnrnen, String),
-            ),
+            )
         ),
-        else_=cast(Flurstueck.flstnrzae, String),
+        else_=cast(Flurstueck.flstnrzae, String)
     ).label('parcel_number')
 
     area_hectares = (
