@@ -1,4 +1,5 @@
 ---
+
 - hosts: all
   become: yes
 
@@ -22,10 +23,22 @@
         groups: www-data
         append: yes
 
+    - name: Ensure remote_tmp directory exists with proper permissions
+      ansible.builtin.file:
+        path: /home/oklab/.ansible/tmp
+        state: directory
+        mode: "0775"
+        owner: oklab
+        group: oklab
+      become: yes
+      become_user: oklab
+
     - name: Handle system setup defaults
       block:
         - name: Install system packages
-          ansible.builtin.apt: "name={{ item }} state=present"
+          ansible.builtin.apt:
+            name: "{{ item }}"
+            state: "present"
           with_items:
             - acl
             - git
@@ -56,10 +69,40 @@
             - postgresql-16-postgis-3
             - postgresql-client-16
 
-        - name: Make sure psycopg2 is installed
-          ansible.builtin.pip:
-            name: psycopg2-binary
+        - name: "Create database user {{ db_user }}"
+          postgresql_user:
             state: present
+            name: "{{ db_user }}"
+            password: "{{ db_password }}"
+          become: yes
+          become_user: postgres
+
+        - name: Create database
+          community.postgresql.postgresql_db:
+            encoding: UTF-8
+            name: "{{ db_name }}"
+            owner: "{{ db_user }}"
+            state: present
+          become_user: postgres
+
+        - name: Grant database user access to app db
+          postgresql_privs:
+            type: database
+            database: postgres
+            roles: PUBLIC
+            privs: all
+          become_user: postgres
+
+        - name: Add PostgreSQL extensions to the database
+          community.postgresql.postgresql_ext:
+            name: "{{ item }}"
+            db: "{{ db_name }}"
+            login_user: postgres
+            schema: public
+            cascade: yes
+          become_user: postgres
+          loop:
+            - postgis
 
   tasks:
     - name: Create a directory if it does not exist
@@ -74,20 +117,20 @@
       ansible.builtin.git:
         repo: https://github.com/oklabflensburg/open-data-api.git
         dest: /opt/git/open-data-api
-      become_user: oklab
+      remote_user: oklab
 
     - name: Ensure the virtual environment exists
       ansible.builtin.pip:
         requirements: /opt/git/open-data-api/requirements.txt
         virtualenv: /opt/git/open-data-api/venv
         virtualenv_command: "{{ ansible_python_interpreter }} -m venv"
-      become_user: oklab
+      remote_user: oklab
 
     - name: Git checkout open-social-map all repositories
       ansible.builtin.git:
         repo: https://github.com/oklabflensburg/open-social-map.git
         dest: /opt/git/open-social-map
-      become_user: oklab
+      remote_user: oklab
 
     - name: Create dotenv file for open-social-map
       ansible.builtin.template:
@@ -96,40 +139,40 @@
         owner: oklab
         group: oklab
         mode: '0644'
-      become_user: oklab
+      remote_user: oklab
 
     - name: Ensure the virtual environment exists
       ansible.builtin.pip:
         requirements: /opt/git/open-social-map/tools/requirements.txt
         virtualenv: /opt/git/open-social-map/tools/venv
         virtualenv_command: "{{ ansible_python_interpreter }} -m venv"
-      become_user: oklab
+      remote_user: oklab
 
     - name: Git checkout open-monuments-map all repositories
       ansible.builtin.git:
         repo: https://github.com/oklabflensburg/open-monuments-map.git
         dest: /opt/git/open-monuments-map
-      become_user: oklab
+      remote_user: oklab
 
     - name: Ensure the virtual environment exists
       ansible.builtin.pip:
         requirements: /opt/git/open-monuments-map/tools/requirements.txt
         virtualenv: /opt/git/open-monuments-map/tools/venv
         virtualenv_command: "{{ ansible_python_interpreter }} -m venv"
-      become_user: oklab
+      remote_user: oklab
 
     - name: Git checkout open-accident-map all repositories
       ansible.builtin.git:
         repo: https://github.com/oklabflensburg/open-accident-map.git
         dest: /opt/git/open-accident-map
-      become_user: oklab
+      remote_user: oklab
 
     - name: Ensure the virtual environment exists
       ansible.builtin.pip:
         requirements: /opt/git/open-accident-map/tools/requirements.txt
         virtualenv: /opt/git/open-accident-map/tools/venv
         virtualenv_command: "{{ ansible_python_interpreter }} -m venv"
-      become_user: oklab
+      remote_user: oklab
 
     - name: Find out if PostgreSQL is initialized
       ansible.builtin.stat:
@@ -141,38 +184,6 @@
         name: postgresql.service
         state: reloaded
       when: not postgres_data.stat.exists
-
-    - name: "Create database user {{ db_user }}"
-      postgresql_user:
-        state: present
-        name: "{{ db_user }}"
-        password: "{{ db_password }}"
-      become_user: postgres
-
-    - name: Create database
-      community.postgresql.postgresql_db:
-        encoding: UTF-8
-        name: "{{ db_name }}"
-        owner: "{{ db_user }}"
-        state: present
-      become_user: postgres
-
-    - name: Grant database user access to app db
-      postgresql_privs:
-        type: database
-        database: postgres
-        roles: PUBLIC
-        privs: all
-      become_user: postgres
-
-    - name: Adds postgis extension to the database
-      community.postgresql.postgresql_ext:
-        name: postgis
-        db: "{{ db_name }}"
-        login_user: postgres
-        schema: public
-        cascade: yes
-      become_user: postgres
 
     - name: Set database user connection authentication method
       postgresql_pg_hba:
@@ -192,41 +203,26 @@
       become_user: postgres
       notify: restart postgres
 
-    - name: Adds postgis extension to the database
-      community.postgresql.postgresql_ext:
-        name: postgis
-        db: "{{ db_name }}"
-        login_user: postgres
-        schema: public
-        cascade: yes
-      become_user: postgres
-
-    - name: Run SQL script to reset public schema
-      community.postgresql.postgresql_script:
-        db: oklab
-        port: "{{ db_port }}"
-        path: "{{ item }}"
-      with_items:
-        - /opt/git/open-social-map/data/cleanup_database_schema.sql
-      become: yes
-      become_user: postgres
-
     - name: Run SQL to create schema
       community.postgresql.postgresql_script:
         db: "{{ db_name }}"
         port: "{{ db_port }}"
         login_host: "{{ db_host }}"
         login_user: "{{ db_user }}"
+        login_password: "{{ db_password }}"
         path: "{{ item }}"
       with_items:
-        - /opt/git/open-social-map/data/flensburg_stadtteile.sql
-        - /opt/git/open-social-map/data/flensburg_sozialatlas_metadaten.sql
         - /opt/git/open-social-map/data/flensburg_sozialatlas.sql
+        - /opt/git/open-social-map/data/flensburg_sozialatlas_meta.sql
         - /opt/git/open-monuments-map/data/denkmalliste_schema.sql
-      become_user: oklab
+      remote_user: oklab
 
-    - name: Run a script using an executable in a system path
-      ansible.builtin.command: /opt/git/open-social-map/tools/venv/bin/python3 /opt/git/open-social-map/tools/insert_districts.py /opt/git/open-social-map/static/flensburg_stadtteile.geojson
+    - name: Run Python script with arguments
+      ansible.builtin.command:
+        argv:
+          - /opt/git/open-social-map/tools/venv/bin/python3
+          - /opt/git/open-social-map/tools/insert_districts.py
+          - /opt/git/open-social-map/static/flensburg_stadtteile.geojson
       become_user: oklab
 
   handlers:
