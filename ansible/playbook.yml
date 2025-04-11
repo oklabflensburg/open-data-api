@@ -1,17 +1,17 @@
 ---
 - hosts: all
-  become: yes
+  become: true
 
   vars_files:
     - vars.yml
 
   pre_tasks:
-    - name: Update system packages
+    - name: Update system packages using apt
       ansible.builtin.apt:
         state: present
         update_cache: yes
 
-    - name: Create a user 'oklab' with a home directory
+    - name: Create user 'oklab' with home directory and SSH key
       ansible.builtin.user:
         name: oklab
         shell: /bin/bash
@@ -22,19 +22,19 @@
         groups: www-data
         append: yes
 
-    - name: Ensure remote_tmp directory exists with proper permissions
+    - name: Ensure remote_tmp directory exists with proper permissions for oklab
       ansible.builtin.file:
         path: /home/oklab/.ansible/tmp
         state: directory
         mode: "0775"
         owner: oklab
         group: oklab
-      become: yes
+      become: true
       become_user: oklab
 
-    - name: Handle system setup defaults
+    - name: Configure system setup defaults
       block:
-        - name: Install system packages
+        - name: Install required system packages
           ansible.builtin.apt:
             name: "{{ item }}"
             state: "present"
@@ -51,34 +51,34 @@
             - unzip
             - libgdal-dev
 
-        - name: Add postgresql signing key to keyring file
+        - name: Add PostgreSQL signing key to keyring
           ansible.builtin.get_url:
             url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
             dest: /etc/apt/keyrings/postgresql.asc
             mode: "0644"
             force: true
 
-        - name: Add postgresql apt source
+        - name: Add PostgreSQL APT repository
           ansible.builtin.apt_repository:
             repo: "deb [arch=amd64, signed-by=/etc/apt/keyrings/postgresql.asc] http://apt.postgresql.org/pub/repos/apt/ {{ ansible_distribution_release }}-pgdg main"
             state: present
 
-        - name: Install database packages
+        - name: Install PostgreSQL 16 and PostGIS
           ansible.builtin.apt: "name={{ item }} state=present update_cache=yes"
           with_items:
             - postgresql-16
             - postgresql-16-postgis-3
             - postgresql-client-16
 
-        - name: "Create database user {{ db_user }}"
+        - name: "Create PostgreSQL user {{ db_user }}"
           postgresql_user:
             state: present
             name: "{{ db_user }}"
             password: "{{ db_password }}"
-          become: yes
+          become: true
           become_user: postgres
 
-        - name: Create database
+        - name: Create PostgreSQL database "{{ db_name }}"
           community.postgresql.postgresql_db:
             encoding: UTF-8
             name: "{{ db_name }}"
@@ -86,7 +86,7 @@
             state: present
           become_user: postgres
 
-        - name: Grant database user access to app db
+        - name: Grant database user access to the "{{ db_name }}" database
           postgresql_privs:
             type: database
             database: postgres
@@ -94,7 +94,7 @@
             privs: all
           become_user: postgres
 
-        - name: Add PostgreSQL extensions to the database
+        - name: Add PostGIS extension to the "{{ db_name }}" database
           community.postgresql.postgresql_ext:
             name: "{{ item }}"
             db: "{{ db_name }}"
@@ -106,7 +106,7 @@
             - postgis
 
   tasks:
-    - name: Create a directory if it does not exist
+    - name: Create /opt/git directory
       ansible.builtin.file:
         path: /opt/git
         state: directory
@@ -114,13 +114,13 @@
         owner: oklab
         group: oklab
 
-    - name: Git checkout open-data-api all repositories
+    - name: Clone open-data-api repository
       ansible.builtin.git:
         repo: https://github.com/oklabflensburg/open-data-api.git
         dest: /opt/git/open-data-api
       become_user: oklab
 
-    - name: Create dotenv file for open-data-api
+    - name: Create .env file for open-data-api
       ansible.builtin.template:
         src: dotenv.j2
         dest: /opt/git/open-data-api/.env
@@ -129,27 +129,27 @@
         mode: "0644"
       become_user: oklab
 
-    - name: Ensure the virtual environment exists
+    - name: Create virtual environment for open-data-api
       ansible.builtin.pip:
         requirements: /opt/git/open-data-api/requirements.txt
         virtualenv: /opt/git/open-data-api/venv
         virtualenv_command: "{{ ansible_python_interpreter }} -m venv"
       become_user: oklab
 
-    - name: Ensure the virtual environment exists
+    - name: Create virtual environment for open-data-api tools
       ansible.builtin.pip:
         requirements: /opt/git/open-data-api/tools/requirements.txt
         virtualenv: /opt/git/open-data-api/tools/venv
         virtualenv_command: "{{ ansible_python_interpreter }} -m venv"
       become_user: oklab
 
-    - name: Git checkout open-social-map all repositories
+    - name: Clone open-social-map repository
       ansible.builtin.git:
         repo: https://github.com/oklabflensburg/open-social-map.git
         dest: /opt/git/open-social-map
       become_user: oklab
 
-    - name: Create dotenv file for open-social-map
+    - name: Create .env file for open-social-map
       ansible.builtin.template:
         src: dotenv.j2
         dest: /opt/git/open-social-map/.env
@@ -158,51 +158,51 @@
         mode: "0644"
       become_user: oklab
 
-    - name: Ensure the virtual environment exists
+    - name: Create virtual environment for open-social-map tools
       ansible.builtin.pip:
         requirements: /opt/git/open-social-map/tools/requirements.txt
         virtualenv: /opt/git/open-social-map/tools/venv
         virtualenv_command: "{{ ansible_python_interpreter }} -m venv"
       become_user: oklab
 
-    - name: Git checkout open-monuments-map all repositories
+    - name: Clone open-monuments-map repository
       ansible.builtin.git:
         repo: https://github.com/oklabflensburg/open-monuments-map.git
         dest: /opt/git/open-monuments-map
       become_user: oklab
 
-    - name: Ensure the virtual environment exists
+    - name: Create virtual environment for open-monuments-map tools
       ansible.builtin.pip:
         requirements: /opt/git/open-monuments-map/tools/requirements.txt
         virtualenv: /opt/git/open-monuments-map/tools/venv
         virtualenv_command: "{{ ansible_python_interpreter }} -m venv"
       become_user: oklab
 
-    - name: Git checkout open-accident-map all repositories
+    - name: Clone open-accident-map repository
       ansible.builtin.git:
         repo: https://github.com/oklabflensburg/open-accident-map.git
         dest: /opt/git/open-accident-map
       become_user: oklab
 
-    - name: Ensure the virtual environment exists
+    - name: Create virtual environment for open-accident-map tools
       ansible.builtin.pip:
         requirements: /opt/git/open-accident-map/tools/requirements.txt
         virtualenv: /opt/git/open-accident-map/tools/venv
         virtualenv_command: "{{ ansible_python_interpreter }} -m venv"
       become_user: oklab
 
-    - name: Find out if PostgreSQL is initialized
+    - name: Check if PostgreSQL is initialized by checking for pg_hba.conf
       ansible.builtin.stat:
         path: /etc/postgresql/16/main/pg_hba.conf
       register: postgres_data
 
-    - name: Reload postgresql service
+    - name: Reload postgresql service if not initialized
       ansible.builtin.systemd:
         name: postgresql.service
         state: reloaded
       when: not postgres_data.stat.exists
 
-    - name: Set database user connection authentication method
+    - name: Set database user connection authentication method in pg_hba.conf
       postgresql_pg_hba:
         dest: "/etc/postgresql/16/main/pg_hba.conf"
         contype: "{{ item.contype }}"
@@ -216,11 +216,11 @@
         - { user: "oklab", contype: "local", database: "oklab" }
         - { user: "postgres", contype: "host", database: "all" }
         - { user: "postgres", contype: "local", database: "all" }
-      become: yes
+      become: true
       become_user: postgres
       notify: restart postgres
 
-    - name: Run SQL to create schema
+    - name: Run SQL scripts to create schemas
       community.postgresql.postgresql_script:
         db: "{{ db_name }}"
         port: "{{ db_port }}"
@@ -249,7 +249,7 @@
         - /opt/git/open-data-api/data/sh_archaeological_monument_schema.sql
       become_user: oklab
 
-    - name: Run Python script with arguments
+    - name: Run Python script to insert districts for open-social-map
       ansible.builtin.command:
         argv:
           - /opt/git/open-social-map/tools/venv/bin/python3
@@ -257,7 +257,7 @@
           - /opt/git/open-social-map/static/flensburg_stadtteile.geojson
       become_user: oklab
 
-    - name: Run the script to insert municipality numbers
+    - name: Run script to insert municipality numbers for open-data-api
       ansible.builtin.command:
         argv:
           - /opt/git/open-data-api/tools/venv/bin/python3
@@ -271,7 +271,7 @@
           - "--verbose"
       become_user: oklab
 
-    - name: Run the script to insert energy metadata
+    - name: Run script to insert energy metadata for open-data-api
       ansible.builtin.command:
         argv:
           - /opt/git/open-data-api/tools/venv/bin/python3
@@ -285,7 +285,7 @@
           - "--verbose"
       become_user: oklab
 
-    - name: Run the script to insert global MOSMIX stations
+    - name: Run script to insert global MOSMIX stations for open-data-api
       ansible.builtin.command:
         argv:
           - /opt/git/open-data-api/tools/venv/bin/python3
@@ -297,7 +297,7 @@
           - "--verbose"
       become_user: oklab
 
-    - name: Run the script to insert EU country codes
+    - name: Run script to insert EU country codes for open-data-api
       ansible.builtin.command:
         argv:
           - /opt/git/open-data-api/tools/venv/bin/python3
@@ -309,7 +309,7 @@
           - "--verbose"
       become_user: oklab
 
-    - name: Run the script to insert DWD weather stations
+    - name: Run script to insert DWD weather stations for open-data-api
       ansible.builtin.command:
         argv:
           - /opt/git/open-data-api/tools/venv/bin/python3
@@ -321,7 +321,7 @@
           - "--verbose"
       become_user: oklab
 
-    - name: Run the script to insert archaeological monuments
+    - name: Run script to insert archaeological monuments for open-data-api
       ansible.builtin.command:
         argv:
           - /opt/git/open-data-api/tools/venv/bin/python3
@@ -335,7 +335,7 @@
           - "--verbose"
       become_user: oklab
 
-    - name: Check if VG25 zip file already exists
+    - name: Check if VG25 zip file exists locally
       ansible.builtin.stat:
         path: /tmp/vg25.utm32s.gpkg.zip
       register: vg25_zip_exists
@@ -355,37 +355,37 @@
         remote_src: yes
       become_user: oklab
 
-    - name: Insert vg25_gem data into database
+    - name: Insert vg25_gem data into database using ogr2ogr
       ansible.builtin.command:
         cmd: ogr2ogr -f "PostgreSQL" PG:"dbname={{ db_name }} user={{ db_user }} port={{ db_port }} host={{ db_host }}" -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=NO -t_srs EPSG:4326 -nlt MULTIPOLYGON -overwrite -update /tmp/daten/DE_VG25.gpkg vg25_gem
       become_user: oklab
 
-    - name: Insert vg25_krs data into database
+    - name: Insert vg25_krs data into database using ogr2ogr
       ansible.builtin.command:
         cmd: ogr2ogr -f "PostgreSQL" PG:"dbname={{ db_name }} user={{ db_user }} port={{ db_port }} host={{ db_host }}" -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=NO -t_srs EPSG:4326 -nlt MULTIPOLYGON -overwrite -update /tmp/daten/DE_VG25.gpkg vg25_krs
       become_user: oklab
 
-    - name: Insert vg25_lan data into database
+    - name: Insert vg25_lan data into database using ogr2ogr
       ansible.builtin.command:
         cmd: ogr2ogr -f "PostgreSQL" PG:"dbname={{ db_name }} user={{ db_user }} port={{ db_port }} host={{ db_host }}" -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=NO -t_srs EPSG:4326 -nlt MULTIPOLYGON -overwrite -update /tmp/daten/DE_VG25.gpkg vg25_lan
       become_user: oklab
 
-    - name: Insert vg25_rbz data into database
+    - name: Insert vg25_rbz data into database using ogr2ogr
       ansible.builtin.command:
         cmd: ogr2ogr -f "PostgreSQL" PG:"dbname={{ db_name }} user={{ db_user }} port={{ db_port }} host={{ db_host }}" -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=NO -t_srs EPSG:4326 -nlt MULTIPOLYGON -overwrite -update /tmp/daten/DE_VG25.gpkg vg25_rbz
       become_user: oklab
 
-    - name: Insert vg25_sta data into database
+    - name: Insert vg25_sta data into database using ogr2ogr
       ansible.builtin.command:
         cmd: ogr2ogr -f "PostgreSQL" PG:"dbname={{ db_name }} user={{ db_user }} port={{ db_port }} host={{ db_host }}" -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=NO -t_srs EPSG:4326 -nlt MULTIPOLYGON -overwrite -update /tmp/daten/DE_VG25.gpkg vg25_sta
       become_user: oklab
 
-    - name: Insert vg25_vwg data into database
+    - name: Insert vg25_vwg data into database using ogr2ogr
       ansible.builtin.command:
         cmd: ogr2ogr -f "PostgreSQL" PG:"dbname={{ db_name }} user={{ db_user }} port={{ db_port }} host={{ db_host }}" -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=NO -t_srs EPSG:4326 -nlt MULTIPOLYGON -overwrite -update /tmp/daten/DE_VG25.gpkg vg25_vwg
       become_user: oklab
 
-    - name: Insert vg25_li data into database
+    - name: Insert vg25_li data into database using ogr2ogr
       ansible.builtin.command:
         cmd: ogr2ogr -f "PostgreSQL" PG:"dbname={{ db_name }} user={{ db_user }} port={{ db_port }} host={{ db_host }}" -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=NO -t_srs EPSG:4326 -nlt LINESTRING -overwrite -update /tmp/daten/DE_VG25.gpkg vg25_li
       become_user: oklab
@@ -393,3 +393,39 @@
   handlers:
     - name: restart postgres
       service: name=postgresql state=restarted
+
+- hosts: all
+  become: true
+
+  vars_files:
+    - vars.yml
+
+  tasks:
+    - name: Create indexes on VG25 tables in PostgreSQL
+      community.postgresql.postgresql_query:
+        db: "{{ db_name }}"
+        port: "{{ db_port }}"
+        login_host: "{{ db_host }}"
+        login_user: "{{ db_user }}"
+        login_password: "{{ db_password }}"
+        query: |
+          -- index state, county and municipality ids
+          CREATE INDEX IF NOT EXISTS idx_lan_sn_l ON vg25_lan (sn_l);
+          CREATE INDEX IF NOT EXISTS idx_krs_sn_l ON vg25_krs (sn_l);
+          CREATE INDEX IF NOT EXISTS idx_krs_sn_r ON vg25_krs (sn_r);
+          CREATE INDEX IF NOT EXISTS idx_krs_sn_k ON vg25_krs (sn_k);
+          CREATE INDEX IF NOT EXISTS idx_gem_sn_k ON vg25_gem (sn_k);
+          CREATE INDEX IF NOT EXISTS idx_gem_sn_r ON vg25_gem (sn_r);
+          CREATE INDEX IF NOT EXISTS idx_gem_sn_l ON vg25_gem (sn_l);
+
+          -- index for the municipality number
+          CREATE INDEX IF NOT EXISTS idx_vg25_gem_ags ON vg25_gem (ags);
+
+          -- index state names
+          CREATE INDEX IF NOT EXISTS idx_vg25_lan_gen ON vg25_lan (gen);
+
+          -- index on geofactor
+          CREATE INDEX IF NOT EXISTS idx_vg25_gem_gf ON vg25_gem (gf);
+          CREATE INDEX IF NOT EXISTS idx_vg25_krs_gf ON vg25_krs (gf);
+          CREATE INDEX IF NOT EXISTS idx_vg25_lan_gf ON vg25_lan (gf);
+      become_user: oklab
