@@ -321,6 +321,20 @@
           - "--verbose"
       become_user: oklab
 
+    - name: Run the script to insert archaeological monuments
+      ansible.builtin.command:
+        argv:
+          - /opt/git/open-data-api/tools/venv/bin/python3
+          - /opt/git/open-data-api/tools/insert_archaeological_monuments.py
+          - "--env"
+          - /opt/git/open-data-api/.env
+          - "--target"
+          - /opt/git/open-data-api/data
+          - "--url"
+          - https://opendata.schleswig-holstein.de/dataset/7db5bc2f-7a99-456b-9faa-005de581cceb/resource/e0157633-62f6-43a0-8f89-3d4aef75801f/download/denkmalliste_sh.json
+          - "--verbose"
+      become_user: oklab
+
     - name: Check if VG25 zip file already exists
       ansible.builtin.stat:
         path: /tmp/vg25.utm32s.gpkg.zip
