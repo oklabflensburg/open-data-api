@@ -285,6 +285,30 @@
           - "--verbose"
       become_user: oklab
 
+    - name: Run the script to insert global MOSMIX stations
+      ansible.builtin.command:
+        argv:
+          - /opt/git/open-data-api/tools/venv/bin/python3
+          - /opt/git/open-data-api/tools/insert_mosmix_stations.py
+          - "--env"
+          - /opt/git/open-data-api/.env
+          - "--src"
+          - /opt/git/open-data-api/data/mosmix_stationskatalog.cfg
+          - "--verbose"
+      become_user: oklab
+
+    - name: Run the script to insert EU country codes
+      ansible.builtin.command:
+        argv:
+          - /opt/git/open-data-api/tools/venv/bin/python3
+          - /opt/git/open-data-api/tools/insert_country_codes.py
+          - "--env"
+          - /opt/git/open-data-api/.env
+          - "--src"
+          - /opt/git/open-data-api/data/eu_country_codes.csv
+          - "--verbose"
+      become_user: oklab
+
     - name: Check if VG25 zip file already exists
       ansible.builtin.stat:
         path: /tmp/vg25.utm32s.gpkg.zip
