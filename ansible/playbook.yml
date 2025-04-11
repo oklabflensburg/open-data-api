@@ -335,6 +335,78 @@
           - "--verbose"
       become_user: oklab
 
+    - name: Run script to insert biomass units
+      ansible.builtin.command:
+        argv:
+          - /opt/git/open-data-api/tools/venv/bin/python3
+          - /opt/git/open-data-api/tools/insert_biomass_units.py
+          - "--env"
+          - /opt/git/open-data-api/.env
+          - "--src"
+          - /tmp/EinheitenBiomasse.xml
+          - "--verbose"
+      become_user: oklab
+
+    - name: Run script to insert combustion units
+      ansible.builtin.command:
+        argv:
+          - /opt/git/open-data-api/tools/venv/bin/python3
+          - /opt/git/open-data-api/tools/insert_combustion_units.py
+          - "--env"
+          - /opt/git/open-data-api/.env
+          - "--src"
+          - /tmp/EinheitenVerbrennung.xml
+          - "--verbose"
+      become_user: oklab
+
+    - name: Run script to insert nuclear units
+      ansible.builtin.command:
+        argv:
+          - /opt/git/open-data-api/tools/venv/bin/python3
+          - /opt/git/open-data-api/tools/insert_nuclear_units.py
+          - "--env"
+          - /opt/git/open-data-api/.env
+          - "--src"
+          - /tmp/EinheitenKernkraft.xml
+          - "--verbose"
+      become_user: oklab
+
+    - name: Run script to insert solar units
+      ansible.builtin.command:
+        argv:
+          - /opt/git/open-data-api/tools/venv/bin/python3
+          - /opt/git/open-data-api/tools/insert_solar_units.py
+          - "--env"
+          - /opt/git/open-data-api/.env
+          - "--src"
+          - /tmp/EinheitenSolar_1.xml
+          - "--verbose"
+      become_user: oklab
+
+    - name: Run script to insert water units
+      ansible.builtin.command:
+        argv:
+          - /opt/git/open-data-api/tools/venv/bin/python3
+          - /opt/git/open-data-api/tools/insert_water_units.py
+          - "--env"
+          - /opt/git/open-data-api/.env
+          - "--src"
+          - /tmp/EinheitenWasser.xml
+          - "--verbose"
+      become_user: oklab
+
+    - name: Run script to insert wind units
+      ansible.builtin.command:
+        argv:
+          - /opt/git/open-data-api/tools/venv/bin/python3
+          - /opt/git/open-data-api/tools/insert_wind_units.py
+          - "--env"
+          - /opt/git/open-data-api/.env
+          - "--src"
+          - /tmp/EinheitenWind.xml
+          - "--verbose"
+      become_user: oklab
+
     - name: Check if VG25 zip file exists locally
       ansible.builtin.stat:
         path: /tmp/vg25.utm32s.gpkg.zip
