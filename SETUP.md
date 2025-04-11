@@ -241,24 +241,24 @@ ogr2ogr -f "PostgreSQL" PG:"dbname=oklab user=oklab port=5432 host=localhost" \
 
 ```sql
 -- index state, county and municipality ids
-CREATE INDEX IF NOT EXISTS idx_lan_sn_l ON vg250_lan (sn_l);
-CREATE INDEX IF NOT EXISTS idx_krs_sn_l ON vg250_krs (sn_l);
-CREATE INDEX IF NOT EXISTS idx_krs_sn_r ON vg250_krs (sn_r);
-CREATE INDEX IF NOT EXISTS idx_krs_sn_k ON vg250_krs (sn_k);
-CREATE INDEX IF NOT EXISTS idx_gem_sn_k ON vg250_gem (sn_k);
-CREATE INDEX IF NOT EXISTS idx_gem_sn_r ON vg250_gem (sn_r);
-CREATE INDEX IF NOT EXISTS idx_gem_sn_l ON vg250_gem (sn_l);
+CREATE INDEX IF NOT EXISTS idx_lan_sn_l ON vg25_lan (sn_l);
+CREATE INDEX IF NOT EXISTS idx_krs_sn_l ON vg25_krs (sn_l);
+CREATE INDEX IF NOT EXISTS idx_krs_sn_r ON vg25_krs (sn_r);
+CREATE INDEX IF NOT EXISTS idx_krs_sn_k ON vg25_krs (sn_k);
+CREATE INDEX IF NOT EXISTS idx_gem_sn_k ON vg25_gem (sn_k);
+CREATE INDEX IF NOT EXISTS idx_gem_sn_r ON vg25_gem (sn_r);
+CREATE INDEX IF NOT EXISTS idx_gem_sn_l ON vg25_gem (sn_l);
 
 -- index for the municipality number
-CREATE INDEX IF NOT EXISTS idx_vg250_gem_ags ON vg250_gem (ags);
+CREATE INDEX IF NOT EXISTS idx_vg25_gem_ags ON vg25_gem (ags);
 
 -- index state names
-CREATE INDEX IF NOT EXISTS idx_vg250_lan_gen ON vg250_lan (gen);
+CREATE INDEX IF NOT EXISTS idx_vg25_lan_gen ON vg25_lan (gen);
 
 -- index on geofactor
-CREATE INDEX IF NOT EXISTS idx_vg250_gem_gf ON vg250_gem (gf);
-CREATE INDEX IF NOT EXISTS idx_vg250_krs_gf ON vg250_krs (gf);
-CREATE INDEX IF NOT EXISTS idx_vg250_lan_gf ON vg250_lan (gf);
+CREATE INDEX IF NOT EXISTS idx_vg25_gem_gf ON vg25_gem (gf);
+CREATE INDEX IF NOT EXISTS idx_vg25_krs_gf ON vg25_krs (gf);
+CREATE INDEX IF NOT EXISTS idx_vg25_lan_gf ON vg25_lan (gf);
 
 -- index place and admin level
 CREATE INDEX IF NOT EXISTS idx_osm_point_place ON planet_osm_point (place);
@@ -300,15 +300,15 @@ JOIN
 ON
     ST_Contains(poly.way, point.way)
 JOIN
-    vg250_gem AS gem
+    vg25_gem AS gem
 ON
     ST_Contains(gem.geom, ST_Transform(point.way, 4326)) AND gem.gf = 4
 JOIN
-    vg250_krs AS krs
+    vg25_krs AS krs
 ON
     gem.sn_l = krs.sn_l AND gem.sn_r = krs.sn_r AND gem.sn_k = krs.sn_k AND krs.gf = 4
 JOIN
-    vg250_lan AS lan
+    vg25_lan AS lan
 ON
     krs.sn_l = lan.sn_l
 WHERE
