@@ -116,3 +116,13 @@
     - pegelstand.oklabflensburg.local
     - unfallkarte.oklabflensburg.local
   tags: nginx_setup
+
+- name: Allow HTTP and HTTPS traffic through the firewall
+  ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  with_items:
+    - 80
+    - 443
+  tags: nginx
