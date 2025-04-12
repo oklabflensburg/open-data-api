@@ -7,6 +7,31 @@
     group: oklab
   tags: application_setup
 
+- name: Clone open-school-map repository
+  ansible.builtin.git:
+    repo: https://github.com/oklabflensburg/open-school-map.git
+    dest: /opt/git/open-school-map
+  become_user: oklab
+  tags: application_setup
+
+- name: Create .env file for open-school-map
+  ansible.builtin.template:
+    src: dotenv.j2
+    dest: /opt/git/open-school-map/.env
+    owner: oklab
+    group: oklab
+    mode: "0644"
+  become_user: oklab
+  tags: application_setup
+
+- name: Create virtual environment for open-data-api
+  ansible.builtin.pip:
+    requirements: /opt/git/open-data-api/requirements.txt
+    virtualenv: /opt/git/open-data-api/venv
+    virtualenv_command: "{{ ansible_python_interpreter }} -m venv"
+  become_user: oklab
+  tags: application_setup
+
 - name: Clone open-data-api repository
   ansible.builtin.git:
     repo: https://github.com/oklabflensburg/open-data-api.git
@@ -138,5 +163,6 @@
     - /opt/git/open-data-api/data/eu_country_codes_schema.sql
     - /opt/git/open-data-api/data/global_mosmix_stations_schema.sql
     - /opt/git/open-data-api/data/sh_archaeological_monument_schema.sql
+    - /opt/git/open-school-map/data/sh_school_schema.sql
   become_user: oklab
   tags: application_setup
