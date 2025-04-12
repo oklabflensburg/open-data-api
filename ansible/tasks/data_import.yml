@@ -168,19 +168,3 @@
       - "--verbose"
   become_user: oklab
   tags: data_import
-
-- name: Copy open-data-api.service file
-  ansible.builtin.copy:
-    src: services/open-data-api.service
-    dest: /etc/systemd/system/open-data-api.service
-    owner: root
-    group: root
-    mode: "0644"
-  tags: data_import
-
-- name: Enable and start open-data-api service
-  ansible.builtin.systemd:
-    name: open-data-api.service
-    enabled: true
-    state: started
-  tags: data_import

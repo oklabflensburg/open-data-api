@@ -40,6 +40,22 @@
   become_user: oklab
   tags: application_setup
 
+- name: Copy open-data-api.service file
+  ansible.builtin.copy:
+    src: services/open-data-api.service
+    dest: /etc/systemd/system/open-data-api.service
+    owner: root
+    group: root
+    mode: "0644"
+  tags: application_setup
+
+- name: Enable and start open-data-api service
+  ansible.builtin.systemd:
+    name: open-data-api.service
+    enabled: true
+    state: started
+  tags: application_setup
+
 - name: Clone open-social-map repository
   ansible.builtin.git:
     repo: https://github.com/oklabflensburg/open-social-map.git
@@ -70,6 +86,7 @@
     repo: https://github.com/oklabflensburg/open-monuments-map.git
     dest: /opt/git/open-monuments-map
   become_user: oklab
+  tags: application_setup
 
 - name: Create virtual environment for open-monuments-map tools
   ansible.builtin.pip:
