@@ -1,0 +1,186 @@
+- name: Run Python script to insert districts for open-social-map
+  ansible.builtin.command:
+    argv:
+      - /opt/git/open-social-map/tools/venv/bin/python3
+      - /opt/git/open-social-map/tools/insert_districts.py
+      - /opt/git/open-social-map/static/flensburg_stadtteile.geojson
+  become_user: oklab
+  tags: data_import
+
+- name: Run script to insert municipality numbers for open-data-api
+  ansible.builtin.command:
+    argv:
+      - /opt/git/open-data-api/tools/venv/bin/python3
+      - /opt/git/open-data-api/tools/insert_municipality_number.py
+      - "--env"
+      - /opt/git/open-data-api/.env
+      - "--target"
+      - /opt/git/open-data-api/data
+      - "--url"
+      - https://www.xrepository.de/api/xrepository/urn:de:bund:destatis:bevoelkerungsstatistik:schluessel:ags_2024-10-31/download/AGS_2024-10-31.json
+      - "--verbose"
+  become_user: oklab
+  tags: data_import
+
+- name: Run script to insert energy metadata for open-data-api
+  ansible.builtin.command:
+    argv:
+      - /opt/git/open-data-api/tools/venv/bin/python3
+      - /opt/git/open-data-api/tools/insert_energy_meta.py
+      - "--env"
+      - /opt/git/open-data-api/.env
+      - "--target"
+      - /opt/git/open-data-api/data
+      - "--url"
+      - https://www.marktstammdatenregister.de/MaStR/Einheit/EinheitJson/GetFilterColumnsErweiterteOeffentlicheEinheitStromerzeugung
+      - "--verbose"
+  become_user: oklab
+  tags: data_import
+
+- name: Run script to insert global MOSMIX stations for open-data-api
+  ansible.builtin.command:
+    argv:
+      - /opt/git/open-data-api/tools/venv/bin/python3
+      - /opt/git/open-data-api/tools/insert_mosmix_stations.py
+      - "--env"
+      - /opt/git/open-data-api/.env
+      - "--src"
+      - /opt/git/open-data-api/data/mosmix_stationskatalog.cfg
+      - "--verbose"
+  become_user: oklab
+  tags: data_import
+
+- name: Run script to insert EU country codes for open-data-api
+  ansible.builtin.command:
+    argv:
+      - /opt/git/open-data-api/tools/venv/bin/python3
+      - /opt/git/open-data-api/tools/insert_country_codes.py
+      - "--env"
+      - /opt/git/open-data-api/.env
+      - "--src"
+      - /opt/git/open-data-api/data/eu_country_codes.csv
+      - "--verbose"
+  become_user: oklab
+  tags: data_import
+
+- name: Run script to insert DWD weather stations for open-data-api
+  ansible.builtin.command:
+    argv:
+      - /opt/git/open-data-api/tools/venv/bin/python3
+      - /opt/git/open-data-api/tools/insert_weather_reference.py
+      - "--env"
+      - /opt/git/open-data-api/.env
+      - "--url"
+      - https://www.dwd.de/DE/leistungen/klimadatendeutschland/statliste/statlex_html.html?view=nasPublication&nn=16102
+      - "--verbose"
+  become_user: oklab
+  tags: data_import
+
+- name: Run script to insert archaeological monuments for open-data-api
+  ansible.builtin.command:
+    argv:
+      - /opt/git/open-data-api/tools/venv/bin/python3
+      - /opt/git/open-data-api/tools/insert_archaeological_monuments.py
+      - "--env"
+      - /opt/git/open-data-api/.env
+      - "--target"
+      - /opt/git/open-data-api/data
+      - "--url"
+      - https://opendata.schleswig-holstein.de/dataset/7db5bc2f-7a99-456b-9faa-005de581cceb/resource/e0157633-62f6-43a0-8f89-3d4aef75801f/download/denkmalliste_sh.json
+      - "--verbose"
+  become_user: oklab
+  tags: data_import
+
+- name: Run script to insert biomass units
+  ansible.builtin.command:
+    argv:
+      - /opt/git/open-data-api/tools/venv/bin/python3
+      - /opt/git/open-data-api/tools/insert_biomass_units.py
+      - "--env"
+      - /opt/git/open-data-api/.env
+      - "--src"
+      - /tmp/EinheitenBiomasse.xml
+      - "--verbose"
+  become_user: oklab
+  tags: data_import
+
+- name: Run script to insert combustion units
+  ansible.builtin.command:
+    argv:
+      - /opt/git/open-data-api/tools/venv/bin/python3
+      - /opt/git/open-data-api/tools/insert_combustion_units.py
+      - "--env"
+      - /opt/git/open-data-api/.env
+      - "--src"
+      - /tmp/EinheitenVerbrennung.xml
+      - "--verbose"
+  become_user: oklab
+  tags: data_import
+
+- name: Run script to insert nuclear units
+  ansible.builtin.command:
+    argv:
+      - /opt/git/open-data-api/tools/venv/bin/python3
+      - /opt/git/open-data-api/tools/insert_nuclear_units.py
+      - "--env"
+      - /opt/git/open-data-api/.env
+      - "--src"
+      - /tmp/EinheitenKernkraft.xml
+      - "--verbose"
+  become_user: oklab
+  tags: data_import
+
+- name: Run script to insert solar units
+  ansible.builtin.command:
+    argv:
+      - /opt/git/open-data-api/tools/venv/bin/python3
+      - /opt/git/open-data-api/tools/insert_solar_units.py
+      - "--env"
+      - /opt/git/open-data-api/.env
+      - "--src"
+      - /tmp/EinheitenSolar_1.xml
+      - "--verbose"
+  become_user: oklab
+  tags: data_import
+
+- name: Run script to insert water units
+  ansible.builtin.command:
+    argv:
+      - /opt/git/open-data-api/tools/venv/bin/python3
+      - /opt/git/open-data-api/tools/insert_water_units.py
+      - "--env"
+      - /opt/git/open-data-api/.env
+      - "--src"
+      - /tmp/EinheitenWasser.xml
+      - "--verbose"
+  become_user: oklab
+  tags: data_import
+
+- name: Run script to insert wind units
+  ansible.builtin.command:
+    argv:
+      - /opt/git/open-data-api/tools/venv/bin/python3
+      - /opt/git/open-data-api/tools/insert_wind_units.py
+      - "--env"
+      - /opt/git/open-data-api/.env
+      - "--src"
+      - /tmp/EinheitenWind.xml
+      - "--verbose"
+  become_user: oklab
+  tags: data_import
+
+- name: Copy open-data-api.service file
+  ansible.builtin.copy:
+    src: services/open-data-api.service
+    dest: /etc/systemd/system/open-data-api.service
+    owner: root
+    group: root
+    mode: "0644"
+  tags: data_import
+
+- name: Enable and start open-data-api service
+  ansible.builtin.systemd:
+    name: open-data-api.service
+    enabled: true
+    state: started
+  tags: data_import

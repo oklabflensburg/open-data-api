@@ -1,0 +1,28 @@
+- name: Create indexes on VG25 tables in PostgreSQL
+  community.postgresql.postgresql_query:
+    db: "{{ db_name }}"
+    port: "{{ db_port }}"
+    login_host: "{{ db_host }}"
+    login_user: "{{ db_user }}"
+    login_password: "{{ db_password }}"
+    query: |
+      -- index state, county and municipality ids
+      CREATE INDEX IF NOT EXISTS idx_lan_sn_l ON vg25_lan (sn_l);
+      CREATE INDEX IF NOT EXISTS idx_krs_sn_l ON vg25_krs (sn_l);
+      CREATE INDEX IF NOT EXISTS idx_krs_sn_r ON vg25_krs (sn_r);
+      CREATE INDEX IF NOT EXISTS idx_krs_sn_k ON vg25_krs (sn_k);
+      CREATE INDEX IF NOT EXISTS idx_gem_sn_k ON vg25_gem (sn_k);
+      CREATE INDEX IF NOT EXISTS idx_gem_sn_r ON vg25_gem (sn_r);
+      CREATE INDEX IF NOT EXISTS idx_gem_sn_l ON vg25_gem (sn_l);
+
+      -- index for the municipality number
+      CREATE INDEX IF NOT EXISTS idx_vg25_gem_ags ON vg25_gem (ags);
+
+      -- index state names
+      CREATE INDEX IF NOT EXISTS idx_vg25_lan_gen ON vg25_lan (gen);
+
+      -- index on geofactor
+      CREATE INDEX IF NOT EXISTS idx_vg25_gem_gf ON vg25_gem (gf);
+      CREATE INDEX IF NOT EXISTS idx_vg25_krs_gf ON vg25_krs (gf);
+      CREATE INDEX IF NOT EXISTS idx_vg25_lan_gf ON vg25_lan (gf);
+  become_user: oklab

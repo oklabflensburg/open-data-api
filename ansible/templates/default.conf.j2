@@ -1,0 +1,840 @@
+map $http_upgrade $connection_upgrade {
+    default upgrade;
+    '' close;
+}
+
+
+server {
+    listen 127.0.0.1:80;
+    server_name localhost;
+
+    location = /basic_status {
+        stub_status;
+        allow 127.0.0.1;
+        allow ::1;
+        deny all;
+    }
+}
+
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name flurstuecksauskunft.oklabflensburg.local;
+
+    charset utf-8;
+
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; img-src 'self' data: blob: https://tiles.oklabflensburg.local; style-src 'self' 'unsafe-inline'; font-src 'self'; worker-src 'none'; object-src 'none'; connect-src 'self' https://api.oklabflensburg.local";
+
+    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+
+    add_header X-Frame-Options "SAMEORIGIN";
+
+
+    add_header X-Content-Type-Options "nosniff";
+
+    root /opt/git/open-parcel-map/dist;
+    index index.html;
+
+    location ~ /\. {
+        deny all;
+    }
+
+    location ~* \.(ico|jpg|jpeg|png|webp|svg|js|css|woff|woff2)$ {
+        expires 1y;
+        add_header Cache-Control "public, no-transform";
+    }
+
+    ssl_certificate /etc/nginx/ssl/flurstuecksauskunft.oklabflensburg.local.crt;
+    ssl_certificate_key /etc/nginx/ssl/flurstuecksauskunft.oklabflensburg.local.key;
+}
+
+
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name glueckskarten.oklabflensburg.local;
+
+    auth_basic "Restricted Content";
+    auth_basic_user_file /etc/nginx/.htpasswd;
+
+    charset utf-8;
+
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tiles.oklabflensburg.local; style-src 'self' 'unsafe-inline'; font-src 'self'; worker-src 'none'; object-src 'none'; connect-src 'self' https://api.oklabflensburg.local";
+
+    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+
+    add_header X-Frame-Options "SAMEORIGIN";
+
+
+    add_header X-Content-Type-Options "nosniff";
+
+    root /opt/git/glueckskarten/dist;
+    index index.html;
+
+    location ~ /\. {
+        deny all;
+    }
+
+    location ~* \.(ico|jpg|jpeg|png|webp|svg|js|css|woff|woff2)$ {
+        expires 1y;
+        add_header Cache-Control "public, no-transform";
+    }
+
+    ssl_certificate /etc/nginx/ssl/glueckskarten.oklabflensburg.local.crt;
+    ssl_certificate_key /etc/nginx/ssl/glueckskarten.oklabflensburg.local.key;
+}
+
+
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name biotopkarte.oklabflensburg.local;
+
+    charset utf-8;
+
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; img-src 'self' data: blob: https://tiles.oklabflensburg.local; style-src 'self' 'unsafe-inline'; font-src 'self'; worker-src 'none'; object-src 'none'; connect-src https://api.oklabflensburg.local";
+
+    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+    
+    add_header X-Frame-Options "SAMEORIGIN";
+
+
+    add_header X-Content-Type-Options "nosniff";
+
+    root /opt/git/open-biotope-map/dist;
+    index index.html;
+
+    location ~ /\. {
+        deny all;
+    }
+
+    location ~* \.(ico|jpg|jpeg|png|webp|svg|js|css|woff|woff2)$ {
+        expires 1y;
+        add_header Cache-Control "public, no-transform";
+    }
+
+    ssl_certificate /etc/nginx/ssl/biotopkarte.oklabflensburg.local.crt;
+    ssl_certificate_key /etc/nginx/ssl/biotopkarte.oklabflensburg.local.key;
+}
+
+
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name spielplatzkarte.oklabflensburg.local;
+
+    charset utf-8;
+
+    add_header Content-Security-Policy "default-src 'self' https://nominatim.openstreetmap.org; script-src 'self' https://unpkg.com; img-src 'self' data: https://unpkg.com https://tiles.oklabflensburg.local; style-src 'self' 'unsafe-inline' https://unpkg.com; font-src 'self'; worker-src 'none'; object-src 'none'";
+
+    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+
+    add_header X-Frame-Options "SAMEORIGIN";
+
+
+    add_header X-Content-Type-Options "nosniff";
+
+    root /opt/git/open-playgrounds-map;
+    index index.html;
+
+    location ~ /\. {
+        deny all;
+    }
+
+    ssl_certificate /etc/nginx/ssl/spielplatzkarte.oklabflensburg.local.crt;
+    ssl_certificate_key /etc/nginx/ssl/spielplatzkarte.oklabflensburg.local.key;
+}
+
+
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name recycling.oklabflensburg.local;
+
+    charset utf-8;
+
+    add_header Content-Security-Policy "default-src 'self' https://nominatim.openstreetmap.org; script-src 'self' https://cdn.tailwindcss.com https://unpkg.com; img-src 'self' data: https://unpkg.com https://tiles.oklabflensburg.local; style-src 'self' 'unsafe-inline' https://unpkg.com; font-src 'self'; worker-src 'none'; object-src 'none'";
+
+    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+
+    add_header X-Frame-Options "SAMEORIGIN";
+
+
+    add_header X-Content-Type-Options "nosniff";
+
+    root /opt/git/open-recycling-map;
+    index index.html;
+
+    location ~ /\. {
+        deny all;
+    }
+
+    ssl_certificate /etc/nginx/ssl/recycling.oklabflensburg.local.crt;
+    ssl_certificate_key /etc/nginx/ssl/recycling.oklabflensburg.local.key;
+}
+
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name topografie.oklabflensburg.local;
+
+    charset utf-8;
+
+    add_header Content-Security-Policy "default-src 'self' https://tiles.oklabflensburg.local https://nominatim.openstreetmap.org; script-src-elem 'self' https://unpkg.com https://cdn.jsdelivr.net; script-src 'self'  https://cdn.jsdelivr.net https://unpkg.com; img-src 'self' data: https://unpkg.com https://tiles.oklabflensburg.local https://tile.openstreetmap.org; style-src 'self' 'unsafe-inline' https://unpkg.com; font-src 'self'; worker-src 'self' blob:; object-src 'none'";
+
+    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+
+    add_header X-Frame-Options "SAMEORIGIN";
+
+
+    add_header X-Content-Type-Options "nosniff";
+
+    root /opt/git/open-topo-map/dist;
+    index index.html;
+
+    location ~ /\. {
+        deny all;
+    }
+
+    ssl_certificate /etc/nginx/ssl/topografie.oklabflensburg.local.crt;
+    ssl_certificate_key /etc/nginx/ssl/topografie.oklabflensburg.local.key;
+}
+
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name nahverkehr.oklabflensburg.local;
+
+    charset utf-8;
+
+    add_header Content-Security-Policy "default-src 'self' https://nominatim.openstreetmap.org; script-src 'self' https://cdn.tailwindcss.com https://unpkg.com; img-src 'self' data: https://unpkg.com https://tiles.oklabflensburg.local https://tile.openstreetmap.org; style-src 'self' 'unsafe-inline' https://unpkg.com; font-src 'self'; worker-src 'none'; object-src 'none'";
+
+    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+
+    add_header X-Frame-Options "SAMEORIGIN";
+
+
+    add_header X-Content-Type-Options "nosniff";
+
+    root /opt/git/open-transport-map;
+    index index.html;
+
+    location ~ /\. {
+        deny all;
+    }
+
+    ssl_certificate /etc/nginx/ssl/nahverkehr.oklabflensburg.local.crt;
+    ssl_certificate_key /etc/nginx/ssl/nahverkehr.oklabflensburg.local.key;
+}
+
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name kitas-in-flensburg.local;
+
+    charset utf-8;
+
+
+    add_header Content-Security-Policy "default-src 'self' https://nominatim.openstreetmap.org; script-src 'self'; img-src 'self' data: https://tiles.oklabflensburg.local https://sgx.geodatenzentrum.de; style-src 'self' 'unsafe-inline'; font-src 'self'; worker-src 'none'; object-src 'none'";
+
+    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+
+    add_header X-Frame-Options "SAMEORIGIN";
+
+
+    add_header X-Content-Type-Options "nosniff";
+
+    root /opt/git/open-kita-map/dist;
+    index index.html;
+
+    location ~ /\. {
+        deny all;
+    }
+
+    location ~* \.(ico|jpg|jpeg|png|webp|svg|js|css|woff|woff2)$ {
+        expires 1y;
+        add_header Cache-Control "public, no-transform";
+    }
+
+    location ~ /(.*)$ {
+        default_type 'text/html';
+        try_files $uri $uri/ /index.html;
+    }
+
+    location /index.html {
+        rewrite /index.html / permanent;
+    }
+
+    ssl_certificate /etc/nginx/ssl/kitas-in-flensburg.local.crt;
+    ssl_certificate_key /etc/nginx/ssl/kitas-in-flensburg.local.key;
+}
+
+
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name knf.grain.local;
+
+    charset utf-8;
+
+    #add_header Content-Security-Policy "default-src 'self' https://nominatim.openstreetmap.org; script-src 'self'; img-src 'self' data: https://tile.openstreetmap.de https://sgx.geodatenzentrum.de; style-src 'self' 'unsafe-inline'; font-src 'self'; worker-src 'none'; object-src 'none'";
+
+    root /opt/git/open-cultural-map/dist;
+    index index.html;
+
+    location ~ /\. {
+        deny all;
+    }
+
+    location ~* \.(ico|jpg|jpeg|png|webp|svg|js|css|woff|woff2)$ {
+        expires 1y;
+        add_header Cache-Control "public, no-transform";
+    }
+
+    location ~ /(.*)$ {
+        default_type 'text/html';
+        try_files $uri $uri/ /index.html;
+    }
+
+    location /index.html {
+        rewrite /index.html / permanent;
+    }
+
+    ssl_certificate /etc/nginx/ssl/knf.grain.local.crt;
+    ssl_certificate_key /etc/nginx/ssl/knf.grain.local.key;
+
+}
+
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name schulkarte.oklabflensburg.local;
+
+    charset utf-8;
+
+    add_header Content-Security-Policy "default-src 'self' https://nominatim.openstreetmap.org; script-src 'self'; img-src 'self' data: https://tiles.oklabflensburg.local; style-src 'self' 'unsafe-inline'; font-src 'self'; worker-src 'none'; object-src 'none'; connect-src https://api.oklabflensburg.local";
+
+    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+
+    add_header X-Frame-Options "SAMEORIGIN";
+
+
+    add_header X-Content-Type-Options "nosniff";
+
+    root /opt/git/open-school-map/dist;
+    index index.html;
+
+    location ~ /\. {
+        deny all;
+    }
+
+    location ~* \.(ico|jpg|jpeg|png|webp|svg|js|css|woff|woff2)$ {
+        expires 1y;
+        add_header Cache-Control "public, no-transform";
+    }
+
+    location ~ /(.*)$ {
+        default_type 'text/html';
+        try_files $uri $uri/ /index.html;
+    }
+
+    location ~ ^((?!.*\..*).)*$ {
+        default_type 'text/html';
+        try_files $uri $uri/ /index.html;
+    }
+
+    ssl_certificate /etc/nginx/ssl/schulkarte.oklabflensburg.local.crt;
+    ssl_certificate_key /etc/nginx/ssl/schulkarte.oklabflensburg.local.key;
+}
+
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name sozialatlas.oklabflensburg.local;
+
+    charset utf-8;
+
+    add_header Content-Security-Policy "default-src 'self' https://api.oklabflensburg.local https://nominatim.openstreetmap.org; script-src 'self' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://unpkg.com; img-src 'self' data: https://unpkg.com https://tile.openstreetmap.org; style-src 'self' 'unsafe-inline' https://unpkg.com; font-src 'self'; worker-src 'none'; object-src 'none'";
+
+    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+
+    add_header X-Frame-Options "SAMEORIGIN";
+
+
+    add_header X-Content-Type-Options "nosniff";
+
+    root /opt/git/open-social-map/temporary/;
+    index index.html;
+
+    location ~ /\. {
+        deny all;
+    }
+
+    ssl_certificate /etc/nginx/ssl/sozialatlas.oklabflensburg.local.crt;
+    ssl_certificate_key /etc/nginx/ssl/sozialatlas.oklabflensburg.local.key;
+}
+
+
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name dev.sozialatlas.oklabflensburg.local;
+
+    charset utf-8;
+
+    add_header Content-Security-Policy "default-src 'self' https://api.oklabflensburg.local https://nominatim.openstreetmap.org; script-src 'self' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://unpkg.com; img-src 'self' data: https://unpkg.com https://tile.openstreetmap.org; style-src 'self' 'unsafe-inline' https://unpkg.com; font-src 'self'; worker-src 'none'; object-src 'none'";
+
+    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+
+    add_header X-Frame-Options "SAMEORIGIN";
+
+
+    add_header X-Content-Type-Options "nosniff";
+
+    root /opt/git/dev/open-social-map/dist;
+    index index.html;
+
+    location ~ /\. {
+        deny all;
+    }
+
+    location ~ \.json {
+	# add_header Content-md5 $file _md5;
+	add_header Cache-Control "public, max-age=315360000";
+    }
+
+    ssl_certificate /etc/nginx/ssl/dev.sozialatlas.oklabflensburg.local.crt;
+    ssl_certificate_key /etc/nginx/ssl/dev.sozialatlas.oklabflensburg.local.key;
+}
+
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name bodennutzung.oklabflensburg.local;
+
+    charset utf-8;
+
+    add_header Content-Security-Policy "default-src 'self' https://nominatim.openstreetmap.org; script-src 'self' https://cdn.tailwindcss.com https://unpkg.com; img-src 'self' data: https://unpkg.com https://tile.openstreetmap.org; style-src 'self' 'unsafe-inline' https://unpkg.com; font-src 'self'; worker-src 'none'; object-src 'none'";
+
+    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+
+    add_header X-Frame-Options "SAMEORIGIN";
+
+
+    add_header X-Content-Type-Options "nosniff";
+
+    root /opt/git/open-surface-map;
+    index index.html;
+
+    location ~ /\. {
+        deny all;
+    }
+
+    ssl_certificate /etc/nginx/ssl/bodennutzung.oklabflensburg.local.crt;
+    ssl_certificate_key /etc/nginx/ssl/bodennutzung.oklabflensburg.local.key;
+}
+
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name uranus.oklabflensburg.local;
+
+    charset utf-8;
+
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self' javascript:; img-src 'self' data: https://api.uranus.oklabflensburg.local https://tiles.oklabflensburg.local; style-src 'self' 'unsafe-inline'; font-src 'self'; worker-src 'none'; object-src 'none'; connect-src https://api.uranus.oklabflensburg.local";
+
+    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+
+    add_header X-Frame-Options "SAMEORIGIN";
+
+
+    add_header X-Content-Type-Options "nosniff";
+
+    root /opt/git/open-uranus-api/dist;
+    index index.html;
+
+    location ~ /\. {
+        deny all;
+    }
+
+    location ~* \.(ico|jpg|jpeg|png|webp|svg|js|css|woff|woff2)$ {
+        expires 1y;
+        add_header Cache-Control "public, no-transform";
+    }
+
+    ssl_certificate /etc/nginx/ssl/uranus.oklabflensburg.local.crt;
+    ssl_certificate_key /etc/nginx/ssl/uranus.oklabflensburg.local.key;
+}
+
+
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name opendataday.oklabflensburg.local;
+
+    charset utf-8;
+
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self' javascript:; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self'; worker-src 'none'; object-src 'none'";
+
+    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+
+    add_header X-Frame-Options "SAMEORIGIN";
+
+
+    add_header X-Content-Type-Options "nosniff";
+
+    root /opt/git/oddfl/dist;
+    index index.html;
+
+    location ~ /\. {
+        deny all;
+    }
+
+    location ~* \.(ico|jpg|jpeg|png|webp|svg|js|css|woff|woff2)$ {
+        expires 1y;
+        add_header Cache-Control "public, no-transform";
+    }
+
+    ssl_certificate /etc/nginx/ssl/opendataday.oklabflensburg.local.crt;
+    ssl_certificate_key /etc/nginx/ssl/opendataday.oklabflensburg.local.key;
+}
+
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name denkmalkarte.oklabflensburg.local;
+
+    charset utf-8;
+
+    add_header Access-Control-Allow-Origin *;
+    add_header Content-Security-Policy "default-src 'self' https://nominatim.openstreetmap.org https://opendata.schleswig-holstein.de; script-src 'self' javascript:; img-src 'self' data: blob: https://opendata.schleswig-holstein.de https://tiles.oklabflensburg.local https://efi2.schleswig-holstein.de; style-src 'self' 'unsafe-inline'; font-src 'self'; worker-src 'none'; object-src 'none'; connect-src https://api.oklabflensburg.local https://efi2.schleswig-holstein.de https://opendata.schleswig-holstein.de";
+
+    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+
+    add_header X-Frame-Options "SAMEORIGIN";
+
+
+    add_header X-Content-Type-Options "nosniff";
+
+    root /opt/git/open-monuments-map/dist;
+
+    location ~ /\. {
+        deny all;
+    }
+
+    location ~* \.(ico|jpg|jpeg|png|webp|svg|js|css|woff|woff2)$ {
+        expires 1y;
+        add_header Cache-Control "public, no-transform";
+    }
+
+    location ~ ^((?!.*\..*).)*$ {
+        default_type 'text/html';
+        try_files $uri $uri/ /index.html;
+    }
+
+    location /proxy/ {
+        proxy_pass https://efi2.schleswig-holstein.de/dish/dish_opendata/Foto/$1;
+    }
+
+    ssl_certificate /etc/nginx/ssl/denkmalkarte.oklabflensburg.local.crt;
+    ssl_certificate_key /etc/nginx/ssl/denkmalkarte.oklabflensburg.local.key;
+}
+
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name baumkarte.oklabflensburg.local;
+
+    charset utf-8;
+
+    add_header Content-Security-Policy "default-src 'self' https://nominatim.oklabflensburg.local; script-src 'self' javascript:; img-src 'self' data: https://tiles.oklabflensburg.local; style-src 'self' 'unsafe-inline'; font-src 'self'; worker-src 'none'; object-src 'none'";
+
+    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+
+    add_header X-Frame-Options "SAMEORIGIN";
+
+
+    add_header X-Content-Type-Options "nosniff";
+
+    root /opt/git/open-trees-map/dist;
+    index index.html;
+
+    location ~ /\. {
+	deny all;
+    }
+
+    location ~* \.(ico|jpg|jpeg|png|webp|svg|js|css|woff|woff2)$ {
+        expires 1y;
+        add_header Cache-Control "public, no-transform";
+    }
+    ssl_certificate /etc/nginx/ssl/baumkarte.oklabflensburg.local.crt;
+    ssl_certificate_key /etc/nginx/ssl/baumkarte.oklabflensburg.local.key;
+}
+
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name admin.uranus.oklabflensburg.local;
+
+    charset utf-8;
+
+    # Deny access to hidden files
+    location ~ /\. {
+        deny all;
+    }
+
+    # CORS configuration
+    set $cors_origin "*"; # Replace '*' with specific domain if necessary
+
+    location / {
+        add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+
+        add_header X-Frame-Options "SAMEORIGIN";
+
+        add_header X-Content-Type-Options "nosniff";
+
+        add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://api.uranus.oklabflensburg.local https://i.pravatar.cc; style-src 'self' 'unsafe-inline'; font-src 'self'; worker-src blob: https://admin.uranus.oklabflensburg.local; object-src 'none'; connect-src 'self' https://tiles.oklabflensburg.local https://nominatim.oklabflensburg.local https://api.uranus.oklabflensburg.local" always;
+
+        proxy_pass http://localhost:6090;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;  # Passes the correct scheme (http or https)
+        proxy_set_header X-Forwarded-For $remote_addr; # Passes client IP
+
+        # Enable caching for better performance
+        proxy_buffering on;
+        proxy_cache_valid 200 5m;
+        proxy_cache_use_stale error timeout invalid_header updating http_500 http_502 http_503 http_504;
+        proxy_cache_bypass $http_cache_control;
+        add_header X-Proxy-Cache $upstream_cache_status always;
+    }
+
+    ssl_certificate /etc/nginx/ssl/admin.uranus.oklabflensburg.local.crt;
+    ssl_certificate_key /etc/nginx/ssl/admin.uranus.oklabflensburg.local.key;
+}
+
+
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name api.uranus.oklabflensburg.local;
+
+    charset utf-8;
+
+    # Deny access to hidden files
+    location ~ /\. {
+        deny all;
+    }
+
+    # CORS configuration
+    set $cors_origin "*"; # Replace '*' with specific domain if necessary
+
+    location / {
+        # Handle CORS Preflight Requests (OPTIONS)
+        if ($request_method = 'OPTIONS') {
+            add_header 'Access-Control-Allow-Origin' $cors_origin always;
+            add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, PUT, DELETE' always;
+            add_header 'Access-Control-Allow-Headers' 'Authorization,DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type' always;
+            add_header 'Access-Control-Allow-Credentials' 'true' always;
+            add_header 'Access-Control-Max-Age' 1728000 always;
+
+            return 204;
+        }
+
+        # CORS for all other requests
+        add_header 'Access-Control-Allow-Origin' $cors_origin always;
+        add_header 'Access-Control-Allow-Credentials' 'true' always;
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, PUT, DELETE' always;
+        add_header 'Access-Control-Allow-Headers' 'Authorization,DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type' always;
+
+        add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+
+        add_header X-Frame-Options "SAMEORIGIN";
+
+        add_header X-Content-Type-Options "nosniff";
+
+        add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self'; worker-src 'none'; object-src 'none'; connect-src 'self'" always;
+
+	proxy_pass http://localhost:6730;
+	proxy_http_version 1.1;
+	proxy_set_header Upgrade $http_upgrade;
+	proxy_set_header Connection 'upgrade';
+	proxy_set_header Host $host;
+	proxy_set_header X-Forwarded-Proto $scheme;  # Passes the correct scheme (http or https)
+	proxy_set_header X-Forwarded-For $remote_addr; # Passes client IP
+	
+	# Enable caching for better performance
+	proxy_buffering on;
+	proxy_cache_valid 200 5m;
+	proxy_cache_use_stale error timeout invalid_header updating http_500 http_502 http_503 http_504;
+	proxy_cache_bypass $http_cache_control;
+	add_header X-Proxy-Cache $upstream_cache_status always;
+    }
+
+    # Handle 404 errors with CORS headers
+    error_page 404 = @cors_404;
+
+    location @cors_404 {
+        add_header 'Access-Control-Allow-Origin' $cors_origin always;
+        add_header 'Access-Control-Allow-Credentials' 'true' always;
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS' always;
+        add_header 'Access-Control-Allow-Headers' 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type' always;
+
+        return 404;
+    }
+
+    ssl_certificate /etc/nginx/ssl/api.uranus.oklabflensburg.local.crt;
+    ssl_certificate_key /etc/nginx/ssl/api.uranus.oklabflensburg.local.key;
+}
+
+
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name api.oklabflensburg.local;
+
+    charset utf-8;
+
+    # Deny access to hidden files
+    location ~ /\. {
+        deny all;
+    }
+
+    # CORS configuration
+    set $cors_origin "*"; # Replace '*' with specific domain if necessary
+
+    location / {
+        # Handle CORS Preflight Requests (OPTIONS)
+        if ($request_method = 'OPTIONS') {
+            add_header 'Access-Control-Allow-Origin' $cors_origin always;
+            add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS' always;
+            add_header 'Access-Control-Allow-Headers' 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type' always;
+            add_header 'Access-Control-Allow-Credentials' 'true' always;
+            add_header 'Access-Control-Max-Age' 1728000 always;
+
+            return 204;
+        }
+
+        # CORS for all other requests
+        add_header 'Access-Control-Allow-Origin' $cors_origin always;
+        add_header 'Access-Control-Allow-Credentials' 'true' always;
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS' always;
+        add_header 'Access-Control-Allow-Headers' 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type' always;
+
+        add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+
+        add_header X-Frame-Options "SAMEORIGIN";
+
+        add_header X-Content-Type-Options "nosniff";
+
+	    add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self'; worker-src 'none'; object-src 'none'; connect-src 'self'" always;
+
+        # Proxy to backend server
+        proxy_pass http://localhost:6720;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+
+        # Enable caching for better performance
+        proxy_buffering on;
+        proxy_cache_valid 200 5m;
+        proxy_cache_use_stale error timeout invalid_header updating http_500 http_502 http_503 http_504;
+        proxy_cache_bypass $http_cache_control;
+        add_header X-Proxy-Cache $upstream_cache_status always;
+    }
+
+    # Handle 404 errors with CORS headers
+    error_page 404 = @cors_404;
+
+    location @cors_404 {
+        add_header 'Access-Control-Allow-Origin' $cors_origin always;
+        add_header 'Access-Control-Allow-Credentials' 'true' always;
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS' always;
+        add_header 'Access-Control-Allow-Headers' 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type' always;
+
+        return 404;
+    }
+
+    ssl_certificate /etc/nginx/ssl/api.oklabflensburg.local.crt;
+    ssl_certificate_key /etc/nginx/ssl/api.oklabflensburg.local.key;
+}
+
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name pegelstand.oklabflensburg.local;
+
+    charset utf-8;
+
+    add_header Content-Security-Policy "default-src 'self' https://nominatim.openstreetmap.org; script-src 'self' https://unpkg.com https://cdn.tailwindcss.com; img-src 'self' data: https://unpkg.com https://tile.openstreetmap.org https://sgx.geodatenzentrum.de; style-src 'self' 'unsafe-inline' https://unpkg.com; font-src 'self'; worker-src 'none'; object-src 'none'; connect-src 'self' https://api.oklabflensburg.local https://www.pegelonline.wsv.de";
+
+    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+
+    add_header X-Frame-Options "SAMEORIGIN";
+
+
+    add_header X-Content-Type-Options "nosniff";
+
+    root /opt/git/open-gauge-map;
+    index index.html;
+
+    location ~ /\. {
+        deny all;
+    }
+
+    ssl_certificate /etc/nginx/ssl/pegelstand.oklabflensburg.local.crt;
+    ssl_certificate_key /etc/nginx/ssl/pegelstand.oklabflensburg.local.key;
+}
+
+
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name unfallkarte.oklabflensburg.local;
+
+    charset utf-8;
+
+    add_header Content-Security-Policy "default-src 'self' https://nominatim.openstreetmap.org; script-src 'self' https://unpkg.com https://cdn.tailwindcss.com; img-src 'self' data: https://unpkg.com https://tile.openstreetmap.org https://sgx.geodatenzentrum.de; style-src 'self' 'unsafe-inline' https://unpkg.com; font-src 'self'; worker-src 'none'; object-src 'none'; connect-src 'self' https://api.oklabflensburg.local";
+
+    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+
+    add_header X-Frame-Options "SAMEORIGIN";
+
+
+    add_header X-Content-Type-Options "nosniff";
+
+    root /opt/git/open-accident-map;
+    index index.html;
+
+    location ~ /\. {
+        deny all;
+    }
+
+    ssl_certificate /etc/nginx/ssl/unfallkarte.oklabflensburg.local.crt;
+    ssl_certificate_key /etc/nginx/ssl/unfallkarte.oklabflensburg.local.key;
+}

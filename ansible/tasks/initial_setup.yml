@@ -1,0 +1,98 @@
+- name: Update system packages using apt
+  ansible.builtin.apt:
+    state: present
+    update_cache: yes
+
+- name: Create user 'oklab' with home directory and SSH key
+  ansible.builtin.user:
+    name: oklab
+    shell: /bin/bash
+    create_home: yes
+    generate_ssh_key: yes
+    ssh_key_bits: 2048
+    ssh_key_file: .ssh/id_rsa
+    groups: www-data
+    append: yes
+
+- name: Ensure remote_tmp directory exists with proper permissions for oklab
+  ansible.builtin.file:
+    path: /home/oklab/.ansible/tmp
+    state: directory
+    mode: "0775"
+    owner: oklab
+    group: oklab
+  become: true
+  become_user: oklab
+
+- name: Configure system setup defaults
+  block:
+    - name: Install required system packages
+      ansible.builtin.apt:
+        name: "{{ item }}"
+        state: "present"
+      with_items:
+        - acl
+        - git
+        - git-lfs
+        - gnupg2
+        - python3
+        - python3-venv
+        - python3-pip
+        - gdal-bin
+        - osm2pgsql
+        - unzip
+        - net-tools
+
+    - name: Add PostgreSQL signing key to keyring
+      ansible.builtin.get_url:
+        url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+        dest: /etc/apt/keyrings/postgresql.asc
+        mode: "0644"
+        force: true
+
+    - name: Add PostgreSQL APT repository
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64, signed-by=/etc/apt/keyrings/postgresql.asc] http://apt.postgresql.org/pub/repos/apt/ {{ ansible_distribution_release }}-pgdg main"
+        state: present
+
+    - name: Install PostgreSQL 16 and PostGIS
+      ansible.builtin.apt: "name={{ item }} state=present update_cache=yes"
+      with_items:
+        - postgresql-16
+        - postgresql-16-postgis-3
+        - postgresql-client-16
+
+    - name: "Create PostgreSQL user {{ db_user }}"
+      postgresql_user:
+        state: present
+        name: "{{ db_user }}"
+        password: "{{ db_password }}"
+      become: true
+      become_user: postgres
+
+    - name: Create PostgreSQL database "{{ db_name }}"
+      community.postgresql.postgresql_db:
+        encoding: UTF-8
+        name: "{{ db_name }}"
+        owner: "{{ db_user }}"
+        state: present
+      become_user: postgres
+
+    - name: Grant database user access to the "{{ db_name }}" database
+      postgresql_privs:
+        type: database
+        database: postgres
+        roles: PUBLIC
+        privs: all
+      become_user: postgres
+
+    - name: Add PostGIS extension to the "{{ db_name }}" database
+      community.postgresql.postgresql_ext:
+        name: "{{ item }}"
+        db: "{{ db_name }}"
+        login_user: postgres
+        schema: public
+        cascade: yes
+      become_user: postgres
+      loop:
+        - postgis

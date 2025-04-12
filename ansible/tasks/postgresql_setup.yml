@@ -1,0 +1,28 @@
+    - name: Check if PostgreSQL is initialized by checking for pg_hba.conf
+      ansible.builtin.stat:
+        path: /etc/postgresql/16/main/pg_hba.conf
+      register: postgres_data
+
+    - name: Reload postgresql service if not initialized
+      ansible.builtin.systemd:
+        name: postgresql.service
+        state: reloaded
+      when: not postgres_data.stat.exists
+
+    - name: Set database user connection authentication method in pg_hba.conf
+      postgresql_pg_hba:
+        dest: "/etc/postgresql/16/main/pg_hba.conf"
+        contype: "{{ item.contype }}"
+        databases: "{{ item.database }}"
+        method: trust
+        users: "{{ item.user }}"
+        create: yes
+        state: present
+      loop:
+        - { user: "oklab", contype: "host", database: "oklab" }
+        - { user: "oklab", contype: "local", database: "oklab" }
+        - { user: "postgres", contype: "host", database: "all" }
+        - { user: "postgres", contype: "local", database: "all" }
+      become: true
+      become_user: postgres
+      notify: restart postgres

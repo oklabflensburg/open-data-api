@@ -1,0 +1,54 @@
+- name: Check if VG25 zip file exists locally
+  ansible.builtin.stat:
+    path: /tmp/vg25.utm32s.gpkg.zip
+  register: vg25_zip_exists
+
+- name: Download administrative area dataset VG25
+  ansible.builtin.get_url:
+    url: https://daten.gdz.bkg.bund.de/produkte/vg/vg25_ebenen/aktuell/vg25.utm32s.gpkg.zip
+    dest: /tmp/vg25.utm32s.gpkg.zip
+  become_user: oklab
+  register: vg25_download
+  when: not vg25_zip_exists.stat.exists
+
+- name: Unzip administrative area dataset VG25
+  ansible.builtin.unarchive:
+    src: /tmp/vg25.utm32s.gpkg.zip
+    dest: /tmp
+    remote_src: yes
+  become_user: oklab
+
+- name: Insert vg25_gem data into database using ogr2ogr
+  ansible.builtin.command:
+    cmd: ogr2ogr -f "PostgreSQL" PG:"dbname={{ db_name }} user={{ db_user }} port={{ db_port }} host={{ db_host }}" -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=NO -t_srs EPSG:4326 -nlt MULTIPOLYGON -overwrite -update /tmp/daten/DE_VG25.gpkg vg25_gem
+  become_user: oklab
+
+- name: Insert vg25_krs data into database using ogr2ogr
+  ansible.builtin.command:
+    cmd: ogr2ogr -f "PostgreSQL" PG:"dbname={{ db_name }} user={{ db_user }} port={{ db_port }} host={{ db_host }}" -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=NO -t_srs EPSG:4326 -nlt MULTIPOLYGON -overwrite -update /tmp/daten/DE_VG25.gpkg vg25_krs
+  become_user: oklab
+
+- name: Insert vg25_lan data into database using ogr2ogr
+  ansible.builtin.command:
+    cmd: ogr2ogr -f "PostgreSQL" PG:"dbname={{ db_name }} user={{ db_user }} port={{ db_port }} host={{ db_host }}" -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=NO -t_srs EPSG:4326 -nlt MULTIPOLYGON -overwrite -update /tmp/daten/DE_VG25.gpkg vg25_lan
+  become_user: oklab
+
+- name: Insert vg25_rbz data into database using ogr2ogr
+  ansible.builtin.command:
+    cmd: ogr2ogr -f "PostgreSQL" PG:"dbname={{ db_name }} user={{ db_user }} port={{ db_port }} host={{ db_host }}" -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=NO -t_srs EPSG:4326 -nlt MULTIPOLYGON -overwrite -update /tmp/daten/DE_VG25.gpkg vg25_rbz
+  become_user: oklab
+
+- name: Insert vg25_sta data into database using ogr2ogr
+  ansible.builtin.command:
+    cmd: ogr2ogr -f "PostgreSQL" PG:"dbname={{ db_name }} user={{ db_user }} port={{ db_port }} host={{ db_host }}" -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=NO -t_srs EPSG:4326 -nlt MULTIPOLYGON -overwrite -update /tmp/daten/DE_VG25.gpkg vg25_sta
+  become_user: oklab
+
+- name: Insert vg25_vwg data into database using ogr2ogr
+  ansible.builtin.command:
+    cmd: ogr2ogr -f "PostgreSQL" PG:"dbname={{ db_name }} user={{ db_user }} port={{ db_port }} host={{ db_host }}" -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=NO -t_srs EPSG:4326 -nlt MULTIPOLYGON -overwrite -update /tmp/daten/DE_VG25.gpkg vg25_vwg
+  become_user: oklab
+
+- name: Insert vg25_li data into database using ogr2ogr
+  ansible.builtin.command:
+    cmd: ogr2ogr -f "PostgreSQL" PG:"dbname={{ db_name }} user={{ db_user }} port={{ db_port }} host={{ db_host }}" -lco GEOMETRY_NAME=geom -lco SPATIAL_INDEX=GIST -lco PRECISION=NO -t_srs EPSG:4326 -nlt LINESTRING -overwrite -update /tmp/daten/DE_VG25.gpkg vg25_li
+  become_user: oklab

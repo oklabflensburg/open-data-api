@@ -1,0 +1,11 @@
+/var/log/nginx/*.log {
+        daily
+        rotate 7
+        missingok
+        notifempty
+        delaycompress
+        compress
+        postrotate
+                /usr/sbin/nginx -s reload >/dev/null 2>&1 || true
+        endscript
+}

@@ -1,0 +1,118 @@
+---
+- name: Install nginx
+  apt:
+    name: nginx
+    state: present
+  tags: nginx
+
+- name: Copy nginx.conf configuration
+  template:
+    src: templates/nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+  notify:
+    - restart nginx
+  tags: nginx
+
+- name: Copy nginx default.conf configuration
+  template:
+    src: templates/default.conf.j2
+    dest: /etc/nginx/sites-enabled/default
+  notify:
+    - restart nginx
+  tags: nginx
+
+- name: Ensure nginx is running and enabled
+  service:
+    name: nginx
+    state: started
+    enabled: yes
+  tags: nginx
+
+- name: Create directory for dhparams
+  file:
+    path: /etc/ssl/private
+    state: directory
+    mode: "0755"
+  tags: nginx
+
+- name: Generate dhparams.pem
+  command: openssl dhparam -out /etc/ssl/private/dhparams.pem 2048
+  args:
+    creates: /etc/ssl/private/dhparams.pem
+  tags: nginx
+
+- name: Create directory for SSL certificates
+  file:
+    path: /etc/nginx/ssl
+    state: directory
+    mode: "0755"
+  tags: nginx
+
+- name: Generate SSL certificates for server names
+  command: openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/ssl/{{ item }}.key -out /etc/nginx/ssl/{{ item }}.crt -subj "/CN={{ item }}"
+  args:
+    creates: /etc/nginx/ssl/{{ item }}.crt
+  with_items:
+    - flurstuecksauskunft.oklabflensburg.local
+    - glueckskarten.oklabflensburg.local
+    - biotopkarte.oklabflensburg.local
+    - spielplatzkarte.oklabflensburg.local
+    - recycling.oklabflensburg.local
+    - topografie.oklabflensburg.local
+    - nahverkehr.oklabflensburg.local
+    - kitas-in-flensburg.local
+    - knf.grain.local
+    - schulkarte.oklabflensburg.local
+    - sozialatlas.oklabflensburg.local
+    - dev.sozialatlas.oklabflensburg.local
+    - bodennutzung.oklabflensburg.local
+    - uranus.oklabflensburg.local
+    - opendataday.oklabflensburg.local
+    - opendataday.oklabflensburg.local
+    - denkmalkarte.oklabflensburg.local
+    - baumkarte.oklabflensburg.local
+    - admin.uranus.oklabflensburg.local
+    - api.uranus.oklabflensburg.local
+    - api.oklabflensburg.local
+    - pegelstand.oklabflensburg.local
+    - unfallkarte.oklabflensburg.local
+  tags: nginx
+
+- name: Set up logrotate for nginx
+  template:
+    src: templates/logrotate_nginx.j2
+    dest: /etc/logrotate.d/nginx
+    owner: root
+    group: root
+    mode: 0644
+  tags: nginx
+
+- name: Add domain names to /etc/hosts
+  lineinfile:
+    path: /etc/hosts
+    line: "127.0.0.1 {{ item }}"
+    state: present
+  with_items:
+    - flurstuecksauskunft.oklabflensburg.local
+    - glueckskarten.oklabflensburg.local
+    - biotopkarte.oklabflensburg.local
+    - spielplatzkarte.oklabflensburg.local
+    - recycling.oklabflensburg.local
+    - topografie.oklabflensburg.local
+    - nahverkehr.oklabflensburg.local
+    - kitas-in-flensburg.local
+    - knf.grain.local
+    - schulkarte.oklabflensburg.local
+    - sozialatlas.oklabflensburg.local
+    - dev.sozialatlas.oklabflensburg.local
+    - bodennutzung.oklabflensburg.local
+    - uranus.oklabflensburg.local
+    - opendataday.oklabflensburg.local
+    - denkmalkarte.oklabflensburg.local
+    - baumkarte.oklabflensburg.local
+    - admin.uranus.oklabflensburg.local
+    - api.uranus.oklabflensburg.local
+    - api.oklabflensburg.local
+    - pegelstand.oklabflensburg.local
+    - unfallkarte.oklabflensburg.local
+  tags: nginx_setup
