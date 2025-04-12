@@ -1,3 +1,16 @@
+- name: Run script to insert schools for open-school-map
+  ansible.builtin.command:
+    argv:
+      - /opt/git/open-school-map/tools/venv/bin/python3
+      - /opt/git/open-school-map/tools/insert_school_csv.py
+      - "--env"
+      - /opt/git/open-school-map/.env
+      - "--src"
+      - /opt/git/open-school-map/data/schulen_schleswig_holstein.csv
+      - "--verbose"
+  become_user: oklab
+  tags: data_import
+
 - name: Run Python script to insert districts for open-social-map
   ansible.builtin.command:
     argv:
