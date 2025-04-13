@@ -16,7 +16,7 @@
 
 - name: Create .env file for open-uranus-api
   ansible.builtin.template:
-    src: dotenv.j2
+    src: dotenv_uranus_api.j2
     dest: /opt/git/open-uranus-api/.env
     owner: oklab
     group: oklab
@@ -45,7 +45,7 @@
   ansible.builtin.systemd:
     name: open-uranus-api.service
     enabled: true
-    state: started
+    state: restarted
   tags: application_setup
 
 - name: Clone open-uranus-admin repository
@@ -222,6 +222,18 @@
     virtualenv_command: "{{ ansible_python_interpreter }} -m venv"
   become_user: oklab
   tags: application_setup
+
+- name: Create .env file for open-monuments-map
+  ansible.builtin.template:
+    src: dotenv.j2
+    dest: /opt/git/open-monuments-map/.env
+    owner: oklab
+    group: oklab
+    mode: "0644"
+  become_user: oklab
+  tags: application_setup
+  vars:
+    base_url: 'https://denkmalkarte.oklabflensburg.local'
 
 - name: Run pnpm install for open-monuments-map
   ansible.builtin.command:
