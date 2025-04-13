@@ -31,7 +31,8 @@
         name: "{{ item }}"
         state: "present"
       with_items:
-        - acl
+        - curl
+        - gpg
         - git
         - git-lfs
         - gnupg2
@@ -96,3 +97,35 @@
       become_user: postgres
       loop:
         - postgis
+
+- name: Add NodeSource GPG key
+  ansible.builtin.get_url:
+    url: https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key
+    dest: /etc/apt/trusted.gpg.d/nodesource.asc
+    mode: '0644'
+    force: true
+  become: true
+  tags: initial_setup
+
+- name: Add NodeSource repository
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/etc/apt/trusted.gpg.d/nodesource.asc] https://deb.nodesource.com/node_20.x nodistro main"
+    state: present
+    update_cache: true
+  become: true
+  tags: initial_setup
+
+- name: Install Node.js
+  ansible.builtin.apt:
+    name: nodejs
+    state: present
+  become: true
+  tags: initial_setup
+
+- name: Install pnpm globally using npm
+  ansible.builtin.npm:
+    name: pnpm
+    global: yes
+    state: present
+  become: true
+  tags: application_setup

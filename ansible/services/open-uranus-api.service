@@ -1,0 +1,32 @@
+[Unit]
+Description=Instance to serve the open data api
+After=network.target
+Requires=postgresql.service
+
+[Service]
+Type=simple
+User=oklab
+Group=www-data
+DynamicUser=false
+
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=ODA
+
+WorkingDirectory=/opt/git/open-uranus-api
+PrivateTmp=false
+
+EnvironmentFile=/opt/git/open-uranus-api/.env
+ExecStart=/opt/git/open-uranus-api/venv/bin/uvicorn \
+        --proxy-headers \
+        --forwarded-allow-ips='*' \
+        --workers=4 \
+        --port=6730 \
+        app.main:app
+
+ExecReload=/bin/kill -HUP ${MAINPID}
+RestartSec=1
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

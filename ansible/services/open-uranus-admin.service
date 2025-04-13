@@ -1,0 +1,17 @@
+[Unit]
+Description=Nuxt 3 Uranus Admin Panel
+After=network.target
+
+[Service]
+Environment=PORT=6090
+ExecStart=/usr/bin/node /opt/git/open-uranus-admin/.output/server/index.mjs
+WorkingDirectory=/opt/git/open-uranus-admin
+Environment=NODE_ENV=production
+Restart=always
+User=oklab
+Group=www-data
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

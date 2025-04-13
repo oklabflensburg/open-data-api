@@ -7,6 +7,94 @@
     group: oklab
   tags: application_setup
 
+- name: Clone open-uranus-api repository
+  ansible.builtin.git:
+    repo: https://github.com/oklabflensburg/open-uranus-api.git
+    dest: /opt/git/open-uranus-api
+  become_user: oklab
+  tags: application_setup
+
+- name: Create .env file for open-uranus-api
+  ansible.builtin.template:
+    src: dotenv.j2
+    dest: /opt/git/open-uranus-api/.env
+    owner: oklab
+    group: oklab
+    mode: "0644"
+  become_user: oklab
+  tags: application_setup
+
+- name: Create virtual environment for open-uranus-api
+  ansible.builtin.pip:
+    requirements: /opt/git/open-uranus-api/requirements.txt
+    virtualenv: /opt/git/open-uranus-api/venv
+    virtualenv_command: "{{ ansible_python_interpreter }} -m venv"
+  become_user: oklab
+  tags: application_setup
+
+- name: Copy open-uranus-api.service file
+  ansible.builtin.copy:
+    src: services/open-uranus-api.service
+    dest: /etc/systemd/system/open-uranus-api.service
+    owner: root
+    group: root
+    mode: "0644"
+  tags: application_setup
+
+- name: Enable and start open-uranus-api service
+  ansible.builtin.systemd:
+    name: open-uranus-api.service
+    enabled: true
+    state: started
+  tags: application_setup
+
+- name: Clone open-uranus-admin repository
+  ansible.builtin.git:
+    repo: https://github.com/oklabflensburg/open-uranus-admin.git
+    dest: /opt/git/open-uranus-admin
+  become_user: oklab
+  tags: application_setup
+
+- name: Create .env file for open-uranus-admin
+  ansible.builtin.template:
+    src: dotenv_uranus_admin.j2
+    dest: /opt/git/open-uranus-admin/.env
+    owner: oklab
+    group: oklab
+    mode: "0644"
+  become_user: oklab
+  tags: application_setup
+
+- name: Run pnpm install for open-uranus-admin
+  ansible.builtin.command:
+    cmd: pnpm install
+    chdir: /opt/git/open-uranus-admin
+  become_user: oklab
+  tags: application_setup
+
+- name: Run pnpm build for open-uranus-admin
+  ansible.builtin.command:
+    cmd: pnpm build
+    chdir: /opt/git/open-uranus-admin
+  become_user: oklab
+  tags: application_setup
+
+- name: Copy open-uranus-admin.service file
+  ansible.builtin.copy:
+    src: services/open-uranus-admin.service
+    dest: /etc/systemd/system/open-uranus-admin.service
+    owner: root
+    group: root
+    mode: "0644"
+  tags: application_setup
+
+- name: Enable and start open-uranus-admin service
+  ansible.builtin.systemd:
+    name: open-uranus-admin.service
+    enabled: true
+    state: started
+  tags: application_setup
+
 - name: Clone open-school-map repository
   ansible.builtin.git:
     repo: https://github.com/oklabflensburg/open-school-map.git
@@ -29,6 +117,20 @@
     requirements: /opt/git/open-data-api/requirements.txt
     virtualenv: /opt/git/open-data-api/venv
     virtualenv_command: "{{ ansible_python_interpreter }} -m venv"
+  become_user: oklab
+  tags: application_setup
+
+- name: Run pnpm install for open-school-map
+  ansible.builtin.command:
+    cmd: pnpm install
+    chdir: /opt/git/open-school-map
+  become_user: oklab
+  tags: application_setup
+
+- name: Run pnpm build for open-school-map
+  ansible.builtin.command:
+    cmd: pnpm build
+    chdir: /opt/git/open-school-map
   become_user: oklab
   tags: application_setup
 
@@ -118,6 +220,20 @@
     requirements: /opt/git/open-monuments-map/tools/requirements.txt
     virtualenv: /opt/git/open-monuments-map/tools/venv
     virtualenv_command: "{{ ansible_python_interpreter }} -m venv"
+  become_user: oklab
+  tags: application_setup
+
+- name: Run pnpm install for open-monuments-map
+  ansible.builtin.command:
+    cmd: pnpm install
+    chdir: /opt/git/open-monuments-map
+  become_user: oklab
+  tags: application_setup
+
+- name: Run pnpm build for open-monuments-map
+  ansible.builtin.command:
+    cmd: pnpm build
+    chdir: /opt/git/open-monuments-map
   become_user: oklab
   tags: application_setup
 
