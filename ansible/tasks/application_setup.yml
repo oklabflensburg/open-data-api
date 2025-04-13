@@ -276,6 +276,7 @@
     - /opt/git/open-social-map/data/flensburg_sozialatlas.sql
     - /opt/git/open-social-map/data/flensburg_sozialatlas_meta.sql
     - /opt/git/open-monuments-map/data/denkmalliste_schema.sql
+    - /opt/git/open-monuments-map/data/denkmalliste_geometrien_schema.sql
     - /opt/git/open-data-api/data/de_biomass_units_schema.sql
     - /opt/git/open-data-api/data/de_combustion_units_schema.sql
     - /opt/git/open-data-api/data/de_district_numbers_schema.sql

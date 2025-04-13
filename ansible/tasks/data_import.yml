@@ -1,3 +1,13 @@
+- name: Run script to insert geo monuments for open-monuments-map
+  ansible.builtin.command:
+    argv:
+      - /opt/git/open-monuments-map/tools/venv/bin/python3
+      - /opt/git/open-monuments-map/tools/insert_boundaries.py
+      - /opt/git/open-monuments-map/data/geodaten-denkmalliste-sh.geojson
+  become_user: oklab
+  tags: data_import
+
+
 - name: Run script to insert schools for open-school-map
   ansible.builtin.command:
     argv:
