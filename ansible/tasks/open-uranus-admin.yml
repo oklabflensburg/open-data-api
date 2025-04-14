@@ -1,0 +1,47 @@
+
+- name: Clone open-uranus-admin repository
+  ansible.builtin.git:
+    repo: https://github.com/oklabflensburg/open-uranus-admin.git
+    dest: /opt/git/open-uranus-admin
+  become_user: oklab
+  tags: open-uranus-admin
+
+- name: Create .env file for open-uranus-admin
+  ansible.builtin.template:
+    src: dotenv_uranus_admin.j2
+    dest: /opt/git/open-uranus-admin/.env
+    owner: oklab
+    group: oklab
+    mode: "0644"
+  become_user: oklab
+  tags: open-uranus-admin
+
+- name: Run pnpm install for open-uranus-admin
+  ansible.builtin.command:
+    cmd: pnpm install
+    chdir: /opt/git/open-uranus-admin
+  become_user: oklab
+  tags: open-uranus-admin
+
+- name: Run pnpm build for open-uranus-admin
+  ansible.builtin.command:
+    cmd: pnpm build
+    chdir: /opt/git/open-uranus-admin
+  become_user: oklab
+  tags: open-uranus-admin
+
+- name: Copy open-uranus-admin.service file
+  ansible.builtin.copy:
+    src: services/open-uranus-admin.service
+    dest: /etc/systemd/system/open-uranus-admin.service
+    owner: root
+    group: root
+    mode: "0644"
+  tags: open-uranus-admin
+
+- name: Enable and start open-uranus-admin service
+  ansible.builtin.systemd:
+    name: open-uranus-admin.service
+    enabled: true
+    state: started
+  tags: open-uranus-admin

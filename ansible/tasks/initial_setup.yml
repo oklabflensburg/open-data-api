@@ -128,4 +128,13 @@
     global: yes
     state: present
   become: true
-  tags: application_setup
+  tags: initial_setup
+
+- name: Create /opt/git directory
+  ansible.builtin.file:
+    path: /opt/git
+    state: directory
+    mode: "0755"
+    owner: oklab
+    group: oklab
+  tags: initial_setup

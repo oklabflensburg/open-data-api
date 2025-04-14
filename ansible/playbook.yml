@@ -6,30 +6,50 @@
     - vars.yml
 
   pre_tasks:
-    - include_tasks: tasks/initial_setup.yml
-      tags: initial_setup
+    - name: Initial System Setup
+      include_tasks: tasks/initial_setup.yml
+      tags: initial_setup, system
 
   tasks:
     - include_tasks: tasks/postgresql_setup.yml
-      tags: postgresql_setup
 
     - include_tasks: tasks/nginx_setup.yml
-      tags: nginx_setup
 
     - include_tasks: tasks/application_setup.yml
-      tags: application_setup
 
     - include_tasks: tasks/vg25_import.yml
-      tags: vg25_import
+
+    - include_tasks: tasks/open-school-map.yml
+      tags: open-school-map
+
+    - include_tasks: tasks/open-social-map.yml
+      tags: open-social-map
+
+    - include_tasks: tasks/open-accident-map.yml
+      tags: open-accident-map
+
+    - include_tasks: tasks/open-data-api.yml
+      tags: open-data-api
+
+    - include_tasks: tasks/open-monuments-map.yml
+      tags: open-monuments-map
+
+    - include_tasks: tasks/open-uranus-admin.yml
+      tags: open-uranus-admin
+
+    - include_tasks: tasks/open-uranus-api.yml
+      tags: open-uranus-api
 
     - include_tasks: tasks/create_indexes.yml
-      tags: create_indexes
 
-    - include_tasks: tasks/data_import.yml
-      tags: data_import
 
   handlers:
     - name: restart nginx
       service:
         name: nginx
+        state: restarted
+
+    - name: restart postgres
+      service:
+        name: postgresql
         state: restarted

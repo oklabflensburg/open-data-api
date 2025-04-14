@@ -1,0 +1,41 @@
+
+- name: Clone open-uranus-api repository
+  ansible.builtin.git:
+    repo: https://github.com/oklabflensburg/open-uranus-api.git
+    dest: /opt/git/open-uranus-api
+  become_user: oklab
+  tags: open-uranus-api
+
+- name: Create .env file for open-uranus-api
+  ansible.builtin.template:
+    src: dotenv_uranus_api.j2
+    dest: /opt/git/open-uranus-api/.env
+    owner: oklab
+    group: oklab
+    mode: "0644"
+  become_user: oklab
+  tags: open-uranus-api
+
+- name: Create virtual environment for open-uranus-api
+  ansible.builtin.pip:
+    requirements: /opt/git/open-uranus-api/requirements.txt
+    virtualenv: /opt/git/open-uranus-api/venv
+    virtualenv_command: "{{ ansible_python_interpreter }} -m venv"
+  become_user: oklab
+  tags: open-uranus-api
+
+- name: Copy open-uranus-api.service file
+  ansible.builtin.copy:
+    src: services/open-uranus-api.service
+    dest: /etc/systemd/system/open-uranus-api.service
+    owner: root
+    group: root
+    mode: "0644"
+  tags: open-uranus-api
+
+- name: Enable and start open-uranus-api service
+  ansible.builtin.systemd:
+    name: open-uranus-api.service
+    enabled: true
+    state: restarted
+  tags: open-uranus-api

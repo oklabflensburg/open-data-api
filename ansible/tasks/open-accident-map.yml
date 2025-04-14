@@ -1,0 +1,14 @@
+- name: Clone open-accident-map repository
+  ansible.builtin.git:
+    repo: https://github.com/oklabflensburg/open-accident-map.git
+    dest: /opt/git/open-accident-map
+  become_user: oklab
+  tags: open-accident-map
+
+- name: Create virtual environment for open-accident-map tools
+  ansible.builtin.pip:
+    requirements: /opt/git/open-accident-map/tools/requirements.txt
+    virtualenv: /opt/git/open-accident-map/tools/venv
+    virtualenv_command: "{{ ansible_python_interpreter }} -m venv"
+  become_user: oklab
+  tags: open-accident-map

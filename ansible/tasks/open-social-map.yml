@@ -1,0 +1,47 @@
+- name: Clone open-social-map repository
+  ansible.builtin.git:
+    repo: https://github.com/oklabflensburg/open-social-map.git
+    dest: /opt/git/open-social-map
+  become_user: oklab
+  tags: open-social-map
+
+- name: Create .env file for open-social-map
+  ansible.builtin.template:
+    src: dotenv.j2
+    dest: /opt/git/open-social-map/.env
+    owner: oklab
+    group: oklab
+    mode: "0644"
+  become_user: oklab
+  tags: open-social-map
+
+- name: Create virtual environment for open-social-map tools
+  ansible.builtin.pip:
+    requirements: /opt/git/open-social-map/tools/requirements.txt
+    virtualenv: /opt/git/open-social-map/tools/venv
+    virtualenv_command: "{{ ansible_python_interpreter }} -m venv"
+  become_user: oklab
+  tags: open-social-map
+
+- name: Run SQL scripts to create schemas
+  community.postgresql.postgresql_script:
+    db: "{{ db_name }}"
+    port: "{{ db_port }}"
+    login_host: "{{ db_host }}"
+    login_user: "{{ db_user }}"
+    login_password: "{{ db_password }}"
+    path: "{{ item }}"
+  with_items:
+    - /opt/git/open-social-map/data/flensburg_sozialatlas.sql
+    - /opt/git/open-social-map/data/flensburg_sozialatlas_meta.sql
+  become_user: oklab
+  tags: open-social-map
+
+- name: Run Python script to insert districts for open-social-map
+  ansible.builtin.command:
+    argv:
+      - /opt/git/open-social-map/tools/venv/bin/python3
+      - /opt/git/open-social-map/tools/insert_districts.py
+      - /opt/git/open-social-map/static/flensburg_stadtteile.geojson
+  become_user: oklab
+  tags: open-social-map

@@ -1,0 +1,64 @@
+- name: Clone open-school-map repository
+  ansible.builtin.git:
+    repo: https://github.com/oklabflensburg/open-school-map.git
+    dest: /opt/git/open-school-map
+  become_user: oklab
+  tags: open-school-map
+
+- name: Create .env file for open-school-map
+  ansible.builtin.template:
+    src: dotenv.j2
+    dest: /opt/git/open-school-map/.env
+    owner: oklab
+    group: oklab
+    mode: "0644"
+  become_user: oklab
+  tags: open-school-map
+
+- name: Run pnpm install for open-school-map
+  ansible.builtin.command:
+    cmd: pnpm install
+    chdir: /opt/git/open-school-map
+  become_user: oklab
+  tags: open-school-map
+
+- name: Run pnpm build for open-school-map
+  ansible.builtin.command:
+    cmd: pnpm build
+    chdir: /opt/git/open-school-map
+  become_user: oklab
+  tags: open-school-map
+
+- name: Create virtual environment for open-school-map tools
+  ansible.builtin.pip:
+    requirements: /opt/git/open-school-map/tools/requirements.txt
+    virtualenv: /opt/git/open-school-map/tools/venv
+    virtualenv_command: "{{ ansible_python_interpreter }} -m venv"
+  become_user: oklab
+  tags: open-school-map
+
+- name: Run SQL scripts to create schemas
+  community.postgresql.postgresql_script:
+    db: "{{ db_name }}"
+    port: "{{ db_port }}"
+    login_host: "{{ db_host }}"
+    login_user: "{{ db_user }}"
+    login_password: "{{ db_password }}"
+    path: "{{ item }}"
+  with_items:
+    - /opt/git/open-school-map/data/sh_school_schema.sql
+  become_user: oklab
+  tags: application_setup
+
+- name: Run script to insert schools for open-school-map
+  ansible.builtin.command:
+    argv:
+      - /opt/git/open-school-map/tools/venv/bin/python3
+      - /opt/git/open-school-map/tools/insert_school_csv.py
+      - "--env"
+      - /opt/git/open-school-map/.env
+      - "--src"
+      - /opt/git/open-school-map/data/schulen_schleswig_holstein.csv
+      - "--verbose"
+  become_user: oklab
+  tags: open-school-map

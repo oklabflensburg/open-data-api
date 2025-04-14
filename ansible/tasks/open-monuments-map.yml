@@ -1,0 +1,63 @@
+- name: Clone open-monuments-map repository
+  ansible.builtin.git:
+    repo: https://github.com/oklabflensburg/open-monuments-map.git
+    dest: /opt/git/open-monuments-map
+  become_user: oklab
+  tags: open-monuments-map
+
+- name: Create virtual environment for open-monuments-map tools
+  ansible.builtin.pip:
+    requirements: /opt/git/open-monuments-map/tools/requirements.txt
+    virtualenv: /opt/git/open-monuments-map/tools/venv
+    virtualenv_command: "{{ ansible_python_interpreter }} -m venv"
+  become_user: oklab
+  tags: open-monuments-map
+
+- name: Create .env file for open-monuments-map
+  ansible.builtin.template:
+    src: dotenv.j2
+    dest: /opt/git/open-monuments-map/.env
+    owner: oklab
+    group: oklab
+    mode: "0644"
+  become_user: oklab
+  tags: open-monuments-map
+  vars:
+    base_url: 'https://denkmalkarte.oklabflensburg.local'
+
+- name: Run pnpm install for open-monuments-map
+  ansible.builtin.command:
+    cmd: pnpm install
+    chdir: /opt/git/open-monuments-map
+  become_user: oklab
+  tags: open-monuments-map
+
+- name: Run pnpm build for open-monuments-map
+  ansible.builtin.command:
+    cmd: pnpm build
+    chdir: /opt/git/open-monuments-map
+  become_user: oklab
+  tags: open-monuments-map
+
+- name: Run SQL scripts to create schemas
+  community.postgresql.postgresql_script:
+    db: "{{ db_name }}"
+    port: "{{ db_port }}"
+    login_host: "{{ db_host }}"
+    login_user: "{{ db_user }}"
+    login_password: "{{ db_password }}"
+    path: "{{ item }}"
+  with_items:
+    - /opt/git/open-monuments-map/data/denkmalliste_schema.sql
+    - /opt/git/open-monuments-map/data/denkmalliste_geometrien_schema.sql
+  become_user: oklab
+  tags: open-monuments-map
+
+- name: Run script to insert geo monuments for open-monuments-map
+  ansible.builtin.command:
+    argv:
+      - /opt/git/open-monuments-map/tools/venv/bin/python3
+      - /opt/git/open-monuments-map/tools/insert_boundaries.py
+      - /opt/git/open-monuments-map/data/geodaten-denkmalliste-sh.geojson
+  become_user: oklab
+  tags: open-monuments-map
