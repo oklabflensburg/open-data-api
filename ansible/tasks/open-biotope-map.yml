@@ -1,0 +1,109 @@
+- name: Clone open-biotope-map repository
+  ansible.builtin.git:
+    repo: https://github.com/oklabflensburg/open-biotope-map.git
+    dest: /opt/git/open-biotope-map
+  become_user: oklab
+  tags: open-biotope-map
+
+- name: Create virtual environment for open-biotope-map tools
+  ansible.builtin.pip:
+    requirements: /opt/git/open-biotope-map/tools/requirements.txt
+    virtualenv: /opt/git/open-biotope-map/tools/venv
+    virtualenv_command: "{{ ansible_python_interpreter }} -m venv"
+  become_user: oklab
+  tags: open-biotope-map
+
+- name: Create .env file for open-biotope-map
+  ansible.builtin.template:
+    src: dotenv.j2
+    dest: /opt/git/open-biotope-map/.env
+    owner: oklab
+    group: oklab
+    mode: "0644"
+  become_user: oklab
+  tags: open-biotope-map
+  vars:
+    base_url: 'https://biotopkarte.oklabflensburg.local'
+
+- name: Run pnpm install for open-biotope-map
+  ansible.builtin.command:
+    cmd: pnpm install
+    chdir: /opt/git/open-biotope-map
+  become_user: oklab
+  tags: open-biotope-map
+
+- name: Run pnpm build for open-biotope-map
+  ansible.builtin.command:
+    cmd: pnpm build
+    chdir: /opt/git/open-biotope-map
+  become_user: oklab
+  tags: open-biotope-map
+
+- name: Run SQL scripts to create schemas
+  community.postgresql.postgresql_script:
+    db: "{{ db_name }}"
+    port: "{{ db_port }}"
+    login_host: "{{ db_host }}"
+    login_user: "{{ db_user }}"
+    login_password: "{{ db_password }}"
+    path: "{{ item }}"
+  with_items:
+    - /opt/git/open-biotope-map/data/biotope_meta_schema.sql
+  become_user: oklab
+  tags: open-biotope-map
+
+- name: Run script to insert biotopes for open-biotope-map
+  ansible.builtin.command:
+    argv:
+      - /opt/git/open-biotope-map/tools/venv/bin/python3
+      - /opt/git/open-biotope-map/tools/insert_biotope_key.py
+      - "--env"
+      - /opt/git/open-biotope-map/.env
+      - "--state"
+      - "hh"
+      - "--src"
+      - /opt/git/open-biotope-map/data/biotoptypen_schluessel_hamburg.csv
+      - "--verbose"
+  become_user: oklab
+  tags: open-biotope-map
+
+- name: Run script to insert biotopes for open-biotope-map
+  ansible.builtin.command:
+    argv:
+      - /opt/git/open-biotope-map/tools/venv/bin/python3
+      - /opt/git/open-biotope-map/tools/insert_biotope_key.py
+      - "--env"
+      - /opt/git/open-biotope-map/.env
+      - "--state"
+      - "sh"
+      - "--src"
+      - /opt/git/open-biotope-map/data/biotoptypen_standardliste.csv
+      - "--verbose"
+  become_user: oklab
+  tags: open-biotope-map
+
+- name: Run script to insert biotopes for open-biotope-map
+  ansible.builtin.command:
+    argv:
+      - /opt/git/open-biotope-map/tools/venv/bin/python3
+      - /opt/git/open-biotope-map/tools/insert_biotope_origin.py
+      - "--env"
+      - /opt/git/open-biotope-map/.env
+      - "--src"
+      - /opt/git/open-biotope-map/data/habitat_mapping_origin.csv
+      - "--verbose"
+  become_user: oklab
+  tags: open-biotope-map
+
+- name: Run script to insert biotopes for open-biotope-map
+  ansible.builtin.command:
+    argv:
+      - /opt/git/open-biotope-map/tools/venv/bin/python3
+      - /opt/git/open-biotope-map/tools/insert_habitat_types.py
+      - "--env"
+      - /opt/git/open-biotope-map/.env
+      - "--src"
+      - /opt/git/open-biotope-map/data/ffh_habitat_types.csv
+      - "--verbose"
+  become_user: oklab
+  tags: open-biotope-map

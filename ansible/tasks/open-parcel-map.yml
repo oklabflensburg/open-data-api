@@ -1,0 +1,66 @@
+- name: Clone open-parcel-map repository
+  ansible.builtin.git:
+    repo: https://github.com/oklabflensburg/open-parcel-map.git
+    dest: /opt/git/open-parcel-map
+  become_user: oklab
+  tags: open-parcel-map
+
+- name: Create virtual environment for open-parcel-map tools
+  ansible.builtin.pip:
+    requirements: /opt/git/open-parcel-map/tools/requirements.txt
+    virtualenv: /opt/git/open-parcel-map/tools/venv
+    virtualenv_command: "{{ ansible_python_interpreter }} -m venv"
+  become_user: oklab
+  tags: open-parcel-map
+
+- name: Create .env file for open-parcel-map
+  ansible.builtin.template:
+    src: dotenv.j2
+    dest: /opt/git/open-parcel-map/.env
+    owner: oklab
+    group: oklab
+    mode: "0644"
+  become_user: oklab
+  tags: open-parcel-map
+  vars:
+    base_url: 'https://flurstuecksauskunft.oklabflensburg.local'
+
+- name: Run pnpm install for open-parcel-map
+  ansible.builtin.command:
+    cmd: pnpm install
+    chdir: /opt/git/open-parcel-map
+  become_user: oklab
+  tags: open-parcel-map
+
+- name: Run pnpm build for open-parcel-map
+  ansible.builtin.command:
+    cmd: pnpm build
+    chdir: /opt/git/open-parcel-map
+  become_user: oklab
+  tags: open-parcel-map
+
+- name: Run SQL scripts to create schemas
+  community.postgresql.postgresql_script:
+    db: "{{ db_name }}"
+    port: "{{ db_port }}"
+    login_host: "{{ db_host }}"
+    login_user: "{{ db_user }}"
+    login_password: "{{ db_password }}"
+    path: "{{ item }}"
+  with_items:
+    - /opt/git/open-parcel-map/data/de_cadastral_district_meta_schema.sql
+  become_user: oklab
+  tags: open-parcel-map
+
+- name: Run script to insert parcels for open-parcel-map
+  ansible.builtin.command:
+    argv:
+      - /opt/git/open-parcel-map/tools/venv/bin/python3
+      - /opt/git/open-parcel-map/tools/insert_cadastral_district_csv.py
+      - "--env"
+      - /opt/git/open-parcel-map/.env
+      - "--src"
+      - /opt/git/open-parcel-map/data/gemarkungen_deutschland.csv
+      - "--verbose"
+  become_user: oklab
+  tags: open-parcel-map

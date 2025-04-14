@@ -15,8 +15,6 @@
 
     - include_tasks: tasks/nginx_setup.yml
 
-    - include_tasks: tasks/application_setup.yml
-
     - include_tasks: tasks/vg25_import.yml
 
     - include_tasks: tasks/open-school-map.yml
@@ -39,6 +37,12 @@
 
     - include_tasks: tasks/open-uranus-api.yml
       tags: open-uranus-api
+
+    - include_tasks: tasks/open-biotope-map.yml
+      tags: open-biotope-map
+
+    - include_tasks: tasks/open-parcel-map.yml
+      tags: open-parcel-map
 
     - include_tasks: tasks/create_indexes.yml
 
