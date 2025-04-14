@@ -2,6 +2,7 @@
   ansible.builtin.apt:
     state: present
     update_cache: yes
+  tags: initial_setup
 
 - name: Create user 'oklab' with home directory and SSH key
   ansible.builtin.user:
@@ -13,6 +14,7 @@
     ssh_key_file: .ssh/id_rsa
     groups: www-data
     append: yes
+  tags: initial_setup
 
 - name: Ensure remote_tmp directory exists with proper permissions for oklab
   ansible.builtin.file:
@@ -23,6 +25,7 @@
     group: oklab
   become: true
   become_user: oklab
+  tags: initial_setup
 
 - name: Configure system setup defaults
   block:
@@ -43,6 +46,7 @@
         - osm2pgsql
         - unzip
         - net-tools
+      tags: initial_setup
 
     - name: Add PostgreSQL signing key to keyring
       ansible.builtin.get_url:
@@ -50,11 +54,13 @@
         dest: /etc/apt/keyrings/postgresql.asc
         mode: "0644"
         force: true
+      tags: initial_setup
 
     - name: Add PostgreSQL APT repository
       ansible.builtin.apt_repository:
         repo: "deb [arch=amd64, signed-by=/etc/apt/keyrings/postgresql.asc] http://apt.postgresql.org/pub/repos/apt/ {{ ansible_distribution_release }}-pgdg main"
         state: present
+      tags: initial_setup
 
     - name: Install PostgreSQL 16 and PostGIS
       ansible.builtin.apt: "name={{ item }} state=present update_cache=yes"
@@ -62,6 +68,7 @@
         - postgresql-16
         - postgresql-16-postgis-3
         - postgresql-client-16
+      tags: initial_setup
 
     - name: "Create PostgreSQL user {{ db_user }}"
       postgresql_user:
@@ -70,6 +77,7 @@
         password: "{{ db_password }}"
       become: true
       become_user: postgres
+      tags: initial_setup
 
     - name: Create PostgreSQL database "{{ db_name }}"
       community.postgresql.postgresql_db:
@@ -78,6 +86,7 @@
         owner: "{{ db_user }}"
         state: present
       become_user: postgres
+      tags: initial_setup
 
     - name: Grant database user access to the "{{ db_name }}" database
       postgresql_privs:
@@ -86,6 +95,7 @@
         roles: PUBLIC
         privs: all
       become_user: postgres
+      tags: initial_setup
 
     - name: Add PostGIS extension to the "{{ db_name }}" database
       community.postgresql.postgresql_ext:
@@ -97,6 +107,8 @@
       become_user: postgres
       loop:
         - postgis
+        - pg_trgm
+      tags: initial_setup
 
 - name: Add NodeSource GPG key
   ansible.builtin.get_url:
