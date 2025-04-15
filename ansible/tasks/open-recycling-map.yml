@@ -1,0 +1,54 @@
+- name: Clone open-recycling-map repository
+  ansible.builtin.git:
+    repo: https://github.com/oklabflensburg/open-recycling-map.git
+    dest: /opt/git/open-recycling-map
+  become_user: oklab
+  tags: open-recycling-map
+
+- name: Create .env file for open-recycling-map
+  ansible.builtin.template:
+    src: dotenv.j2
+    dest: /opt/git/open-recycling-map/.env
+    owner: oklab
+    group: oklab
+    mode: "0644"
+  become_user: oklab
+  tags: open-recycling-map
+
+- name: Create virtual environment for open-recycling-map tools
+  ansible.builtin.pip:
+    requirements: /opt/git/open-recycling-map/tools/requirements.txt
+    virtualenv: /opt/git/open-recycling-map/tools/venv
+    virtualenv_command: "{{ ansible_python_interpreter }} -m venv"
+  become_user: oklab
+  tags: open-recycling-map
+
+- name: Run script to download altkleider for open-recycling-map
+  ansible.builtin.command:
+    argv:
+      - /opt/git/open-recycling-map/tools/venv/bin/python3
+      - /opt/git/open-recycling-map/tools/retrieve_geometries.py
+      - "--url"
+      - https://tbz-flensburg.de/de/container-altglas
+      - "--category"
+      - 7
+      - "--target"
+      - /tmp/flensburg_alttextilien_container.json
+      - "--verbose"
+  become_user: oklab
+  tags: open-recycling-map
+
+- name: Run script to download altglas for open-recycling-map
+  ansible.builtin.command:
+    argv:
+      - /opt/git/open-recycling-map/tools/venv/bin/python3
+      - /opt/git/open-recycling-map/tools/retrieve_geometries.py
+      - "--url"
+      - https://tbz-flensburg.de/de/container-altglas
+      - "--category"
+      - 8
+      - "--target"
+      - /tmp/flensburg_altglas_container.json
+      - "--verbose"
+  become_user: oklab
+  tags: open-recycling-map

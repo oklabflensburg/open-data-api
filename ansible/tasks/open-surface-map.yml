@@ -1,0 +1,16 @@
+- name: Clone open-surface-map repository
+  ansible.builtin.git:
+    repo: https://github.com/oklabflensburg/open-surface-map.git
+    dest: /opt/git/open-surface-map
+  become_user: oklab
+  tags: open-surface-map
+
+- name: Create .env file for open-surface-map
+  ansible.builtin.template:
+    src: dotenv.j2
+    dest: /opt/git/open-surface-map/.env
+    owner: oklab
+    group: oklab
+    mode: "0644"
+  become_user: oklab
+  tags: open-surface-map

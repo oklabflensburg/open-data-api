@@ -8,7 +8,7 @@
   pre_tasks:
     - name: Initial System Setup
       include_tasks: tasks/initial_setup.yml
-      tags: initial_setup, system
+      tags: initial_setup
 
   tasks:
     - include_tasks: tasks/postgresql_setup.yml
@@ -43,6 +43,12 @@
 
     - include_tasks: tasks/open-parcel-map.yml
       tags: open-parcel-map
+
+    - include_tasks: tasks/open-recycling-map.yml
+      tags: open-recycling-map
+
+    - include_tasks: tasks/open-surface-map.yml
+      tags: open-surface-map
 
     - include_tasks: tasks/create_indexes.yml
 
