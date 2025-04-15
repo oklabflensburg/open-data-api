@@ -1,0 +1,40 @@
+- name: Clone open-trees-map repository
+  ansible.builtin.git:
+    repo: https://github.com/oklabflensburg/open-trees-map.git
+    dest: /opt/git/open-trees-map
+  become_user: oklab
+  tags: open-trees-map
+
+- name: Create virtual environment for open-trees-map tools
+  ansible.builtin.pip:
+    requirements: /opt/git/open-trees-map/tools/requirements.txt
+    virtualenv: /opt/git/open-trees-map/tools/venv
+    virtualenv_command: "{{ ansible_python_interpreter }} -m venv"
+  become_user: oklab
+  tags: open-trees-map
+
+- name: Create .env file for open-trees-map
+  ansible.builtin.template:
+    src: dotenv.j2
+    dest: /opt/git/open-trees-map/.env
+    owner: oklab
+    group: oklab
+    mode: "0644"
+  become_user: oklab
+  tags: open-trees-map
+  vars:
+    base_url: 'https://baumkataster.oklabflensburg.local'
+
+- name: Run pnpm install for open-trees-map
+  ansible.builtin.command:
+    cmd: pnpm install
+    chdir: /opt/git/open-trees-map
+  become_user: oklab
+  tags: open-trees-map
+
+- name: Run pnpm build for open-trees-map
+  ansible.builtin.command:
+    cmd: pnpm build
+    chdir: /opt/git/open-trees-map
+  become_user: oklab
+  tags: open-trees-map

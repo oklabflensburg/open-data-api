@@ -53,6 +53,9 @@
     - include_tasks: tasks/open-playgrounds-map.yml
       tags: open-playgrounds-map
 
+    - include_tasks: tasks/open-trees-map.yml
+      tags: open-trees-map
+
     - include_tasks: tasks/create_indexes.yml
 
 
