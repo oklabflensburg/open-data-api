@@ -50,6 +50,9 @@
     - include_tasks: tasks/open-surface-map.yml
       tags: open-surface-map
 
+    - include_tasks: tasks/open-playgrounds-map.yml
+      tags: open-playgrounds-map
+
     - include_tasks: tasks/create_indexes.yml
 
 

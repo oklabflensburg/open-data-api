@@ -1,0 +1,49 @@
+- name: Clone open-playgrounds-map repository
+  ansible.builtin.git:
+    repo: https://github.com/oklabflensburg/open-playgrounds-map.git
+    dest: /opt/git/open-playgrounds-map
+  become_user: oklab
+  tags: open-playgrounds-map
+
+- name: Create .env file for open-playgrounds-map
+  ansible.builtin.template:
+    src: dotenv.j2
+    dest: /opt/git/open-playgrounds-map/.env
+    owner: oklab
+    group: oklab
+    mode: "0644"
+  become_user: oklab
+  tags: open-playgrounds-map
+
+- name: Create virtual environment for open-playgrounds-map tools
+  ansible.builtin.pip:
+    requirements: /opt/git/open-playgrounds-map/tools/requirements.txt
+    virtualenv: /opt/git/open-playgrounds-map/tools/venv
+    virtualenv_command: "{{ ansible_python_interpreter }} -m venv"
+  become_user: oklab
+  tags: open-playgrounds-map
+
+- name: Run script to download playgrounds for open-playgrounds-map
+  ansible.builtin.command:
+    argv:
+      - /opt/git/open-playgrounds-map/tools/venv/bin/python3
+      - /opt/git/open-playgrounds-map/tools/retrieve_geometries.py
+      - "--url"
+      - https://tbz-flensburg.de/de/spielplaetze
+      - "--category"
+      - 5
+      - "--target"
+      - /tmp/spielplaetze_flensburg.json
+      - "--verbose"
+  become_user: oklab
+  tags: open-playgrounds-map
+
+- name: Run script to convert to geojson for open-playgrounds-map
+  ansible.builtin.command:
+    argv:
+      - /opt/git/open-playgrounds-map/tools/venv/bin/python3
+      - /opt/git/open-playgrounds-map/tools/generate_geojson.py
+      - /tmp/spielplaetze_flensburg.json
+      - /tmp/spielplaetze_flensburg.geojson
+  become_user: oklab
+  tags: open-playgrounds-map
