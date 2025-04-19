@@ -16,10 +16,19 @@ from .api.administrative import route_administrative
 from .api.demographic import route_demographic
 from .api.energy import route_energy
 from .api.school import route_school
+from .api.xplan import route_xplan
 
 
-app = FastAPI(docs_url=None, redoc_url=None, version='1.18', title='Opendata API',
-              summary='Opendata API developed by volonteers from https://oklabflensburg.de')
+app = FastAPI(
+    docs_url=None,
+    redoc_url=None,
+    version='1.19',
+    title='Opendata API',
+    summary=(
+        'Opendata API developed by volonteers from '
+        'https://oklabflensburg.de'
+    )
+)
 Base = declarative_base()
 
 app.mount('/static', StaticFiles(directory='static'), name='static')
@@ -57,6 +66,7 @@ async def custom_validation_error_handler(
     )
 
 
+app.include_router(route_xplan)
 app.include_router(route_school)
 app.include_router(route_biotope)
 app.include_router(route_climate)
