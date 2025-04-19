@@ -12,6 +12,7 @@ async def get_plan_by_lat_lng(
         b.name AS plan_name,
         b.nummer AS plan_number,
         b.gemeinde AS municipality,
+        b.beschreibung AS description,
         CASE
             WHEN ST_Area(ST_Transform(b.geometry, 3587)) < 10000 THEN
                 ST_Area(ST_Transform(b.geometry, 3587)) || ' m²'
