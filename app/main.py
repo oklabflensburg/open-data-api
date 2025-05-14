@@ -25,7 +25,7 @@ app = FastAPI(
     version='1.19',
     title='Opendata API',
     summary=(
-        'Opendata API developed by volunteers from '
+        'Opendata API developed by volunteers of '
         'https://oklabflensburg.de'
     )
 )
