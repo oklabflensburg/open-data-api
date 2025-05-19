@@ -14,6 +14,7 @@
     - include_tasks: tasks/postgresql_setup.yml
 
     - include_tasks: tasks/nginx_setup.yml
+      tags: nginx_setup
 
     - include_tasks: tasks/vg25_import.yml
 
