@@ -11,28 +11,28 @@
     line: "127.0.0.1 {{ item }}"
     state: present
   with_items:
-    - flurstuecksauskunft.oklabflensburg.pluto
-    - glueckskarten.oklabflensburg.pluto
-    - biotopkarte.oklabflensburg.pluto
-    - spielplatzkarte.oklabflensburg.pluto
-    - recycling.oklabflensburg.pluto
-    - topografie.oklabflensburg.pluto
-    - nahverkehr.oklabflensburg.pluto
-    - kitas-in-flensburg.pluto
-    - knf.grain.pluto
-    - schulkarte.oklabflensburg.pluto
-    - sozialatlas.oklabflensburg.pluto
-    - dev.sozialatlas.oklabflensburg.pluto
-    - bodennutzung.oklabflensburg.pluto
-    - uranus.oklabflensburg.pluto
-    - opendataday.oklabflensburg.pluto
-    - denkmalkarte.oklabflensburg.pluto
-    - baumkarte.oklabflensburg.pluto
-    - admin.uranus.oklabflensburg.pluto
-    - api.uranus.oklabflensburg.pluto
-    - api.oklabflensburg.pluto
-    - pegelstand.oklabflensburg.pluto
-    - unfallkarte.oklabflensburg.pluto
+    - "{{ open_parcel_map_domain }}"
+    - "{{ glueckskarten_domain }}"
+    - "{{ open_biotope_map_domain }}"
+    - "{{ open_playground_map_domain }}"
+    - "{{ open_recycling_map_domain }}"
+    - "{{ open_topo_map_domain }}"
+    - "{{ open_transport_map_domain }}"
+    - "{{ open_kita_map_domain }}"
+    - "{{ open_cultural_map_domain }}"
+    - "{{ open_school_map_domain }}"
+    - "{{ open_social_map_domain }}"
+    - "{{ open_social_map_dev_domain }}"
+    - "{{ open_surface_map_domain }}"
+    - "{{ open_uranus_domain }}"
+    - "{{ open_data_day_domain }}"
+    - "{{ open_monuments_map_domain }}"
+    - "{{ open_trees_map_domain }}"
+    - "{{ open_uranus_admin_domain }}"
+    - "{{ open_uranus_api_domain }}"
+    - "{{ open_data_api_domain }}"
+    - "{{ open_gauge_map_domain }}"
+    - "{{ open_accident_map_domain }}"
   tags: nginx_setup
 
 - name: Allow HTTP and HTTPS traffic through the firewall
@@ -86,29 +86,28 @@
   args:
     creates: /etc/nginx/ssl/{{ item }}.crt
   with_items:
-    - flurstuecksauskunft.oklabflensburg.pluto
-    - glueckskarten.oklabflensburg.pluto
-    - biotopkarte.oklabflensburg.pluto
-    - spielplatzkarte.oklabflensburg.pluto
-    - recycling.oklabflensburg.pluto
-    - topografie.oklabflensburg.pluto
-    - nahverkehr.oklabflensburg.pluto
-    - kitas-in-flensburg.pluto
-    - knf.grain.pluto
-    - schulkarte.oklabflensburg.pluto
-    - sozialatlas.oklabflensburg.pluto
-    - dev.sozialatlas.oklabflensburg.pluto
-    - bodennutzung.oklabflensburg.pluto
-    - uranus.oklabflensburg.pluto
-    - opendataday.oklabflensburg.pluto
-    - opendataday.oklabflensburg.pluto
-    - denkmalkarte.oklabflensburg.pluto
-    - baumkarte.oklabflensburg.pluto
-    - admin.uranus.oklabflensburg.pluto
-    - api.uranus.oklabflensburg.pluto
-    - api.oklabflensburg.pluto
-    - pegelstand.oklabflensburg.pluto
-    - unfallkarte.oklabflensburg.pluto
+    - "{{ open_parcel_map_domain }}"
+    - "{{ glueckskarten_domain }}"
+    - "{{ open_biotope_map_domain }}"
+    - "{{ open_playground_map_domain }}"
+    - "{{ open_recycling_map_domain }}"
+    - "{{ open_topo_map_domain }}"
+    - "{{ open_transport_map_domain }}"
+    - "{{ open_kita_map_domain }}"
+    - "{{ open_cultural_map_domain }}"
+    - "{{ open_school_map_domain }}"
+    - "{{ open_social_map_domain }}"
+    - "{{ open_social_map_dev_domain }}"
+    - "{{ open_surface_map_domain }}"
+    - "{{ open_uranus_domain }}"
+    - "{{ open_data_day_domain }}"
+    - "{{ open_monuments_map_domain }}"
+    - "{{ open_trees_map_domain }}"
+    - "{{ open_uranus_admin_domain }}"
+    - "{{ open_uranus_api_domain }}"
+    - "{{ open_data_api_domain }}"
+    - "{{ open_gauge_map_domain }}"
+    - "{{ open_accident_map_domain }}"
   tags: nginx_setup
 
 - name: Set up logrotate for nginx

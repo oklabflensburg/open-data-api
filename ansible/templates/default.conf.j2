@@ -20,11 +20,11 @@ server {
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    server_name flurstuecksauskunft.oklabflensburg.pluto;
+    server_name {{ open_parcel_map_domain }};
 
     charset utf-8;
 
-    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; img-src 'self' data: blob: https://tiles.oklabflensburg.de; style-src 'self' 'unsafe-inline'; font-src 'self'; worker-src 'none'; object-src 'none'; connect-src 'self' https://api.oklabflensburg.pluto";
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; img-src 'self' data: blob: https://tiles.oklabflensburg.de; style-src 'self' 'unsafe-inline'; font-src 'self'; worker-src 'none'; object-src 'none'; connect-src 'self' https://{{ open_data_api_domain }};";
 
     add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
 
@@ -45,8 +45,8 @@ server {
         add_header Cache-Control "public, no-transform";
     }
 
-    ssl_certificate /etc/nginx/ssl/flurstuecksauskunft.oklabflensburg.pluto.crt;
-    ssl_certificate_key /etc/nginx/ssl/flurstuecksauskunft.oklabflensburg.pluto.key;
+    ssl_certificate /etc/nginx/ssl/{{ open_parcel_map_domain }}.crt;
+    ssl_certificate_key /etc/nginx/ssl/{{ open_parcel_map_domain }}.key;
 }
 
 
@@ -54,14 +54,14 @@ server {
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    server_name glueckskarten.oklabflensburg.pluto;
+    server_name {{ glueckskarten_domain }};
 
     auth_basic "Restricted Content";
     auth_basic_user_file /etc/nginx/.htpasswd;
 
     charset utf-8;
 
-    add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tiles.oklabflensburg.de; style-src 'self' 'unsafe-inline'; font-src 'self'; worker-src 'none'; object-src 'none'; connect-src 'self' https://api.oklabflensburg.pluto";
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tiles.oklabflensburg.de; style-src 'self' 'unsafe-inline'; font-src 'self'; worker-src 'none'; object-src 'none'; connect-src 'self' https://{{ open_data_api_domain }};";
 
     add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
 
@@ -82,8 +82,8 @@ server {
         add_header Cache-Control "public, no-transform";
     }
 
-    ssl_certificate /etc/nginx/ssl/glueckskarten.oklabflensburg.pluto.crt;
-    ssl_certificate_key /etc/nginx/ssl/glueckskarten.oklabflensburg.pluto.key;
+    ssl_certificate /etc/nginx/ssl/{{ glueckskarten_domain }}.crt;
+    ssl_certificate_key /etc/nginx/ssl/{{ glueckskarten_domain }}.key;
 }
 
 
@@ -91,7 +91,7 @@ server {
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    server_name biotopkarte.oklabflensburg.pluto;
+    server_name {{ open_biotope_map_domain }};
 
     charset utf-8;
 
@@ -116,8 +116,8 @@ server {
         add_header Cache-Control "public, no-transform";
     }
 
-    ssl_certificate /etc/nginx/ssl/biotopkarte.oklabflensburg.pluto.crt;
-    ssl_certificate_key /etc/nginx/ssl/biotopkarte.oklabflensburg.pluto.key;
+    ssl_certificate /etc/nginx/ssl/{{ open_biotope_map_domain }}.crt;
+    ssl_certificate_key /etc/nginx/ssl/{{ open_biotope_map_domain }}.key;
 }
 
 
@@ -125,7 +125,7 @@ server {
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    server_name spielplatzkarte.oklabflensburg.pluto;
+    server_name {{ open_playground_map_domain }};
 
     charset utf-8;
 
@@ -145,8 +145,8 @@ server {
         deny all;
     }
 
-    ssl_certificate /etc/nginx/ssl/spielplatzkarte.oklabflensburg.pluto.crt;
-    ssl_certificate_key /etc/nginx/ssl/spielplatzkarte.oklabflensburg.pluto.key;
+    ssl_certificate /etc/nginx/ssl/{{ open_playground_map_domain }}.crt;
+    ssl_certificate_key /etc/nginx/ssl/{{ open_playground_map_domain }}.key;
 }
 
 
@@ -154,7 +154,7 @@ server {
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    server_name recycling.oklabflensburg.pluto;
+    server_name {{ open_recycling_map_domain }};
 
     charset utf-8;
 
@@ -174,15 +174,15 @@ server {
         deny all;
     }
 
-    ssl_certificate /etc/nginx/ssl/recycling.oklabflensburg.pluto.crt;
-    ssl_certificate_key /etc/nginx/ssl/recycling.oklabflensburg.pluto.key;
+    ssl_certificate /etc/nginx/ssl/{{ open_recycling_map_domain }}.crt;
+    ssl_certificate_key /etc/nginx/ssl/{{ open_recycling_map_domain }}.key;
 }
 
 
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    server_name topografie.oklabflensburg.pluto;
+    server_name {{ open_topo_map_domain }};
 
     charset utf-8;
 
@@ -202,15 +202,15 @@ server {
         deny all;
     }
 
-    ssl_certificate /etc/nginx/ssl/topografie.oklabflensburg.pluto.crt;
-    ssl_certificate_key /etc/nginx/ssl/topografie.oklabflensburg.pluto.key;
+    ssl_certificate /etc/nginx/ssl/{{ open_topo_map_domain }}.crt;
+    ssl_certificate_key /etc/nginx/ssl/{{ open_topo_map_domain }}.key;
 }
 
 
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    server_name nahverkehr.oklabflensburg.pluto;
+    server_name {{ open_recycling_map_domain }};
 
     charset utf-8;
 
@@ -230,15 +230,15 @@ server {
         deny all;
     }
 
-    ssl_certificate /etc/nginx/ssl/nahverkehr.oklabflensburg.pluto.crt;
-    ssl_certificate_key /etc/nginx/ssl/nahverkehr.oklabflensburg.pluto.key;
+    ssl_certificate /etc/nginx/ssl/{{ open_recycling_map_domain }}.crt;
+    ssl_certificate_key /etc/nginx/ssl/{{ open_recycling_map_domain }}.key;
 }
 
 
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    server_name kitas-in-flensburg.pluto;
+    server_name {{ open_kita_map_domain }};
 
     charset utf-8;
 
@@ -273,8 +273,8 @@ server {
         rewrite /index.html / permanent;
     }
 
-    ssl_certificate /etc/nginx/ssl/kitas-in-flensburg.pluto.crt;
-    ssl_certificate_key /etc/nginx/ssl/kitas-in-flensburg.pluto.key;
+    ssl_certificate /etc/nginx/ssl/{{ open_kita_map_domain }}.crt;
+    ssl_certificate_key /etc/nginx/ssl/{{ open_kita_map_domain }}.key;
 }
 
 
@@ -282,7 +282,7 @@ server {
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    server_name knf.grain.pluto;
+    server_name {{ open_cultural_map_domain }};
 
     charset utf-8;
 
@@ -309,8 +309,8 @@ server {
         rewrite /index.html / permanent;
     }
 
-    ssl_certificate /etc/nginx/ssl/knf.grain.pluto.crt;
-    ssl_certificate_key /etc/nginx/ssl/knf.grain.pluto.key;
+    ssl_certificate /etc/nginx/ssl/{{ open_cultural_map_domain }}.crt;
+    ssl_certificate_key /etc/nginx/ssl/{{ open_cultural_map_domain }}.key;
 
 }
 
@@ -318,11 +318,11 @@ server {
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    server_name schulkarte.oklabflensburg.pluto;
+    server_name {{ open_school_map_domain }};
 
     charset utf-8;
 
-    add_header Content-Security-Policy "default-src 'self' https://nominatim.openstreetmap.org; script-src 'self'; img-src 'self' data: https://tiles.oklabflensburg.de; style-src 'self' 'unsafe-inline'; font-src 'self'; worker-src 'none'; object-src 'none'; connect-src https://api.oklabflensburg.pluto";
+    add_header Content-Security-Policy "default-src 'self' https://nominatim.openstreetmap.org; script-src 'self'; img-src 'self' data: https://tiles.oklabflensburg.de; style-src 'self' 'unsafe-inline'; font-src 'self'; worker-src 'none'; object-src 'none'; connect-src https://{{ open_data_api_domain }};";
 
     add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
 
@@ -353,19 +353,19 @@ server {
         try_files $uri $uri/ /index.html;
     }
 
-    ssl_certificate /etc/nginx/ssl/schulkarte.oklabflensburg.pluto.crt;
-    ssl_certificate_key /etc/nginx/ssl/schulkarte.oklabflensburg.pluto.key;
+    ssl_certificate /etc/nginx/ssl/{{ open_school_map_domain }}.crt;
+    ssl_certificate_key /etc/nginx/ssl/{{ open_school_map_domain }}.key;
 }
 
 
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    server_name sozialatlas.oklabflensburg.pluto;
+    server_name {{ open_social_map_domain }};
 
     charset utf-8;
 
-    add_header Content-Security-Policy "default-src 'self' https://api.oklabflensburg.pluto https://nominatim.openstreetmap.org; script-src 'self' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://unpkg.com; img-src 'self' data: https://unpkg.com https://tile.openstreetmap.org; style-src 'self' 'unsafe-inline' https://unpkg.com; font-src 'self'; worker-src 'none'; object-src 'none'";
+    add_header Content-Security-Policy "default-src 'self' https://{{ open_data_api_domain }}; https://nominatim.openstreetmap.org; script-src 'self' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://unpkg.com; img-src 'self' data: https://unpkg.com https://tile.openstreetmap.org; style-src 'self' 'unsafe-inline' https://unpkg.com; font-src 'self'; worker-src 'none'; object-src 'none'";
 
     add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
 
@@ -381,8 +381,8 @@ server {
         deny all;
     }
 
-    ssl_certificate /etc/nginx/ssl/sozialatlas.oklabflensburg.pluto.crt;
-    ssl_certificate_key /etc/nginx/ssl/sozialatlas.oklabflensburg.pluto.key;
+    ssl_certificate /etc/nginx/ssl/{{ open_social_map_domain }}.crt;
+    ssl_certificate_key /etc/nginx/ssl/{{ open_social_map_domain }}.key;
 }
 
 
@@ -390,11 +390,11 @@ server {
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    server_name dev.sozialatlas.oklabflensburg.pluto;
+    server_name {{ open_social_map_dev_domain }};
 
     charset utf-8;
 
-    add_header Content-Security-Policy "default-src 'self' https://api.oklabflensburg.pluto https://nominatim.openstreetmap.org; script-src 'self' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://unpkg.com; img-src 'self' data: https://unpkg.com https://tile.openstreetmap.org; style-src 'self' 'unsafe-inline' https://unpkg.com; font-src 'self'; worker-src 'none'; object-src 'none'";
+    add_header Content-Security-Policy "default-src 'self' {{ open_data_api_domain }} https://nominatim.openstreetmap.org; script-src 'self' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://unpkg.com; img-src 'self' data: https://unpkg.com https://tile.openstreetmap.org; style-src 'self' 'unsafe-inline' https://unpkg.com; font-src 'self'; worker-src 'none'; object-src 'none'";
 
     add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
 
@@ -415,15 +415,15 @@ server {
 	add_header Cache-Control "public, max-age=315360000";
     }
 
-    ssl_certificate /etc/nginx/ssl/dev.sozialatlas.oklabflensburg.pluto.crt;
-    ssl_certificate_key /etc/nginx/ssl/dev.sozialatlas.oklabflensburg.pluto.key;
+    ssl_certificate /etc/nginx/ssl/{{ open_social_map_dev_domain }}.crt;
+    ssl_certificate_key /etc/nginx/ssl/{{ open_social_map_dev_domain }}.key;
 }
 
 
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    server_name bodennutzung.oklabflensburg.pluto;
+    server_name {{ open_surface_map_domain }};
 
     charset utf-8;
 
@@ -443,19 +443,19 @@ server {
         deny all;
     }
 
-    ssl_certificate /etc/nginx/ssl/bodennutzung.oklabflensburg.pluto.crt;
-    ssl_certificate_key /etc/nginx/ssl/bodennutzung.oklabflensburg.pluto.key;
+    ssl_certificate /etc/nginx/ssl/{{ open_surface_map_domain }}.crt;
+    ssl_certificate_key /etc/nginx/ssl/{{ open_surface_map_domain }}.key;
 }
 
 
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    server_name uranus.oklabflensburg.pluto;
+    server_name {{ open_uranus_domain }};
 
     charset utf-8;
 
-    add_header Content-Security-Policy "default-src 'self'; script-src 'self' javascript:; img-src 'self' data: https://api.uranus.oklabflensburg.pluto https://tiles.oklabflensburg.de; style-src 'self' 'unsafe-inline'; font-src 'self'; worker-src 'none'; object-src 'none'; connect-src https://api.uranus.oklabflensburg.pluto";
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self' javascript:; img-src 'self' data: {{ open_uranus_api_domain }} https://tiles.oklabflensburg.de; style-src 'self' 'unsafe-inline'; font-src 'self'; worker-src 'none'; object-src 'none'; connect-src https://{{ open_uranus_api_domain }};";
 
     add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
 
@@ -476,8 +476,8 @@ server {
         add_header Cache-Control "public, no-transform";
     }
 
-    ssl_certificate /etc/nginx/ssl/uranus.oklabflensburg.pluto.crt;
-    ssl_certificate_key /etc/nginx/ssl/uranus.oklabflensburg.pluto.key;
+    ssl_certificate /etc/nginx/ssl/{{ open_uranus_domain }}.crt;
+    ssl_certificate_key /etc/nginx/ssl/{{ open_uranus_domain }}.key;
 }
 
 
@@ -485,7 +485,7 @@ server {
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    server_name opendataday.oklabflensburg.pluto;
+    server_name {{ open_data_day_domain }};
 
     charset utf-8;
 
@@ -510,20 +510,20 @@ server {
         add_header Cache-Control "public, no-transform";
     }
 
-    ssl_certificate /etc/nginx/ssl/opendataday.oklabflensburg.pluto.crt;
-    ssl_certificate_key /etc/nginx/ssl/opendataday.oklabflensburg.pluto.key;
+    ssl_certificate /etc/nginx/ssl/{{ open_data_day_domain }}.crt;
+    ssl_certificate_key /etc/nginx/ssl/{{ open_data_day_domain }}.key;
 }
 
 
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    server_name denkmalkarte.oklabflensburg.pluto;
+    server_name {{ open_monuments_map_domain }};
 
     charset utf-8;
 
     add_header Access-Control-Allow-Origin *;
-    add_header Content-Security-Policy "default-src 'self' https://nominatim.openstreetmap.org https://opendata.schleswig-holstein.de; script-src 'self' javascript:; img-src 'self' data: blob: https://opendata.schleswig-holstein.de https://tiles.oklabflensburg.de https://efi2.schleswig-holstein.de; style-src 'self' 'unsafe-inline'; font-src 'self'; worker-src 'none'; object-src 'none'; connect-src https://api.oklabflensburg.pluto https://efi2.schleswig-holstein.de https://opendata.schleswig-holstein.de";
+    add_header Content-Security-Policy "default-src 'self' https://nominatim.openstreetmap.org https://opendata.schleswig-holstein.de; script-src 'self' javascript:; img-src 'self' data: blob: https://opendata.schleswig-holstein.de https://tiles.oklabflensburg.de https://efi2.schleswig-holstein.de; style-src 'self' 'unsafe-inline'; font-src 'self'; worker-src 'none'; object-src 'none'; connect-src https://{{ open_data_api_domain }}; https://efi2.schleswig-holstein.de https://opendata.schleswig-holstein.de";
 
     add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
 
@@ -552,15 +552,15 @@ server {
         proxy_pass https://efi2.schleswig-holstein.de/dish/dish_opendata/Foto/$1;
     }
 
-    ssl_certificate /etc/nginx/ssl/denkmalkarte.oklabflensburg.pluto.crt;
-    ssl_certificate_key /etc/nginx/ssl/denkmalkarte.oklabflensburg.pluto.key;
+    ssl_certificate /etc/nginx/ssl/{{ open_monuments_map_domain }}.crt;
+    ssl_certificate_key /etc/nginx/ssl/{{ open_monuments_map_domain }}.key;
 }
 
 
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    server_name baumkarte.oklabflensburg.pluto;
+    server_name {{ open_trees_map_domain }};
 
     charset utf-8;
 
@@ -584,15 +584,15 @@ server {
         expires 1y;
         add_header Cache-Control "public, no-transform";
     }
-    ssl_certificate /etc/nginx/ssl/baumkarte.oklabflensburg.pluto.crt;
-    ssl_certificate_key /etc/nginx/ssl/baumkarte.oklabflensburg.pluto.key;
+    ssl_certificate /etc/nginx/ssl/{{ open_trees_map_domain }}.crt;
+    ssl_certificate_key /etc/nginx/ssl/{{ open_trees_map_domain }}.key;
 }
 
 
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    server_name admin.uranus.oklabflensburg.pluto;
+    server_name {{ open_uranus_admin_domain }};
 
     charset utf-8;
 
@@ -611,7 +611,7 @@ server {
 
         add_header X-Content-Type-Options "nosniff";
 
-        add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://api.uranus.oklabflensburg.pluto https://i.pravatar.cc; style-src 'self' 'unsafe-inline'; font-src 'self'; worker-src blob: https://admin.uranus.oklabflensburg.pluto; object-src 'none'; connect-src 'self' https://tiles.oklabflensburg.de https://nominatim.oklabflensburg.pluto https://api.uranus.oklabflensburg.pluto" always;
+        add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; img-src 'self' data: blob: { open_uranus_api_domain }} https://i.pravatar.cc; style-src 'self' 'unsafe-inline'; font-src 'self'; worker-src blob: https://{{ open_uranus_admin_domain }};; object-src 'none'; connect-src 'self' https://tiles.oklabflensburg.de https://nominatim.oklabflensburg.pluto https://{{ open_uranus_api_domain }};" always;
 
         proxy_pass http://localhost:6090;
         proxy_http_version 1.1;
@@ -629,8 +629,8 @@ server {
         add_header X-Proxy-Cache $upstream_cache_status always;
     }
 
-    ssl_certificate /etc/nginx/ssl/admin.uranus.oklabflensburg.pluto.crt;
-    ssl_certificate_key /etc/nginx/ssl/admin.uranus.oklabflensburg.pluto.key;
+    ssl_certificate /etc/nginx/ssl/{{ open_uranus_admin_domain }}.crt;
+    ssl_certificate_key /etc/nginx/ssl/{{ open_uranus_admin_domain }}.key;
 }
 
 
@@ -638,7 +638,7 @@ server {
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    server_name api.uranus.oklabflensburg.pluto;
+    server_name {{ open_uranus_api_domain }};
 
     charset utf-8;
 
@@ -704,8 +704,8 @@ server {
         return 404;
     }
 
-    ssl_certificate /etc/nginx/ssl/api.uranus.oklabflensburg.pluto.crt;
-    ssl_certificate_key /etc/nginx/ssl/api.uranus.oklabflensburg.pluto.key;
+    ssl_certificate /etc/nginx/ssl/{{ open_uranus_api_domain }}.crt;
+    ssl_certificate_key /etc/nginx/ssl/{{ open_uranus_api_domain }}.key;
 }
 
 
@@ -713,7 +713,7 @@ server {
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    server_name api.oklabflensburg.pluto;
+    server_name {{ open_data_api_domain }};
 
     charset utf-8;
 
@@ -778,19 +778,19 @@ server {
         return 404;
     }
 
-    ssl_certificate /etc/nginx/ssl/api.oklabflensburg.pluto.crt;
-    ssl_certificate_key /etc/nginx/ssl/api.oklabflensburg.pluto.key;
+    ssl_certificate /etc/nginx/ssl/{{ open_data_api_domain }}.crt;
+    ssl_certificate_key /etc/nginx/ssl/{{ open_data_api_domain }}.key;
 }
 
 
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    server_name pegelstand.oklabflensburg.pluto;
+    server_name {{ open_gauge_map_domain }};
 
     charset utf-8;
 
-    add_header Content-Security-Policy "default-src 'self' https://nominatim.openstreetmap.org; script-src 'self' https://unpkg.com https://cdn.tailwindcss.com; img-src 'self' data: https://unpkg.com https://tile.openstreetmap.org https://sgx.geodatenzentrum.de; style-src 'self' 'unsafe-inline' https://unpkg.com; font-src 'self'; worker-src 'none'; object-src 'none'; connect-src 'self' https://api.oklabflensburg.pluto https://www.pegelonline.wsv.de";
+    add_header Content-Security-Policy "default-src 'self' https://nominatim.openstreetmap.org; script-src 'self' https://unpkg.com https://cdn.tailwindcss.com; img-src 'self' data: https://unpkg.com https://tile.openstreetmap.org https://sgx.geodatenzentrum.de; style-src 'self' 'unsafe-inline' https://unpkg.com; font-src 'self'; worker-src 'none'; object-src 'none'; connect-src 'self' https://{{ open_data_api_domain }}; https://www.pegelonline.wsv.de";
 
     add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
 
@@ -806,8 +806,8 @@ server {
         deny all;
     }
 
-    ssl_certificate /etc/nginx/ssl/pegelstand.oklabflensburg.pluto.crt;
-    ssl_certificate_key /etc/nginx/ssl/pegelstand.oklabflensburg.pluto.key;
+    ssl_certificate /etc/nginx/ssl/{{ open_gauge_map_domain }}.crt;
+    ssl_certificate_key /etc/nginx/ssl/{{ open_gauge_map_domain }}.key;
 }
 
 
@@ -815,11 +815,11 @@ server {
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    server_name unfallkarte.oklabflensburg.pluto;
+    server_name {{ open_accident_map_domain }};
 
     charset utf-8;
 
-    add_header Content-Security-Policy "default-src 'self' https://nominatim.openstreetmap.org; script-src 'self' https://unpkg.com https://cdn.tailwindcss.com; img-src 'self' data: https://unpkg.com https://tile.openstreetmap.org https://sgx.geodatenzentrum.de; style-src 'self' 'unsafe-inline' https://unpkg.com; font-src 'self'; worker-src 'none'; object-src 'none'; connect-src 'self' https://api.oklabflensburg.pluto";
+    add_header Content-Security-Policy "default-src 'self' https://nominatim.openstreetmap.org; script-src 'self' https://unpkg.com https://cdn.tailwindcss.com; img-src 'self' data: https://unpkg.com https://tile.openstreetmap.org https://sgx.geodatenzentrum.de; style-src 'self' 'unsafe-inline' https://unpkg.com; font-src 'self'; worker-src 'none'; object-src 'none'; connect-src 'self' https://{{ open_data_api_domain }};";
 
     add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
 
@@ -835,6 +835,6 @@ server {
         deny all;
     }
 
-    ssl_certificate /etc/nginx/ssl/unfallkarte.oklabflensburg.pluto.crt;
-    ssl_certificate_key /etc/nginx/ssl/unfallkarte.oklabflensburg.pluto.key;
+    ssl_certificate /etc/nginx/ssl/{{ open_accident_map_domain }}.crt;
+    ssl_certificate_key /etc/nginx/ssl/{{ open_accident_map_domain }}.key;
 }
