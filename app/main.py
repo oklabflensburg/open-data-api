@@ -16,6 +16,7 @@ from .api.administrative import route_administrative
 from .api.demographic import route_demographic
 from .api.energy import route_energy
 from .api.school import route_school
+from .api.police import route_police
 from .api.xplan import route_xplan
 
 
@@ -67,6 +68,7 @@ async def custom_validation_error_handler(
 
 
 app.include_router(route_xplan)
+app.include_router(route_police)
 app.include_router(route_school)
 app.include_router(route_biotope)
 app.include_router(route_climate)
