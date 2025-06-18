@@ -1,21 +1,20 @@
 import json
 
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 
 from fastapi import Depends, APIRouter, HTTPException, status
 from geojson import Feature, FeatureCollection
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..schemas.tree import (
-    TreeGeometryResponse,
-    TreeResponse
+    StreetTreeResponse
 )
 from ..dependencies import get_session
 from ..services.tree import (
     get_tree_by_id
 )
 
-route_police = APIRouter(prefix='/tree/v1')
+route_street_tree = APIRouter(prefix='/street_tree/v1')
 
 def create_geojson_from_rows(rows: List[Dict[str, Any]]) -> FeatureCollection:
     features = [
@@ -33,20 +32,20 @@ def create_geojson_from_rows(rows: List[Dict[str, Any]]) -> FeatureCollection:
     return FeatureCollection(features, crs=crs)
 
 
-@route_police.get(
+@route_street_tree.get(
     '/details',
-    response_model=TreeResponse,
-    tags=['Polizeidienststellen'],
+    response_model=StreetTreeResponse,
+    tags=['Strassenbaeume'],
     description=(
-        'Retrieves police station details based on the provided station id.'
+        'Retrieves street tree details based on the provided tree id.'
     )
 )
 async def fetch_tree_by_id(
     tree_id: int,
     session: AsyncSession = Depends(get_session)
-) -> List[TreeResponse]:
+) -> List[StreetTreeResponse]:
     rows = await get_tree_by_id(session, tree_id)
-    identifier = f'station_id {tree_id}'
+    identifier = f'tree_id {tree_id}'
 
     if not rows:
         raise HTTPException(

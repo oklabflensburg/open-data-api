@@ -5,7 +5,7 @@ class GeoPoint(BaseModel):
     type: str = 'Point'
     coordinates: List[float]
 
-class TreeResponse(BaseModel):
+class StreetTreeResponse(BaseModel):
     id: int
     tree_number: str
     street: str

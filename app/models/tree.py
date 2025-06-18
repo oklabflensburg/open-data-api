@@ -1,10 +1,6 @@
-from tokenize import String
-from datetime import date
 from sqlmodel import SQLModel, Field
-from typing import Optional
 from geoalchemy2 import Geometry
-from sqlalchemy import Column
-from sqlalchemy.dialects.postgresql import DOUBLE_PRECISION
+from sqlalchemy import Column, Numeric, String, Date
 
 
 class Street_tree_register(SQLModel, table=True):
@@ -19,4 +15,4 @@ class Street_tree_register(SQLModel, table=True):
     east = Column(Numeric, nullable=False)
     register_date = Column(Date, nullable=False)
     type = Column(String, nullable=False)
-    geom = Column(Geometry, ('POINT', srid=4326))
+    geom = Column(Geometry('POINT', srid=4326))
