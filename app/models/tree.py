@@ -2,8 +2,7 @@ from sqlmodel import SQLModel, Field
 from geoalchemy2 import Geometry
 from sqlalchemy import Column, Numeric, String, Date
 
-
-class Street_tree_register(SQLModel, table=True):
+class StreetTreeRegister(SQLModel):
     __tablename__ = "flensburg.street_tree_register"
 
     id: int = Field(primary_key=True, nullable=False)
