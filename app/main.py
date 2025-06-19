@@ -18,6 +18,7 @@ from .api.energy import route_energy
 from .api.school import route_school
 from .api.police import route_police
 from .api.xplan import route_xplan
+from .api.tree import route_street_tree
 
 
 app = FastAPI(
@@ -78,3 +79,4 @@ app.include_router(route_archaeology)
 app.include_router(route_administrative)
 app.include_router(route_demographic)
 app.include_router(route_energy)
+app.include_router(route_street_tree)
