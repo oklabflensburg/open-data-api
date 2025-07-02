@@ -32,11 +32,11 @@ async def get_tree_by_species(session: AsyncSession):
                 WHEN tr.species ILIKE '%Carpinus%' THEN 6
                 ELSE 0
             END AS species_index
-        FROM {{schema}}.street_tree_register tr
+        FROM flensburg.street_tree_register tr
         WHERE tr.type = 'bestand'
           AND NOT EXISTS (
             SELECT 1
-            FROM {{schema}}.street_tree_register gef
+            FROM flensburg.street_tree_register gef
             WHERE gef.type = 'gefaellt'
               AND gef.tree_number = tr.tree_number
               AND gef.street = tr.street
