@@ -9,13 +9,14 @@ class StreetTreeResponse(BaseModel):
     id: int
     tree_number: str
     street: str
-    area_type: str
+    area_type: Optional[str]
     species: str
     north: float
     east: float
-    register_date: str
+    registration_date: str
     type: str
-    geom = GeoPoint
+    geom: GeoPoint  # Correctly typed attribute
+
 
 class CrsProperties(BaseModel):
     name: str
