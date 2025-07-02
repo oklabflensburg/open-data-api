@@ -11,7 +11,8 @@ from ..schemas.tree import (
 )
 from ..dependencies import get_session
 from ..services.tree import (
-    get_tree_by_id
+    get_tree_by_id,
+    get_tree_by_species
 )
 
 route_street_tree = APIRouter(prefix='/street_tree/v1')
@@ -51,6 +52,27 @@ async def fetch_tree_by_id(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f'No matches found for {identifier}'
+        )
+
+    return rows
+
+@route_street_tree.get(
+    '/species',
+    response_model=StreetTreeResponse,
+    tags=['Strassenbaeume'],
+    description=(
+        'Retrieves street tree details based on the provided tree id.'
+    )
+)
+async def fetch_tree_by_species(
+    session: AsyncSession = Depends(get_session)
+) -> List[StreetTreeResponse]:
+    rows = await get_tree_by_species(session)
+
+    if not rows:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f'No matches found'
         )
 
     return rows
