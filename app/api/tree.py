@@ -11,7 +11,8 @@ from ..schemas.tree import (
 )
 from ..dependencies import get_session
 from ..services.tree import (
-    get_tree_by_id
+    get_tree_by_id,
+    get_tree_by_species
 )
 
 from geoalchemy2.shape import to_shape
@@ -73,3 +74,24 @@ async def fetch_tree_by_id(
         "type": tree.type,
         "geom": geojson_dict,
     }
+
+@route_street_tree.get(
+    '/species',
+    response_model=StreetTreeResponse,
+    tags=['Strassenbaeume'],
+    description='Retrieves street tree details based there species.'
+)
+async def get_tree_by_species(
+    tree_id: int,
+    session: AsyncSession = Depends(get_session)
+) -> StreetTreeResponse:
+
+    rows = await get_tree_by_species()
+
+    if not row:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f'No matches found for tree_id {tree_id}'
+        )
+
+    return rows
