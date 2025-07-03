@@ -77,21 +77,22 @@ async def fetch_tree_by_id(
 
 @route_street_tree.get(
     '/species',
-    response_model=StreetTreeResponse,
+    response_model=List,
     tags=['Strassenbaeume'],
     description='Retrieves street tree details based there species.'
 )
 async def get_tree_by_species(
-    tree_id: int,
     session: AsyncSession = Depends(get_session)
-) -> StreetTreeResponse:
+):
 
-    rows = await get_tree_by_species()
+    rows = await get_tree_by_species(session)
+    response = jsonable_encoder(rows)
 
-    if not row:
+    try:
+        return JSONResponse(content=response[0])
+    except IndexError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f'No matches found for tree_id {tree_id}'
+            detail='Not found'
         )
-
-    return rows
+        
