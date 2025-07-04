@@ -3,8 +3,12 @@ import json
 from typing import List, Dict, Any
 
 from fastapi import Depends, APIRouter, HTTPException, status
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import JSONResponse
 from geojson import Feature, FeatureCollection
 from sqlalchemy.ext.asyncio import AsyncSession
+
+
 
 from ..schemas.tree import (
     StreetTreeResponse
@@ -84,15 +88,13 @@ async def fetch_tree_by_id(
 async def get_tree_by_species(
     session: AsyncSession = Depends(get_session)
 ):
-
     rows = await get_tree_by_species(session)
     response = jsonable_encoder(rows)
 
     try:
-        return JSONResponse(content=response[0])
+        return JSONResponse(content=response)
     except IndexError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='Not found'
         )
-        

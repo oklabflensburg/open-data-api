@@ -1,4 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql import text
 from sqlmodel import select
 from app.models.tree import StreetTreeRegister
 
