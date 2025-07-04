@@ -85,7 +85,7 @@ async def fetch_tree_by_id(
     tags=['Strassenbaeume'],
     description='Retrieves street tree details based there species.'
 )
-async def get_tree_by_species(
+async def fetch_tree_by_species(
     session: AsyncSession = Depends(get_session)
 ):
     rows = await get_tree_by_species(session)
