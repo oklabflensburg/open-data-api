@@ -90,6 +90,9 @@ def create_geojson_from_rows(rows: List[Dict[str, Any]]) -> FeatureCollection:
                     }
                 }
             }
+        },
+        500: {
+            'description': 'Internal Server Error'
         }
     },
     tags=['Schulen'],

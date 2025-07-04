@@ -41,6 +41,12 @@ def create_geojson_from_rows(rows: List[Dict[str, Any]]) -> FeatureCollection:
     '/details',
     response_model=PoliceResponse,
     tags=['Polizeidienststellen'],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     description=(
         'Retrieves police station details based on the provided station id.'
     )
@@ -65,6 +71,12 @@ async def fetch_police_station_by_id(
     '/bounds',
     response_model=PoliceGeometryResponse,
     tags=['Polizeidienststellen'],
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+    },
     description=(
         'Retrieves police geometries based on the provided bounding box. '
         'The coordinates must be in the order: xmin, ymin, xmax, ymax.'
