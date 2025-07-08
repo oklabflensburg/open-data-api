@@ -38,6 +38,13 @@ def create_geojson_from_rows(rows: List[Dict[str, Any]]) -> FeatureCollection:
 @route_street_tree.get(
     '/details',
     response_model=StreetTreeResponse,
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+        500: {'description': 'Internal Server Error'}
+    },
     tags=['Strassenbaeume'],
     description='Retrieves street tree details based on the provided tree id.'
 )
