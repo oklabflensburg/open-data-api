@@ -89,6 +89,13 @@ async def fetch_tree_by_id(
 @route_street_tree.get(
     '/species',
     response_model=List,
+    responses={
+        200: {'description': 'OK'},
+        400: {'description': 'Bad Request'},
+        404: {'description': 'Not Found'},
+        422: {'description': 'Unprocessable Entity'},
+        500: {'description': 'Internal Server Error'}
+    },
     tags=['Strassenbaeume'],
     description='Retrieves street tree details based there species.'
 )
