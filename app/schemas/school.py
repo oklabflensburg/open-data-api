@@ -22,7 +22,7 @@ class SchoolResponse(BaseModel):
     house_number: str
     telephone: str
     fax: Optional[str] = None
-    email: EmailStr
+    email: Optional[EmailStr] = None
     website: Optional[HttpUrl] = None
     agency_number: str
     main_school_type: str
