@@ -125,7 +125,7 @@ async def get_school_geometries_by_lat_lng(
     session: AsyncSession,
     lat: float,
     lng: float,
-    radius: float = 1000
+    radius: int
 ):
     stmt = text('''
     SELECT

@@ -274,6 +274,7 @@ async def fetch_school_geometries_by_bbox(
 async def fetch_school_geometries_by_lat_lng(
     lat: float,
     lng: float,
+    radius: int = 1000,
     session: AsyncSession = Depends(get_session)
 ) -> FeatureCollection:
     """
@@ -282,6 +283,7 @@ async def fetch_school_geometries_by_lat_lng(
     Args:
         lat: Latitude
         lng: Longitude
+        radius: Search radius in meters (default: 1000)
         session: Database session
 
     Returns:
@@ -290,7 +292,7 @@ async def fetch_school_geometries_by_lat_lng(
     Raises:
         HTTPException: If no schools are found near the coordinates
     """
-    rows = await get_school_geometries_by_lat_lng(session, lat, lng)
+    rows = await get_school_geometries_by_lat_lng(session, lat, lng, radius)
 
     if not rows:
         raise HTTPException(
