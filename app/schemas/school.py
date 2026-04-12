@@ -1,5 +1,5 @@
 from typing import List, Optional
-from pydantic import BaseModel, EmailStr, HttpUrl
+from pydantic import BaseModel
 
 
 class SchoolTypeResponse(BaseModel):
@@ -13,21 +13,26 @@ class GeoPoint(BaseModel):
 
 
 class SchoolResponse(BaseModel):
-    geojson: GeoPoint
+    geojson: Optional[GeoPoint] = None
     id: int
+    source_id: Optional[int] = None
     name: str
-    city: str
-    zipcode: str
-    street: str
-    house_number: str
-    telephone: str
+    city: Optional[str] = None
+    zipcode: Optional[str] = None
+    street: Optional[str] = None
+    house_number: Optional[str] = None
+    telephone: Optional[str] = None
     fax: Optional[str] = None
-    email: Optional[EmailStr] = None
-    website: Optional[HttpUrl] = None
-    agency_number: str
-    main_school_type: str
+    email: Optional[str] = None
+    website: Optional[str] = None
+    longitude: Optional[float] = None
+    latitude: Optional[float] = None
+    agency_number: Optional[str] = None
+    main_school_type: Optional[str] = None
     school_types: List[str]
-    slug: str
+    wikidata_p13491: Optional[str] = None
+    wikidata_id: Optional[str] = None
+    slug: Optional[str] = None
 
 
 class CrsProperties(BaseModel):

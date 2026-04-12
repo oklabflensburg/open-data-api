@@ -10,8 +10,24 @@ async def get_school_by_slug(session: AsyncSession, slug: str):
 
     stmt = text('''
     SELECT
-        ST_AsGeoJSON(s.wkb_geometry, 15)::jsonb AS geojson,
+        ST_AsGeoJSON(
+            COALESCE(
+                s.wkb_geometry,
+                CASE
+                    WHEN s.longitude IS NOT NULL AND s.latitude IS NOT NULL THEN
+                        ST_SetSRID(
+                            ST_MakePoint(
+                                s.longitude::double precision,
+                                s.latitude::double precision
+                            ),
+                            4326
+                        )
+                END
+            ),
+            15
+        )::jsonb AS geojson,
         s.id,
+        s.source_id,
         s.name,
         s.city,
         s.zipcode,
@@ -21,9 +37,13 @@ async def get_school_by_slug(session: AsyncSession, slug: str):
         s.fax,
         s.email,
         s.website,
+        s.longitude,
+        s.latitude,
         s.agency_number,
         st.name AS main_school_type,
         COALESCE(jsonb_agg(st2.name) FILTER (WHERE st2.name IS NOT NULL), '[]'::jsonb) AS school_types,
+        s.wikidata_p13491,
+        s.wikidata_id,
         s.slug
     FROM
         sh_school AS s
@@ -54,8 +74,24 @@ async def get_school_by_id(session: AsyncSession, school_id: int):
 
     stmt = text('''
     SELECT
-        ST_AsGeoJSON(s.wkb_geometry, 15)::jsonb AS geojson,
+        ST_AsGeoJSON(
+            COALESCE(
+                s.wkb_geometry,
+                CASE
+                    WHEN s.longitude IS NOT NULL AND s.latitude IS NOT NULL THEN
+                        ST_SetSRID(
+                            ST_MakePoint(
+                                s.longitude::double precision,
+                                s.latitude::double precision
+                            ),
+                            4326
+                        )
+                END
+            ),
+            15
+        )::jsonb AS geojson,
         s.id,
+        s.source_id,
         s.name,
         s.city,
         s.zipcode,
@@ -65,9 +101,13 @@ async def get_school_by_id(session: AsyncSession, school_id: int):
         s.fax,
         s.email,
         s.website,
+        s.longitude,
+        s.latitude,
         s.agency_number,
         st.name AS main_school_type,
         COALESCE(jsonb_agg(st2.name) FILTER (WHERE st2.name IS NOT NULL), '[]'::jsonb) AS school_types,
+        s.wikidata_p13491,
+        s.wikidata_id,
         s.slug
     FROM
         sh_school AS s
@@ -98,20 +138,43 @@ async def get_school_geometries_by_bbox(
     ymax: float
 ):
     stmt = text('''
+    WITH school_geometry AS (
+        SELECT
+            id,
+            school_type,
+            name,
+            COALESCE(
+                wkb_geometry,
+                CASE
+                    WHEN longitude IS NOT NULL AND latitude IS NOT NULL THEN
+                        ST_SetSRID(
+                            ST_MakePoint(
+                                longitude::double precision,
+                                latitude::double precision
+                            ),
+                            4326
+                        )
+                END
+            ) AS geom
+        FROM
+            sh_school
+    )
     SELECT
         id,
         school_type,
-        ST_AsGeoJSON(wkb_geometry, 15) AS geojson,
+        ST_AsGeoJSON(geom, 15) AS geojson,
         name AS label
     FROM
-        sh_school
+        school_geometry
     WHERE
+        geom IS NOT NULL
+    AND
         ST_WITHIN(
-            wkb_geometry,
+            geom,
             ST_MakeEnvelope(:xmin, :ymin, :xmax, :ymax, 4326)
         )
     AND
-        ST_IsValid(wkb_geometry)
+        ST_IsValid(geom)
     ''')
 
     sql = stmt.bindparams(xmin=xmin, ymin=ymin, xmax=xmax, ymax=ymax)
@@ -128,21 +191,44 @@ async def get_school_geometries_by_lat_lng(
     radius: int
 ):
     stmt = text('''
+    WITH school_geometry AS (
+        SELECT
+            id,
+            school_type,
+            name,
+            COALESCE(
+                wkb_geometry,
+                CASE
+                    WHEN longitude IS NOT NULL AND latitude IS NOT NULL THEN
+                        ST_SetSRID(
+                            ST_MakePoint(
+                                longitude::double precision,
+                                latitude::double precision
+                            ),
+                            4326
+                        )
+                END
+            ) AS geom
+        FROM
+            sh_school
+    )
     SELECT
         id,
         school_type,
-        ST_AsGeoJSON(wkb_geometry, 15) AS geojson,
+        ST_AsGeoJSON(geom, 15) AS geojson,
         name AS label
     FROM
-        sh_school
+        school_geometry
     WHERE
+        geom IS NOT NULL
+    AND
         ST_DWithin(
-            wkb_geometry::geography,
+            geom::geography,
             ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography,
             :radius
         )
     AND
-        ST_IsValid(wkb_geometry)
+        ST_IsValid(geom)
     ''')
 
     sql = stmt.bindparams(lat=lat, lng=lng, radius=radius)
@@ -157,17 +243,40 @@ async def get_school_geometries_by_school_type(
     school_type: int
 ):
     stmt = text('''
+    WITH school_geometry AS (
+        SELECT
+            id,
+            school_type,
+            name,
+            COALESCE(
+                wkb_geometry,
+                CASE
+                    WHEN longitude IS NOT NULL AND latitude IS NOT NULL THEN
+                        ST_SetSRID(
+                            ST_MakePoint(
+                                longitude::double precision,
+                                latitude::double precision
+                            ),
+                            4326
+                        )
+                END
+            ) AS geom
+        FROM
+            sh_school
+    )
     SELECT
         id,
         school_type,
-        ST_AsGeoJSON(wkb_geometry, 15) AS geojson,
+        ST_AsGeoJSON(geom, 15) AS geojson,
         name AS label
     FROM
-        sh_school
+        school_geometry
     WHERE
         (school_type & :school_type) != 0
     AND
-        ST_IsValid(wkb_geometry)
+        geom IS NOT NULL
+    AND
+        ST_IsValid(geom)
     ''')
 
     sql = stmt.bindparams(school_type=school_type)
